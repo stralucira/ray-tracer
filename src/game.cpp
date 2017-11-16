@@ -18,7 +18,8 @@ void Game::HandleInput( float dt ) { }
 void Game::Tick( float dt )
 {
 	screen->Clear( 0 );
-	screen->Print( "Hello world", 2, 2, 0xffffff );
+	screen->Print( "Hello World", 100, 100, 0xffffff );
 	screen->Line( 2, 10, 66, 10, 0xff0000 );
 	screen->Line( 30, 30, 30, 50, 0xff0000  );
+	screen->Plot(50, 50 , 0xff0000 );
 }
