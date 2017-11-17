@@ -1,0 +1,9 @@
+/build/
+
+/documentation/
+
+.dll
+.bat
+.sh
+.sln
+.txt
