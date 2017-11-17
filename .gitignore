@@ -2,8 +2,15 @@
 
 /documentation/
 
-.dll
-.bat
-.sh
-.sln
-.txt
+/lib/
+
+Makefile
+
+*.cmake
+*.pdb
+*.dll
+*.bat
+*.sh
+*.sln
+*.txt
+*.vcxproj
