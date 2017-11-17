@@ -20,7 +20,7 @@ Sphere::~Sphere()
 {
 }
 
-void Sphere::IntersectSphere( Ray ray )
+bool Sphere::IntersectSphere( Ray ray )
 {
 float3 c = this->center - ray.orig;
 
@@ -28,11 +28,12 @@ float t = dot( c, ray.dir );
 float3 q = c - ray.dir * t;
 
 float p2 = dot( q, q );
-if (p2 > this->radius2) return; // r2 = r * r
+if (p2 > this->radius2) return false; // r2 = r * r
 t -= sqrt(this->radius2-p2);
 
 if ((t < ray.t) && (t > 0)){
 	ray.t = t;
-}
+	return true;
+} else return false; 
 // or: ray.t = min( ray.t, max( 0, t ) );
 }

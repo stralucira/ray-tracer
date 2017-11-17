@@ -12,7 +12,7 @@ public:
 	~Sphere();
 
 	
-	void IntersectSphere( Ray ray );
+	bool IntersectSphere( Ray ray );
 	
 	//Ray getNormal(Vector3 point) override;
 

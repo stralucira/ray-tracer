@@ -1,5 +1,6 @@
 #include "Primitive.h"
 #include "template.h"
+#include <stdlib.h>
 
 class Triangle : public Primitive
 {
@@ -11,7 +12,7 @@ public:
 	~Triangle();
 	
 
-	void IntersectTriangle( Ray ray );
+	bool IntersectTriangle( Ray ray );
 	//Ray getNormal(float3 point) override;
 
 private:
