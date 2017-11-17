@@ -1,4 +1,5 @@
 #include "Primitive.h"
+#include "template.h"
 
 class Sphere :
 	public Primitive
@@ -11,12 +12,12 @@ public:
 	~Sphere();
 
 	
-	//float intersects(Ray r) override;
-
+	void IntersectSphere( Ray ray );
 	
 	//Ray getNormal(Vector3 point) override;
 
 private:
 	float3 center;
 	float radius;
+	float radius2;
 };
