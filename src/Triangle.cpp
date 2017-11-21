@@ -21,6 +21,7 @@ Triangle::~Triangle()
 {
 }
 
+
 // from https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 bool Triangle::IntersectTriangle( Ray ray ) {
 

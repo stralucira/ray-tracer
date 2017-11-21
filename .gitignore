@@ -4,6 +4,8 @@
 
 /lib/
 
+/ray-tracer.xcodeproj/
+
 Makefile
 
 *.cmake
@@ -14,3 +16,7 @@ Makefile
 *.sln
 *.txt
 *.vcxproj
+*.xcodeproj
+*.plist
+*.pbxproj
+*.xcuserstate

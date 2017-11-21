@@ -1,6 +1,5 @@
 #include "Camera.h"
 
-
 Camera::Camera(){
 	this->pos = float3(0, 0, 0);
 	this->dir = float3(0, 0, 1);
