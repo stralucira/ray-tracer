@@ -11,7 +11,7 @@ public:
     
     Ray getRay(float x, float y);
     
-    float3 calculateScreen();
+    void calculateScreen();
     Ray generateRay(float2 p);
 	
 	float3 pos;

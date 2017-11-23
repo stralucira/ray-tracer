@@ -12,7 +12,7 @@ Camera::Camera(float3 pos, float3 dir){
 		this->d = 1;
 }
 
-float3 Camera::calculateScreen(){
+void Camera::calculateScreen(){
     screenCenter = pos + dir*d;
     
     p0.x = screenCenter.x - 1;
@@ -23,8 +23,6 @@ float3 Camera::calculateScreen(){
     
     p2.x = screenCenter.x - 1;
     p2.y = screenCenter.x + 1;
-    
-
 }
 
 Ray Camera::generateRay(float2 p){

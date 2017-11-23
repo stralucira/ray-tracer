@@ -1,4 +1,5 @@
 #include "template.h"
+#include "Material.h"
 #include "Ray.h"
 
 class Primitive
