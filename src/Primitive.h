@@ -1,8 +1,6 @@
 #include "template.h"
 #include "Ray.h"
 
-enum Material { DIFFUSE, MIRROR, DIELECTRIC };
-
 class Primitive
 {
 protected:

@@ -1,8 +1,18 @@
+/.vs/
+
 /build/
+
+/Debug/
+
+/dlls_x64/
+
+/dlls_x86/
 
 /documentation/
 
 /lib/
+
+/Release/
 
 /ray-tracer.xcodeproj/
 
@@ -20,3 +30,4 @@ Makefile
 *.plist
 *.pbxproj
 *.xcuserstate
+
