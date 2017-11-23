@@ -1,4 +1,5 @@
 #include "template.h"
+#include "Ray.h"
 
 class Camera
 {
@@ -7,8 +8,17 @@ public:
 	Camera();
 	Camera(float3 pos, float3 dir);
 	~Camera();
+    
+    Ray getRay(float x, float y);
+    
+    float3 calculateScreen();
+    Ray generateRay(float2 p);
 	
 	float3 pos;
 	float3 dir;
-	float focalDistance = 0;
+	float d = 1;
+    float3 screenCenter;
+    float3 p0,p1,p2;
+    
+    float2 p;
 };

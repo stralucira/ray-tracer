@@ -8,7 +8,6 @@ Ray::Ray(float3 orig, float3 dir)
 	this->t = 0; 
 }
 
-
 Ray::~Ray()
 {
 }

@@ -29,7 +29,7 @@ float3 q = c - ray.dir * t;
 
 float p2 = dot( q, q );
 if (p2 > this->radius2) return false; // r2 = r * r
-t -= sqrt(this->radius2-p2);
+t -= sqrtf(this->radius2-p2);
 
 if ((t < ray.t) && (t > 0)){
 	ray.t = t;
