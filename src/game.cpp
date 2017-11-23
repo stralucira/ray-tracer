@@ -3,7 +3,16 @@
 // -----------------------------------------------------------
 // Initialize the game
 // -----------------------------------------------------------
-void Game::Init() { }
+void Game::Init() {
+    
+    RayTracer rayTracer = new RayTracer();
+    Camera cam = new Camera();
+    
+    Triange testTriangle = new Triangle();
+    float3 color;
+    int c;
+    
+}
 
 void Game::Shutdown() { }
 
@@ -30,4 +39,14 @@ void Game::Tick( float dt )
 	// (int)(cc.x*255)
 
 	// c = b + ( g << 8 ) + ( r << 16 )
+    
+    
+    
+    for(int x=0; x< SCRWIDTH ; x++){
+        for(int y=0 ; y < SCRHEIGHT ; y++){
+            color = rayTracer.getColor(cam,testTriangle);
+            c = color.z + ( color.y << 8 ) + ( color.x << 16 );
+            screen->Plot(x, y ,c );
+        }
+    }
 }

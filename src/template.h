@@ -75,6 +75,7 @@ extern "C"
 //#include <immintrin.h>
 
 #include "game.h"
+#include "Ray.h"
 
 using namespace Tmpl8;				// to use template classes
 using namespace glm;
