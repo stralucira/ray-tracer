@@ -75,7 +75,6 @@ extern "C"
 //#include <immintrin.h>
 
 #include "game.h"
-#include "Ray.h"
 
 using namespace Tmpl8;				// to use template classes
 using namespace glm;
@@ -345,3 +344,11 @@ mat4 operator * ( const mat4& a, const mat4& b );
 }; // namespace Tmpl8
 
 // TODO: Include your own headers for your own code here
+#include "Material.h"
+#include "Ray.h"
+#include "Primitive.h"
+#include "Camera.h"
+#include "Triangle.h"
+#include "Sphere.h"
+#include "RayTracer.h"
+#include "game.h"

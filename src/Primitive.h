@@ -1,6 +1,6 @@
-#include "template.h"
-#include "Material.h"
+#pragma once
 
+#include "template.h"
 
 class Primitive
 {

@@ -3,6 +3,8 @@
 #define SCRWIDTH	 800
 #define SCRHEIGHT	 600
 
+#include "template.h"
+
 namespace Tmpl8 {
 
 class Surface;

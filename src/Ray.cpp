@@ -1,5 +1,8 @@
-#include "Ray.h"
+#include "template.h"
 
+Ray::Ray()
+{
+}
 
 Ray::Ray(float3 orig, float3 dir)
 {

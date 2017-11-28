@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "template.h"
 
 Camera::Camera(){
 	this->pos = float3(0, 0, 0);

@@ -1,4 +1,5 @@
-#include "Primitive.h"
+#pragma once
+
 #include "template.h"
 
 class Sphere :

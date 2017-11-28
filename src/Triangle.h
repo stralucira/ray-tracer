@@ -1,6 +1,6 @@
-#include "Primitive.h"
+#pragma once
 #include "template.h"
-#include "Ray.h"
+
 #include <stdlib.h>
 
 class Triangle : public Primitive

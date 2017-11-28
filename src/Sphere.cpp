@@ -1,4 +1,4 @@
-#include "Sphere.h"
+#include "template.h"
 #include <math.h>
 
 Sphere::Sphere()

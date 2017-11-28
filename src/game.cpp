@@ -1,16 +1,23 @@
 #include "template.h"
 
+
 // -----------------------------------------------------------
 // Initialize the game
 // -----------------------------------------------------------
+RayTracer* rayTracer;
+Camera* cam;
+Triangle* testTriangle;
+int c;
+float3 color;
+
 void Game::Init() {
     
-    RayTracer rayTracer = new RayTracer();
-    Camera cam = new Camera();
+    rayTracer = new RayTracer();
+    cam = new Camera();
     
-    Triange testTriangle = new Triangle();
-    float3 color;
-    int c;
+    testTriangle = new Triangle();
+    
+    
     
 }
 
@@ -44,8 +51,8 @@ void Game::Tick( float dt )
     
     for(int x=0; x< SCRWIDTH ; x++){
         for(int y=0 ; y < SCRHEIGHT ; y++){
-            color = rayTracer.getColor(cam,testTriangle);
-            c = color.z + ( color.y << 8 ) + ( color.x << 16 );
+            rayTracer->getColor(x, y, cam, testTriangle);
+            c = color.z + ( (int) color.y << 8 ) + ( (int) color.x << 16 );
             screen->Plot(x, y ,c );
         }
     }
