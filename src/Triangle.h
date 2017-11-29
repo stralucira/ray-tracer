@@ -14,7 +14,7 @@ public:
 	
 
 	bool IntersectTriangle( Ray ray );
-	//Ray getNormal(float3 point) override;
+	float3 getNormal(float3 point);
 
 private:
 	float3 a;

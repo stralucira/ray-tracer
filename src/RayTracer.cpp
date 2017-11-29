@@ -4,7 +4,9 @@ RayTracer::RayTracer() {
     
 }
 
-void RayTracer::getColor(int x, int y, Camera* cam , Triangle* tri){
+
+
+void RayTracer::getColor(int x, int y, Camera* cam, std::vector<pointLight*> pointLights, Triangle* tri){
 	
     float u = x/SCRWIDTH;
     float v = y/SCRHEIGHT;
@@ -15,8 +17,8 @@ void RayTracer::getColor(int x, int y, Camera* cam , Triangle* tri){
     
     bool intersects = tri->IntersectTriangle(r);
     if(intersects){
-    printf("yes\n");
+    //printf("yes\n");
     } else {
-         printf("intersects\n");
+         //printf("intersects\n");
     }
 }

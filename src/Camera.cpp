@@ -16,13 +16,13 @@ void Camera::calculateScreen(){
     screenCenter = pos + dir*d;
     
     p0.x = screenCenter.x - 1;
-    p0.y = screenCenter.x - 1;
+    p0.y = screenCenter.y - 1;
     
     p1.x = screenCenter.x + 1;
-    p1.y = screenCenter.x - 1;
+    p1.y = screenCenter.y - 1;
     
     p2.x = screenCenter.x - 1;
-    p2.y = screenCenter.x + 1;
+    p2.y = screenCenter.y + 1;
 }
 
 Ray Camera::generateRay(float2 p){

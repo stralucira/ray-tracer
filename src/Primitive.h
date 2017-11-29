@@ -15,4 +15,6 @@ public:
 	{
 		return this->mat;
 	}
+    
+    float3 getNormal(float3 point);
 };

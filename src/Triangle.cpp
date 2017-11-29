@@ -46,3 +46,7 @@ bool Triangle::IntersectTriangle( Ray ray ) {
 	t = ac.dot(qvec) * invDet;
 	return true;
 };
+
+float3 Triangle::getNormal(float3 point) {
+    return (a - c).cross(b - c).normalized();
+}
