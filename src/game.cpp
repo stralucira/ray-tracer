@@ -6,6 +6,7 @@
 RayTracer* rayTracer;
 Camera* cam;
 Primitive* testTriangle;
+Primitive* testSphere;
 Material* defaultMaterial;
 int c;
 float3 color;
@@ -19,9 +20,11 @@ void Game::Init() {
     
     testTriangle = new Triangle();
     
+    testSphere = new Sphere();
+    
     light = new pointLight(float3(0,0,0), defaultMaterial);
     
-    primList.push_back(testTriangle);
+    primList.push_back(testSphere);
     
 }
 
