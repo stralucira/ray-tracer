@@ -4,25 +4,24 @@ Camera::Camera(){
 	this->pos = float3(0, 0, 0);
 	this->dir = float3(0, 0, 1);
 	this->d = 1;
+
+	this->calculateScreen();
 }
 	
 Camera::Camera(float3 pos, float3 dir){
-		this->pos = pos;
-		this->dir = dir;
-		this->d = 1;
+	this->pos = pos;
+	this->dir = dir;
+	this->d = 1;
+
+	this->calculateScreen();
 }
 
 void Camera::calculateScreen(){
     screenCenter = pos + dir*d;
     
-    p0.x = screenCenter.x - 1;
-    p0.y = screenCenter.y - 1;
-    
-    p1.x = screenCenter.x + 1;
-    p1.y = screenCenter.y - 1;
-    
-    p2.x = screenCenter.x - 1;
-    p2.y = screenCenter.y + 1;
+	p0 = screenCenter + float3(-1, -1, 0);
+	p1 = screenCenter + float3(1, -1, 0);
+	p2 = screenCenter + float3(-1, 1, 0);
 }
 
 Ray Camera::generateRay(float2 p){

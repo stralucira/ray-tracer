@@ -35,10 +35,10 @@ void Game::HandleInput( float dt ) { }
 void Game::Tick( float dt )
 {
 	screen->Clear( 0 );
-	screen->Print( "Hello World", 100, 100, 0xffffff );
-	screen->Line( 2, 10, 66, 10, 0xff0000 );
-	screen->Line( 30, 30, 30, 50, 0xff0000  );
-	screen->Plot(50, 50 , 0xff0000 );
+	//screen->Print( "Hello World", 100, 100, 0xffffff );
+	//screen->Line( 2, 10, 66, 10, 0xff0000 );
+	//screen->Line( 30, 30, 30, 50, 0xff0000  );
+	//screen->Plot(50, 50 , 0xff0000 );
 
 	//color in plot is integer 32 bit
 	//store ray tracer colors in vec3
@@ -48,8 +48,9 @@ void Game::Tick( float dt )
     for(int x=0; x< SCRWIDTH ; x++){
         for(int y=0 ; y < SCRHEIGHT ; y++){
             color = rayTracer->getColor(x, y, cam, light, testTriangle);
-            c = color.z + ( (int) color.y << 8 ) + ( (int) color.x << 16 );
-            //screen->Plot(x, y ,c );
+			
+			c = (int)(color.z*255.0f) + ((int)(color.y*255.0f) << 8) + ((int)(color.x*255.0) << 16);
+            screen->Plot(x, y ,c );
         }
     }
 }

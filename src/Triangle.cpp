@@ -3,9 +3,9 @@
 
 Triangle::Triangle()
 {
-	this->a = float3(0, 1, 0);
-	this->b = float3(1, 0, 0);
-	this->c = float3(-1, 0, 0);
+	this->a = float3(0, 1, 2);
+	this->b = float3(1, 0, 2);
+	this->c = float3(-1, 0, 2);
     this->mat = new Material(float4(1,1,1,1));
 }
 
@@ -38,11 +38,11 @@ float3 Triangle::IntersectTriangle( Ray ray ) {
 	float3 tvec = ray.orig - a;
 	u = tvec.dot(pvec)*invDet;
 
-	if (u < 0 || u > 1) return false;
+	if (u < 0 || u > 1) return -1;
 
 	float3 qvec = tvec.cross(ab);
 	v = ray.dir.dot(qvec) * invDet;
-	if (v < 0 || u + v > 1) return false;
+	if (v < 0 || u + v > 1) return -1;
 
 	t = ac.dot(qvec) * invDet;
 	return float3(ray.orig + ray.dir*t);
