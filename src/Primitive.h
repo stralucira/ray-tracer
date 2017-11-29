@@ -5,7 +5,7 @@
 class Primitive
 {
 public:
-	Material* mat;
+	Material* mat = nullptr;
 
 	virtual ~Primitive()
 	{

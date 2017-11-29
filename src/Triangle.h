@@ -19,5 +19,4 @@ public:
 	float3 b;
 	float3 c;
 	float3 normal;
-    Material* mat;
 };

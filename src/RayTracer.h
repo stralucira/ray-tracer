@@ -20,5 +20,5 @@ public:
 	RayTracer(float3 pos, float3 dir);
 	~RayTracer();
     
-    float3 getColor(int x, int y, Camera* cam, pointLight* light, Primitive* prim);
+    float3 getColor(int x, int y, Camera* cam, pointLight* light, std::vector<Primitive*> primList);
 };

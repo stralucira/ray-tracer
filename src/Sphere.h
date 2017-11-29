@@ -18,5 +18,4 @@ public:
 	float3 center;
 	float radius;
 	float radius2;
-    Material* mat;
 };
