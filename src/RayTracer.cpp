@@ -6,7 +6,7 @@ RayTracer::RayTracer() {
 
 
 
-void RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, Triangle* tri){
+float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, Triangle* tri){
 	
     float u = x/SCRWIDTH;
     float v = y/SCRHEIGHT;
@@ -19,4 +19,5 @@ void RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, Triangle*
     float3 normal = tri->getNormal(hitPoint);
     Ray shadowRay = Ray(hitPoint, (light->pos - hitPoint).normalized());
 
+    return float3(tri->mat->specs.x, tri->mat->specs.y, tri->mat->specs.z);
 }

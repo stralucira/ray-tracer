@@ -8,7 +8,7 @@ Sphere::Sphere()
 	this->radius2 = 5*5;
 }
 
-Sphere::Sphere(float3 c, float r, Material mat)
+Sphere::Sphere(float3 c, float r, Material* mat)
 {
 	this->center = c;
 	this->radius = r;

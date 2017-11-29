@@ -47,7 +47,7 @@ void Game::Tick( float dt )
     
     for(int x=0; x< SCRWIDTH ; x++){
         for(int y=0 ; y < SCRHEIGHT ; y++){
-            rayTracer->getColor(x, y, cam, light, testTriangle);
+            color = rayTracer->getColor(x, y, cam, light, testTriangle);
             c = color.z + ( (int) color.y << 8 ) + ( (int) color.x << 16 );
             //screen->Plot(x, y ,c );
         }

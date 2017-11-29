@@ -21,5 +21,5 @@ public:
 	RayTracer(float3 pos, float3 dir);
 	~RayTracer();
     
-    void getColor(int x, int y, Camera* cam, pointLight* light, Triangle* tri);
+    float3 getColor(int x, int y, Camera* cam, pointLight* light, Triangle* tri);
 };

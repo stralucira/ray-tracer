@@ -6,7 +6,12 @@ class Material
 {
 public:
     Material(){
-        this->mat = float4(1, 1, 1, 1);
+        this->specs = float4(1, 1, 1, 1);
     }
-	float4 mat;
+    
+    Material(float4 specs) {
+        this->specs = specs;
+    }
+    
+	float4 specs;
 };

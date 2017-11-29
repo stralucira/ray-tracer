@@ -5,13 +5,13 @@
 class Primitive
 {
 protected:
-	Material mat;
+	Material* mat;
 public:
 	virtual ~Primitive()
 	{
 	}
 
-	Material getMaterial() const
+	Material* getMaterial() const
 	{
 		return this->mat;
 	}
