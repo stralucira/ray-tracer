@@ -6,7 +6,7 @@ Triangle::Triangle()
 	this->a = float3(0, 1, 2);
 	this->b = float3(1, 0, 2);
 	this->c = float3(-1, 0, 2);
-    this->mat = new Material(float4(1,1,1,1));
+    this->mat = new Material(float4(1,0,1,1));
 }
 
 Triangle::Triangle(float3 a, float3 b, float3 c, Material* mat)

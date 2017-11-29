@@ -15,18 +15,18 @@ float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::ve
     
     Ray r = cam->generateRay(p);
     
-    Primitive* test = primList[0];
+    float3 color = float3(0,0,0);
+    Primitive* test;
     
-    float3 hitPoint = test->intersect(r);
-	if (hitPoint.x == -1)
-	{
-		return float3(0, 0, 0);
-	}
-	else
-	{
-		float3 normal = test->getNormal(hitPoint);
-		Ray shadowRay = Ray(hitPoint, (light->pos - hitPoint).normalized());
+    for(int k=0; k<primList.size() ; k++) {
+        test = primList[k];
+        float3 hitPoint = test->intersect(r);
+        if (hitPoint.x != -1) {
+            float3 normal = test->getNormal(hitPoint);
+            Ray shadowRay = Ray(hitPoint, (light->pos - hitPoint).normalized());
         
-		return float3(test->mat->specs.x, test->mat->specs.y, test->mat->specs.z);
-	}
+            color = color + float3(test->mat->specs.x, test->mat->specs.y, test->mat->specs.z);
+        }
+    }
+    return color;
 }

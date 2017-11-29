@@ -6,6 +6,7 @@ Sphere::Sphere()
 	this->center = float3(0, 0, 10);
 	this->radius = 1;
 	this->radius2 = 1*1;
+    this->mat = new Material(float4(0,1,1,1));
 }
 
 Sphere::Sphere(float3 c, float r, Material* mat)
