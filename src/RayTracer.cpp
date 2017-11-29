@@ -6,7 +6,7 @@ RayTracer::RayTracer() {
 
 
 
-void RayTracer::getColor(int x, int y, Camera* cam, std::vector<pointLight*> pointLights, Triangle* tri){
+void RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, Triangle* tri){
 	
     float u = x/SCRWIDTH;
     float v = y/SCRHEIGHT;
@@ -15,10 +15,8 @@ void RayTracer::getColor(int x, int y, Camera* cam, std::vector<pointLight*> poi
     
     Ray r = cam->generateRay(p);
     
-    bool intersects = tri->IntersectTriangle(r);
-    if(intersects){
-    //printf("yes\n");
-    } else {
-         //printf("intersects\n");
-    }
+    float3 hitPoint = tri->IntersectTriangle(r);
+    float3 normal = tri->getNormal(hitPoint);
+    Ray shadowRay = Ray(hitPoint, (light->pos - hitPoint).normalized());
+
 }

@@ -13,7 +13,7 @@ public:
 
 	bool IntersectSphere( Ray ray );
 	
-	//Ray getNormal(Vector3 point) override;
+	float3 getNormal(float3 point);
 
 private:
 	float3 center;

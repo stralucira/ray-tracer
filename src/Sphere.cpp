@@ -37,3 +37,7 @@ if ((t < ray.t) && (t > 0)){
 } else return false; 
 // or: ray.t = min( ray.t, max( 0, t ) );
 }
+
+float3 Sphere::getNormal(float3 point){
+    return (point - center).normalized();
+}

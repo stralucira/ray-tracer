@@ -13,7 +13,7 @@ public:
 	~Triangle();
 	
 
-	bool IntersectTriangle( Ray ray );
+	float3 IntersectTriangle( Ray ray );
 	float3 getNormal(float3 point);
 
 private:

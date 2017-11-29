@@ -6,19 +6,21 @@
 RayTracer* rayTracer;
 Camera* cam;
 Triangle* testTriangle;
+Material* defaultMaterial;
 int c;
 float3 color;
-std::vector<pointLight*> pointLights;
+pointLight* light;
 
 void Game::Init() {
     
     rayTracer = new RayTracer();
     cam = new Camera();
+    defaultMaterial = new Material();
     
     testTriangle = new Triangle();
     
-    pointLights = std::vector<pointLight*>();
-    pointLights.reserve(3);
+    
+    light = new pointLight(float3(0,0,0), defaultMaterial);
 }
 
 void Game::Shutdown() { }
@@ -45,7 +47,7 @@ void Game::Tick( float dt )
     
     for(int x=0; x< SCRWIDTH ; x++){
         for(int y=0 ; y < SCRHEIGHT ; y++){
-            rayTracer->getColor(x, y, cam, pointLights, testTriangle);
+            rayTracer->getColor(x, y, cam, light, testTriangle);
             c = color.z + ( (int) color.y << 8 ) + ( (int) color.x << 16 );
             //screen->Plot(x, y ,c );
         }
