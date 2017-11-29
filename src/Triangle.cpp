@@ -24,7 +24,7 @@ Triangle::~Triangle()
 
 
 // from https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
-float3 Triangle::IntersectTriangle( Ray ray ) {
+float3 Triangle::intersect( Ray ray ) {
 
 	float t,u,v;
 
