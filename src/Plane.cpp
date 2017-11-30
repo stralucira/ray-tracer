@@ -2,8 +2,9 @@
 
 Plane::Plane()
 {
-	this->position = float3(0,0,20);
-	this->normal = float3(0,0,-1);
+	this->position = float3(0, 0, 20);
+	this->normal = float3(0, 0, -1);
+	this->mat = new Material(float4(0.1, 0.1, 0.1, 1));
 }
 
 Plane::Plane(float3 position, float3 normal)

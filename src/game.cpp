@@ -30,7 +30,7 @@ void Game::Init() {
     
     primList.push_back(testSphere);
     primList.push_back(testTriangle);
-    //primList.push_back(testPlane);
+    primList.push_back(testPlane);
 }
 
 void Game::Shutdown() { }
