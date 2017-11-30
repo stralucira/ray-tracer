@@ -43,6 +43,7 @@ void Game::HandleInput( float dt ) { }
 // -----------------------------------------------------------
 void Game::Tick( float dt )
 {
+	moveCamera();
 	screen->Clear( 0 );
     
     for(int x=0; x < SCRWIDTH ; x++){
@@ -54,4 +55,42 @@ void Game::Tick( float dt )
             screen->Plot(x, y, c);
         }
     }
+}
+
+void Game::moveCamera()
+{
+	if (GetAsyncKeyState(VK_UP))
+	{
+		cam->pos.z += 0.1;
+	}
+	if (GetAsyncKeyState(VK_DOWN))
+	{
+		cam->pos.z -= 0.1;
+	}
+	if (GetAsyncKeyState(VK_LEFT))
+	{
+		cam->pos.x -= 0.1;
+	}
+	if (GetAsyncKeyState(VK_RIGHT))
+	{
+		cam->pos.x += 0.1;
+	}
+	if (GetAsyncKeyState(0x57))
+	{
+		cam->pos.y -= 0.1;
+	}
+	if (GetAsyncKeyState(0x53))
+	{
+		cam->pos.y += 0.1;
+	}
+	if (GetAsyncKeyState(VK_OEM_PLUS))
+	{
+		cam->d += 0.1;
+		cam->calculateScreen();
+	}
+	if (GetAsyncKeyState(VK_OEM_MINUS))
+	{
+		cam->d -= 0.1;
+		cam->calculateScreen();
+	}
 }

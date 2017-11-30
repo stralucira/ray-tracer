@@ -15,6 +15,8 @@
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\RayTracer.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game.h" />
@@ -670,6 +672,8 @@
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\tiny_obj_loader.h" />
     <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\RayTracer.h" />
+    <ClInclude Include="src\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\FreeImage\lib64\freeimage.lib">
