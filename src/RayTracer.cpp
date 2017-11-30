@@ -6,8 +6,8 @@ RayTracer::RayTracer() {
 
 float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::vector<Primitive*> primList){
 	
-	float u = (float)x / (float)SCRWIDTH;
-	float v = (float)y / (float)SCRHEIGHT;
+	float u = (float)x / SCRWIDTH;
+	float v = (float)y / SCRHEIGHT;
     
 	float2 p = float2(u, v);
     

@@ -13,7 +13,7 @@ float3 color;
 pointLight* light;
 std::vector<Primitive*> primList;
 
-float3 aspectRatio = SCRHEIGHT/SCRWIDTH;
+//float3 aspectRatio = SCRHEIGHT/SCRWIDTH;
 
 void Game::Init() {
     
@@ -37,13 +37,32 @@ void Game::Shutdown() { }
 // Input handling
 // -----------------------------------------------------------
 void Game::HandleInput( float dt ) { }
+void Game::KeyDown(int a_Key)
+{
+	if (a_Key == 79)
+	{
+		cam->pos.x += 0.1;
+	}
+	if (a_Key == 80)
+	{
+		cam->pos.x -= 0.1;
+	}
+	if (a_Key == 81)
+	{
+		cam->pos.z -= 0.1;
+	}
+	if (a_Key == 82)
+	{
+		cam->pos.z += 0.1;
+	}
+}
 
 // -----------------------------------------------------------
 // Main game tick function
 // -----------------------------------------------------------
 void Game::Tick( float dt )
 {
-	moveCamera();
+	//moveCamera();
 	screen->Clear( 0 );
     
     for(int x=0; x < SCRWIDTH ; x++){
@@ -57,6 +76,7 @@ void Game::Tick( float dt )
     }
 }
 
+/*
 void Game::moveCamera()
 {
 	if (GetAsyncKeyState(VK_UP))
@@ -94,3 +114,4 @@ void Game::moveCamera()
 		cam->calculateScreen();
 	}
 }
+*/
