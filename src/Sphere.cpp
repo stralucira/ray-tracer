@@ -39,7 +39,7 @@ Sphere::~Sphere()
 //// or: ray.t = min( ray.t, max( 0, t ) );
 //}
 
-float3 Sphere::intersect(Ray ray)
+float Sphere::intersect(Ray ray)
 {
 	float t0, t1; // solutions for t if the ray intersects
 
@@ -62,7 +62,7 @@ float3 Sphere::intersect(Ray ray)
 
 	ray.t = t0;
 
-	return float3(ray.orig + ray.dir*ray.t);
+	return ray.t;
 }
 
 float3 Sphere::getNormal(float3 point)

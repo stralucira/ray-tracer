@@ -21,4 +21,6 @@ public:
 	~RayTracer();
     
     float3 getColor(int x, int y, Camera* cam, pointLight* light, std::vector<Primitive*> primList);
+
+    float3 DirectIllumination(float3 hitPoint, float3 direction, float3 normal, std::vector<Primitive*> primList );
 };
