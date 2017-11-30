@@ -7,6 +7,8 @@ class Primitive
 public:
 	Material* mat = nullptr;
 
+
+
 	virtual ~Primitive()
 	{
 	}
@@ -15,9 +17,7 @@ public:
 	{
 		return this->mat;
 	}
-    
+
+	virtual bool intersect(Ray ray) = 0;
     virtual float3 getNormal(float3 point) = 0;
-    
-    virtual float intersect( Ray ray ) = 0;
-    
 };

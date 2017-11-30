@@ -12,11 +12,15 @@
     </ClCompile>
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Ray.cpp" />
-    <ClCompile Include="src\Sphere.cpp" />
-    <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\RayTracer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\Triangle.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sphere.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\game.h" />
@@ -666,14 +670,20 @@
       <Filter>Library</Filter>
     </ClInclude>
     <ClInclude Include="src\Camera.h" />
-    <ClInclude Include="src\Primitive.h" />
     <ClInclude Include="src\Ray.h" />
-    <ClInclude Include="src\Sphere.h" />
-    <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\tiny_obj_loader.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\RayTracer.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\Triangle.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sphere.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Primitive.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\FreeImage\lib64\freeimage.lib">
@@ -1087,6 +1097,9 @@
   <ItemGroup>
     <Filter Include="Library">
       <UniqueIdentifier>{45b22f88-0da7-4bc0-97e9-e6ffc450baed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitives">
+      <UniqueIdentifier>{706a009a-5605-4c5c-980d-14914c4e2c75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

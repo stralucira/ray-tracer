@@ -26,7 +26,7 @@ float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::ve
 		test = primList[k];
 		distance = test->intersect(r);
 
-		if(distance < nearest & distance != -1) {
+		if(distance < nearest && distance != -1) {
 			nearest = distance;
 			hitPrim = test;
 		}
@@ -55,5 +55,5 @@ float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::ve
 
 
 float3 RayTracer::DirectIllumination(float3 hitPoint, float3 direction, float3 normal, std::vector<Primitive*> primList ){
-	return float3(1,1,1);
+	return float3(0.1,0.1,0.1);
 }
