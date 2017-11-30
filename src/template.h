@@ -70,6 +70,7 @@ extern "C"
 #include <stdio.h>
 #include "fcntl.h"
 #include <memory>
+#include <algorithm>
 #include "emmintrin.h"
 
 //#include <immintrin.h>
@@ -350,6 +351,7 @@ mat4 operator * ( const mat4& a, const mat4& b );
 #include "Camera.h"
 #include "Triangle.h"
 #include "Sphere.h"
+#include "Plane.h"
 #include "RayTracer.h"
 #include "game.h"
 

@@ -7,6 +7,7 @@ RayTracer* rayTracer;
 Camera* cam;
 Primitive* testTriangle;
 Primitive* testSphere;
+Primitive* testPlane;
 Material* defaultMaterial;
 int c;
 float3 color;
@@ -22,14 +23,14 @@ void Game::Init() {
     defaultMaterial = new Material();
     
     testTriangle = new Triangle();
-    
+    testPlane = new Plane();
     testSphere = new Sphere();
     
     light = new pointLight(float3(0,0,0), defaultMaterial);
     
     primList.push_back(testSphere);
     primList.push_back(testTriangle);
-    
+    //primList.push_back(testPlane);
 }
 
 void Game::Shutdown() { }
@@ -70,7 +71,8 @@ void Game::Tick( float dt )
             
             color = rayTracer->getColor(x, y, cam, light, primList);
 			
-			c = (int)(color.z*255.0f) + ((int)(color.y*255.0f) << 8) + ((int)(color.x*255.0) << 16);
+            // Clamped color values transformed to int
+			c = min((int)(color.z*255.0f),255) + (min((int)(color.y*255.0f),255) << 8) + (min((int)(color.x*255.0),255) << 16);
             screen->Plot(x, y, c);
         }
     }
