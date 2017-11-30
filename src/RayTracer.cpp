@@ -25,7 +25,7 @@ float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::ve
 	for (size_t k = 0; k < primList.size(); k++)
 	{
 		test = primList[k];
-		distance = test->intersect(r);
+		distance = test->intersect(&r);
 
 		if(distance < nearest & distance != -1) 
 		{
@@ -67,7 +67,7 @@ float3 RayTracer::DirectIllumination(float3 hitPoint, float3 reflectionDirection
 	for (size_t k = 0; k < primList.size(); k++)
 	{
 		test = primList[k];
-		distance = test->intersect(shadowRay);
+		distance = test->intersect(&shadowRay);
 	}
 
 	if(distance < nearest && distance != -1)

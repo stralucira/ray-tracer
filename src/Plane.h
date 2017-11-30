@@ -11,7 +11,7 @@ public:
 	Plane(float3 position, float3 normal);
 	~Plane();
 
-	float intersect( Ray ray );
+	float intersect( Ray* ray );
 	
 	float3 getNormal(float3 point);
 

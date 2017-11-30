@@ -39,12 +39,12 @@ Sphere::~Sphere()
 //// or: ray.t = min( ray.t, max( 0, t ) );
 //}
 
-float Sphere::intersect(Ray ray)
+float Sphere::intersect( Ray* ray )
 {
 	float t0, t1; // solutions for t if the ray intersects
 
-	float3 L = center - ray.orig;
-	float tca = L.dot(ray.dir);
+	float3 L = center - ray->orig;
+	float tca = L.dot(ray->dir);
 	if (tca < 0) return -1;
 	float d2 = L.dot(L) - tca * tca;
 	if (d2 > radius2) return -1;
@@ -60,9 +60,9 @@ float Sphere::intersect(Ray ray)
 		if (t0 < 0) return -1; // both t0 and t1 are negative
 	}
 
-	ray.t = t0;
+	ray->t = t0;
 
-	return ray.t;
+	return t0;
 }
 
 float3 Sphere::getNormal(float3 point)

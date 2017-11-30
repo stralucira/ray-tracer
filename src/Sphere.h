@@ -11,7 +11,7 @@ public:
 	Sphere(float3 c, float r, Material* mat);
 	~Sphere();
 
-	float intersect( Ray ray );
+	float intersect( Ray* ray );
 	
 	float3 getNormal(float3 point);
 
