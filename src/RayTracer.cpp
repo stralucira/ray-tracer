@@ -4,7 +4,8 @@ RayTracer::RayTracer() {
    
 }
 
-float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::vector<Primitive*> primList){
+float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::vector<Primitive*> primList)
+{
 	
 	float nearest = INFINITY;
 	Primitive* hitPrim;
@@ -26,34 +27,57 @@ float3 RayTracer::getColor(int x, int y, Camera* cam, pointLight* light, std::ve
 		test = primList[k];
 		distance = test->intersect(r);
 
-		if(distance < nearest & distance != -1) {
+		if(distance < nearest & distance != -1) 
+		{
 			nearest = distance;
 			hitPrim = test;
 		}
     }
 
-    if (nearest == INFINITY) {
+    if (nearest == INFINITY) 
+    {
     	return float3(0,0,0);
-    } else {
+    } 
+    else 
+    {
     	hitPoint = r.orig + r.dir*distance;
     	float3 normal = hitPrim->getNormal(hitPoint);
 
+    	color = color + float3(test->mat->specs.x, test->mat->specs.y, test->mat->specs.z);
 
-    	color += DirectIllumination(hitPoint, r.dir, normal, primList);
+    	float3 reflectionDirection = light->pos - hitPoint;
+
+    	color += DirectIllumination(hitPoint, reflectionDirection, normal, primList, light);
     }
-
-
-    if (hitPoint.x != -1)
-		{
-			float3 normal = test->getNormal(hitPoint);
-			Ray shadowRay = Ray(hitPoint, (light->pos - hitPoint).normalized());
-        
-			color = color + float3(test->mat->specs.x, test->mat->specs.y, test->mat->specs.z);
-        }
     return color;
 }
 
 
-float3 RayTracer::DirectIllumination(float3 hitPoint, float3 direction, float3 normal, std::vector<Primitive*> primList ){
-	return float3(1,1,1);
+float3 RayTracer::DirectIllumination(float3 hitPoint, float3 reflectionDirection, float3 normal, std::vector<Primitive*> primList, pointLight* light )
+{
+	
+	Ray shadowRay = Ray(hitPoint*0.01f, reflectionDirection);
+	float nearest = INFINITY;
+	float distance;
+
+	Primitive* test;
+
+	float dToLight = (light->pos - shadowRay.orig).length();
+
+	for (size_t k = 0; k < primList.size(); k++)
+	{
+		test = primList[k];
+		distance = test->intersect(shadowRay);
+	}
+
+	if(distance < nearest && distance != -1)
+	{
+			nearest = distance;
+			if(nearest < dToLight)
+			{
+				return float3(0.0,0.0,0.0);
+			}
+	}
+
+	return float3(1,1,1) * dot(normal,reflectionDirection) * (1/(distance*distance)) * float3(0.5/PI,0.5/PI,0.5/PI);
 }
