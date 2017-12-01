@@ -1,22 +1,20 @@
 #pragma once
-#include "template.h"
-
-#include <stdlib.h>
+#include "Primitive.h"
 
 class Triangle : public Primitive
 {
 public:
+	Triangle(float3 a, float3 b, float3 c)
+	{
+		this->a = a;
+		this->b = b;
+		this->c = c;
+		this->normal = ((a - b).cross(b - c)).normalized();
+	}
 	
-	Triangle();
-
-	Triangle(float3 a, float3 b, float3 c, Material* mat);
-	~Triangle();
-	
-	float intersect( Ray ray );
+	bool intersect(Ray* ray);
 	float3 getNormal(float3 point);
 
-	float3 a;
-	float3 b;
-	float3 c;
+	float3 a, b, c;
 	float3 normal;
 };

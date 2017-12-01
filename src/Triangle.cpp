@@ -1,53 +1,34 @@
 #include "template.h"
-#include <math.h> 
-
-Triangle::Triangle()
-{
-	this->a = float3(0, 1, 2);
-	this->b = float3(1, 0, 2);
-	this->c = float3(-1, 0, 2);
-    this->mat = new Material(float4(1,0,1,1));
-}
-
-Triangle::Triangle(float3 a, float3 b, float3 c, Material* mat)
-{
-	this->a = a;
-	this->b = b;
-	this->c = c;
-	this->normal = ((a - b).cross(b - c)).normalized();
-	this->mat = mat;
-}
-
-Triangle::~Triangle()
-{
-}
-
+#include "Triangle.h"
 
 // from https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
-float Triangle::intersect( Ray ray ) {
-
-	float t,u,v;
+bool Triangle::intersect(Ray* ray)
+{
+	float t, u, v;
 
 	float3 ab = b - a;
 	float3 ac = c - a;
-	float3 pvec = ray.dir.cross(ac);
+	float3 pvec = ray->dir.cross(ac);
 	float det = ab.dot(pvec);
 
-	float invDet = 1 / det; 
+	float invDet = 1 / det;
 
-	float3 tvec = ray.orig - a;
+	float3 tvec = ray->orig - a;
 	u = tvec.dot(pvec)*invDet;
 
-	if (u < 0 || u > 1) return -1;
+	if (u < 0 || u > 1) return false;
 
 	float3 qvec = tvec.cross(ab);
-	v = ray.dir.dot(qvec) * invDet;
-	if (v < 0 || u + v > 1) return -1;
+	v = ray->dir.dot(qvec) * invDet;
+	if (v < 0 || u + v > 1) return false;
 
 	t = ac.dot(qvec) * invDet;
-	return t;
+
+	return true;
 };
 
-float3 Triangle::getNormal(float3 point) {
-    return (a - c).cross(b - c).normalized();
+float3 Triangle::getNormal(float3 point)
+{
+	return this->normal;
+	//return (a - c).cross(b - c).normalized();
 }

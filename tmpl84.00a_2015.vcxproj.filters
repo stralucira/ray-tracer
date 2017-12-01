@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\game.cpp" />
-    <ClCompile Include="src\surface.cpp" />
-    <ClCompile Include="src\template.cpp" />
     <ClCompile Include="lib\glm\detail\dummy.cpp">
       <Filter>Library</Filter>
     </ClCompile>
@@ -13,7 +10,6 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\RayTracer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Triangle.cpp">
       <Filter>Primitives</Filter>
@@ -21,12 +17,23 @@
     <ClCompile Include="src\Sphere.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="src\RayTracer.cpp" />
+    <ClCompile Include="src\surface.cpp">
+      <Filter>Template</Filter>
+    </ClCompile>
+    <ClCompile Include="src\template.cpp">
+      <Filter>Template</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Light.cpp" />
+    <ClCompile Include="src\Primitive.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Template</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\game.h" />
     <ClInclude Include="src\pixel.h" />
-    <ClInclude Include="src\surface.h" />
-    <ClInclude Include="src\template.h" />
     <ClInclude Include="lib\glm\detail\_features.hpp">
       <Filter>Library</Filter>
     </ClInclude>
@@ -673,7 +680,6 @@
     <ClInclude Include="src\Ray.h" />
     <ClInclude Include="src\tiny_obj_loader.h" />
     <ClInclude Include="src\Material.h" />
-    <ClInclude Include="src\RayTracer.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Triangle.h">
       <Filter>Primitives</Filter>
@@ -683,6 +689,17 @@
     </ClInclude>
     <ClInclude Include="src\Primitive.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RayTracer.h" />
+    <ClInclude Include="src\surface.h">
+      <Filter>Template</Filter>
+    </ClInclude>
+    <ClInclude Include="src\template.h">
+      <Filter>Template</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Light.h" />
+    <ClInclude Include="src\game.h">
+      <Filter>Template</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -715,7 +732,6 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <None Include="tmpl84.00a_2015.VC.db" />
     <None Include="lib\glm\gtx\associated_min_max.inl">
       <Filter>Library</Filter>
     </None>
@@ -1085,6 +1101,9 @@
     <None Include="lib\glm\gtx\wrap.inl">
       <Filter>Library</Filter>
     </None>
+    <None Include="tmpl84.00a_2015.VC.db">
+      <Filter>Template</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="lib\glm\util\autoexp.txt">
@@ -1100,6 +1119,9 @@
     </Filter>
     <Filter Include="Primitives">
       <UniqueIdentifier>{706a009a-5605-4c5c-980d-14914c4e2c75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Template">
+      <UniqueIdentifier>{9d3397ee-4c46-4ef7-b09d-2dbdeae9c534}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

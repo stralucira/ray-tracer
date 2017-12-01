@@ -1,4 +1,4 @@
-#include "template.h"
+#pragma once
 
 class Material
 {

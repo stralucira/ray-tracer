@@ -1,18 +1,17 @@
 #pragma once
+#include "Primitive.h"
 
-#include "template.h"
-
-class Sphere :
-	public Primitive
+class Sphere : public Primitive
 {
 public:
-	Sphere();
+	Sphere(float3 c, float r)
+	{
+		this->center = c;
+		this->radius = r;
+		this->radius2 = r*r;
+	}
 
-	Sphere(float3 c, float r, Material* mat);
-	~Sphere();
-
-	float intersect( Ray ray );
-	
+	bool intersect(Ray* ray);
 	float3 getNormal(float3 point);
 
 	float3 center;
