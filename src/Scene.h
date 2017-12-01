@@ -9,6 +9,9 @@ public:
 	Scene();
 	Camera* camera;
 
-	Light* lights[1];
-	Primitive* primitives[1];
+	//Light* lights[1];
+	//Primitive* primitives[1];
+
+	Primitive* primitives[3];
+	Light* lights[2];
 };

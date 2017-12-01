@@ -12,9 +12,7 @@ void Camera::Init()
 	this->pos = float3(0.0f, 0.0f, 0.0f);
 	this->dir = float3(0.0f, 0.0f, 1.0f);
 	this->d = 1.0f;
-
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
-//	this->calculateScreen();
 
 	this->screenCenter = pos + dir*d;
 

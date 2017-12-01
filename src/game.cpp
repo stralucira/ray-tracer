@@ -44,4 +44,9 @@ void Game::HandleInput( float dt ) { }
 // -----------------------------------------------------------
 void Game::Tick( float dt )
 {
+	rayTracer->Render();
+
+	char buffer[500];
+	sprintf(buffer, "FPS: %f \n Resolution : %i x %i ", 1 / dt, SCRWIDTH, SCRHEIGHT);
+	screen->Print(buffer, 2, 2, 0xffffff);	
 }
