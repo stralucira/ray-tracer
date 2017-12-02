@@ -1,4 +1,4 @@
-﻿#include "template.h"
+#include "template.h"
 #include "RayTracer.h"
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
@@ -54,7 +54,8 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray)
 		if (primHit->material.shader == Material::Shader::MIRROR)
 		{
 			ray->t = INFINITY;
-			return primHit->material.color * GetColor(x, y, &Ray(hitPoint, reflect(ray->dir, normal)));
+            return vec3(0.0f);
+            //return primHit->material.color * GetColor(x, y, &Ray(hitPoint, reflect(ray->dir, normal)));
 		}
 
 		// GLASS material shader hit
@@ -100,9 +101,9 @@ void RayTracer::Render()
 			vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x]);
 
 			color *= 256.0f;
-			int r = min((int)color.x, 255);
-			int g = min((int)color.y, 255);
-			int b = min((int)color.z, 255);
+            int r = glm::min((int)color.x, 255);
+            int g = glm::min((int)color.y, 255);
+            int b = glm::min((int)color.z, 255);
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}

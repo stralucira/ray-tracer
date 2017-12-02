@@ -39,8 +39,8 @@ typedef unsigned char byte;
 #include <assert.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "glm\gtx\matrix_decompose.hpp"
-#include "glm\gtx\quaternion.hpp"
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #ifdef __linux__
 #include <FreeImage.h>

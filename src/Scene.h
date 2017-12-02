@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Primitive.h"
 #include "Light.h"
 #include "Camera.h"
@@ -13,5 +13,5 @@ public:
 	//Primitive* primitives[1];
 
 	Light* lights[2];
-	Primitive* primitives[7];
+	Primitive* primitives[8];
 };
