@@ -1,4 +1,4 @@
-#include "template.h"
+﻿#include "template.h"
 #include "RayTracer.h"
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
@@ -8,7 +8,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 	this->scene->camera->GenerateRays();
 }
 
-float3 RayTracer::getColor(int x, int y, Ray* ray)
+vec3 RayTracer::GetColor(int x, int y, Ray* ray)
 {
 	float nearest = INFINITY;
 	Primitive* primHit;
@@ -24,30 +24,27 @@ float3 RayTracer::getColor(int x, int y, Ray* ray)
 		}
 	}
 
-	if (nearest == INFINITY) // if ray does not intersect
+	// ray does not intersect
+	if (nearest == INFINITY)
 	{
-		return float3(0.0f, 0.0f, 0.0f);
+		return vec3(0.0f);
 	}
-	else // if ray intersect
-	{
-		float3 hitPoint = ray->orig + ray->dir * nearest;
-		float3 normal = primHit->getNormal(hitPoint);
-		float3 color = float3(0.0f, 0.0f, 0.0f);
 
+	// ray intersects
+	else
+	{
+		vec3 hitPoint = ray->orig + ray->dir * nearest;
+		vec3 normal = primHit->getNormal(hitPoint);
+		vec3 color = vec3(0.0f);
+		
 		// DIFFUSE material shader hit
 		if (primHit->material.shader == Material::Shader::DIFFUSE)
 		{
 			int lightCount = sizeof(this->scene->lights) / sizeof(this->scene->lights[0]);
 			for (int i = 0; i < lightCount; i++)
 			{
-				float3 dir = (scene->lights[i]->pos - hitPoint);
-				dir.normalize();
-
-				if (dot(dir, normal) < 0)
-				{
-					continue;
-				}
-
+				vec3 dir = normalize(scene->lights[i]->pos - hitPoint);
+				if (dot(dir, normal) < 0) continue;
 				color += DirectIllumination(hitPoint, dir, normal, scene->lights[i], primHit->material);
 			}
 			ray->t = INFINITY;
@@ -57,7 +54,7 @@ float3 RayTracer::getColor(int x, int y, Ray* ray)
 		if (primHit->material.shader == Material::Shader::MIRROR)
 		{
 			ray->t = INFINITY;
-			return primHit->material.color * getColor(x, y, &Ray(hitPoint, reflect(ray->dir, normal)));
+			return primHit->material.color * GetColor(x, y, &Ray(hitPoint, reflect(ray->dir, normal)));
 		}
 
 		// GLASS material shader hit
@@ -67,15 +64,14 @@ float3 RayTracer::getColor(int x, int y, Ray* ray)
 
 		return color;
 	}
-
 }
 
-float3 RayTracer::DirectIllumination(float3 hitPoint, float3 dir, float3 normal, Light* light, Material mat)
+vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Material mat)
 {
-	float3 hitEpsilon = hitPoint + dir * 0.01f;
-	Ray shadowRay = Ray(hitEpsilon, dir);
+	vec3 hitEpsilon = hitPoint + dir * 0.01f;
+	Ray shadowRay = Ray(hitPoint, dir);
 	shadowRay.t = INFINITY;
-
+	
 	float lightInt = 0.0f;
 	float tToLight = (light->pos.x - hitEpsilon.x) / dir.x;
 
@@ -85,35 +81,35 @@ float3 RayTracer::DirectIllumination(float3 hitPoint, float3 dir, float3 normal,
 		this->scene->primitives[i]->intersect(&shadowRay);
 		if (shadowRay.t < tToLight)
 		{
-			return float3(0.0f, 0.0f, 0.0f);
+			return vec3(0.0f);
 		}
 	}
 
-	float euclidianDistanceToLight = (hitPoint, light->pos).length();
-	float3 matPI = float3(mat.color.x / PI, mat.color.y / PI, mat.color.z / PI);
-
-	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight * euclidianDistanceToLight)) * matPI;
+	float euclidianDistanceToLight = distance(hitPoint, light->pos);
+	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.color / PI);
 }
 
 void RayTracer::Render()
 {
-	// render color
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
 	{
+#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
-			float3 color = getColor(x, y, this->scene->camera->cameraRays[y * SCRWIDTH + x]);
+			vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x]);
 
 			color *= 256.0f;
 			int r = min((int)color.x, 255);
 			int g = min((int)color.y, 255);
 			int b = min((int)color.z, 255);
-			buffer[y][x] = ((r << 16) + (g << 8) + b);
+			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
-
+#pragma omp parallel for
 	for (int y = 0; y < SCRHEIGHT; y++)
 	{
+#pragma omp parallel for
 		for (int x = 0; x < SCRWIDTH; x++)
 		{
 			this->screen->Plot(x, y, this->buffer[y][x]);

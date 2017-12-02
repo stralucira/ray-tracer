@@ -1,9 +1,9 @@
-#include "template.h"
+﻿#include "template.h"
 #include "Ray.h"
 
-Ray::Ray(float3 orig, float3 dir)
+Ray::Ray(vec3 orig, vec3 dir)
 {
-	this->dir = dir;
 	this->orig = orig;
-	this->t = INFINITY; 
+	this->dir = dir;
+	this->t = INFINITY;
 }

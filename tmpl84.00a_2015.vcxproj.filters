@@ -24,16 +24,20 @@
     <ClCompile Include="src\template.cpp">
       <Filter>Template</Filter>
     </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Template</Filter>
+    </ClCompile>
     <ClCompile Include="src\Light.cpp" />
-    <ClCompile Include="src\Primitive.cpp">
+    <ClCompile Include="src\Primitive.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Plane.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="src\game.cpp">
+    <ClCompile Include="src\threads.cpp">
       <Filter>Template</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\pixel.h" />
     <ClInclude Include="lib\glm\detail\_features.hpp">
       <Filter>Library</Filter>
     </ClInclude>
@@ -678,7 +682,6 @@
     </ClInclude>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Ray.h" />
-    <ClInclude Include="src\tiny_obj_loader.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Triangle.h">
@@ -699,6 +702,19 @@
     </ClInclude>
     <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\game.h">
+      <Filter>Template</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Plane.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pixel.h">
+      <Filter>Template</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tiny_obj_loader.h">
+      <Filter>Template</Filter>
+    </ClInclude>
+    <ClInclude Include="src\threads.h">
       <Filter>Template</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,34 +1,39 @@
-#include "template.h"
+﻿#include "template.h"
 #include "Triangle.h"
 
 // from https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 bool Triangle::intersect(Ray* ray)
 {
-	float t, u, v;
+	vec3 ab = b - a;
+	vec3 ac = c - a; 
+	vec3 pvec = cross(ray->dir, ac);
+	float det = dot(ab, pvec);
 
-	float3 ab = b - a;
-	float3 ac = c - a;
-	float3 pvec = ray->dir.cross(ac);
-	float det = ab.dot(pvec);
+	if (det > -0.00001f && det < 0.00001f) return false;
+	
+	float invDet = 1.0f / det;
+	vec3 tvec = ray->orig - a;
+	float u = dot(tvec, pvec) * invDet;
 
-	float invDet = 1 / det;
+	if (u < 0.0f || u > 1.0f) return false;
 
-	float3 tvec = ray->orig - a;
-	u = tvec.dot(pvec)*invDet;
+	vec3 qvec = cross(tvec, ab);
+	float v = dot(ray->dir, qvec) * invDet;
 
-	if (u < 0 || u > 1) return false;
+	if (v < 0.0f || u + v > 1.0f) return false;
 
-	float3 qvec = tvec.cross(ab);
-	v = ray->dir.dot(qvec) * invDet;
-	if (v < 0 || u + v > 1) return false;
+	float t = dot(ac, qvec) * invDet;
 
-	t = ac.dot(qvec) * invDet;
+	if (t > 0.00001f)
+	{
+		ray->t = t;
+		return true;
+	}
 
-	return true;
-};
+	return false;
+}
 
-float3 Triangle::getNormal(float3 point)
+vec3 Triangle::getNormal(vec3 point)
 {
 	return this->normal;
-	//return (a - c).cross(b - c).normalized();
-}
+} 

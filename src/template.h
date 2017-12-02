@@ -5,8 +5,8 @@
 #pragma once
 
 #define GLM_FORCE_RADIANS
-#define GLM_SWIZZLE
-
+//#define GLM_SWIZZLE
+#define GLM_ENABLE_EXPERIMENTAL
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?
@@ -38,6 +38,9 @@ typedef unsigned char byte;
 #include <stdlib.h>
 #include <assert.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include "glm\gtx\matrix_decompose.hpp"
+#include "glm\gtx\quaternion.hpp"
 
 #ifdef __linux__
 #include <FreeImage.h>
@@ -78,7 +81,7 @@ extern "C"
 
 using namespace Tmpl8;				// to use template classes
 using namespace glm;
-//using namespace std;				// to use stl vectors
+using namespace std;				// to use stl vectors
 
 inline float Rand(float range) { return ((float)rand() / RAND_MAX) * range; }
 inline int IRand(int range) { return rand() % range; }
@@ -344,12 +347,16 @@ mat4 operator * ( const mat4& a, const mat4& b );
 }; // namespace Tmpl8
 
 // TODO: Include your own headers for your own code here
-#include "Material.h"
-#include "Ray.h"
-#include "Primitive.h"
-#include "Camera.h"
-#include "Triangle.h"
-#include "Sphere.h"
-#include "RayTracer.h"
-#include "game.h"
+
+//#include "Primitive.h"
+//#include "Sphere.h"
+//#include "Triangle.h"
+//#include "Camera.h"
+//#include "Light.h"
+//#include "Material.h"
+//#include "Ray.h"
+//#include "RayTracer.h"
+//#include "Scene.h"
+
+
 

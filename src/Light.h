@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "template.h"
 
 class Light
 {
 public:
-	Light(float3 pos, float3 color);
+	Light(vec3 pos, vec3 color);
 
-	float3 pos;
-	float3 color;
+	vec3 pos;
+	vec3 color;
 };

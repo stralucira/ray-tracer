@@ -1,20 +1,19 @@
-#pragma once
+﻿#pragma once
 #include "Primitive.h"
 
 class Sphere : public Primitive
 {
 public:
-	Sphere(float3 c, float r)
+	Sphere(vec3 pos, float r) : Primitive(pos)
 	{
-		this->center = c;
+		this->center = pos;
 		this->radius = r;
 		this->radius2 = r*r;
 	}
 
 	bool intersect(Ray* ray);
-	float3 getNormal(float3 point);
+	vec3 getNormal(vec3 point);
 
-	float3 center;
-	float radius;
-	float radius2;
+	vec3 center;
+	float radius, radius2;
 };

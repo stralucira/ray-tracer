@@ -1,12 +1,12 @@
-#pragma once
+﻿#pragma once
 
 class Ray
 {
 public:
-	Ray(float3 orig, float3 dir);
-	
-	float3 dir;
-	float3 orig;
+	Ray(vec3 orig, vec3 dir);
+
+	vec3 orig;
+	vec3 dir;	
 	
 	float t;
 };

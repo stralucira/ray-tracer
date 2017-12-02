@@ -1,17 +1,17 @@
-#include "template.h"
+﻿#include "template.h"
 #include "Sphere.h"
 
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
 bool Sphere::intersect(Ray* ray)
 {
-	float t, t0, t1; // solutions for t if the ray intersects
+	float t0, t1; // solutions for t if the ray intersects
 
-	float3 L = center - ray->orig;
-	float tca = L.dot(ray->dir);
+	vec3 L = center - ray->orig;
+	float tca = dot(L, ray->dir);
 	if (tca < 0) return false;
-	float d2 = L.dot(L) - tca * tca;
+	float d2 = dot(L, L) - tca * tca;
 	if (d2 > radius2) return false;
-	float thc = sqrtf(radius2 - d2);
+	float thc = sqrt(radius2 - d2);
 	t0 = tca - thc;
 	t1 = tca + thc;
 
@@ -22,13 +22,12 @@ bool Sphere::intersect(Ray* ray)
 		t0 = t1; // if t0 is negative, let's use t1 instead
 		if (t0 < 0) return false; // both t0 and t1 are negative
 	}
-
-	t = t0;
+	ray->t = t0;
 
 	return true;
 }
 
-float3 Sphere::getNormal(float3 point)
+vec3 Sphere::getNormal(vec3 point)
 {
-    return (point - center).normalized();
+	return normalize(point - center);
 }

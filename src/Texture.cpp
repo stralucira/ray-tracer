@@ -1,6 +1,6 @@
 #pragma once
 #include "template.h"
 
-class Material
+class Texture
 {
 };

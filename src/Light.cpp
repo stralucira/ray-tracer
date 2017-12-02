@@ -1,7 +1,7 @@
-#include "template.h"
-#include "light.h"
+﻿#include "template.h"
+#include "Light.h"
 
-Light::Light(float3 pos, float3 color)
+Light::Light(vec3 pos, vec3 color)
 {
 	this->pos = pos;
 	this->color = color;

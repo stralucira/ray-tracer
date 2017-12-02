@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "Primitive.h"
 #include "Light.h"
-#include "Primitive.h"
+#include "Camera.h"
 
 class Scene
 {
@@ -12,6 +12,6 @@ public:
 	//Light* lights[1];
 	//Primitive* primitives[1];
 
-	Primitive* primitives[3];
 	Light* lights[2];
+	Primitive* primitives[7];
 };
