@@ -1,7 +1,8 @@
 #pragma once
 
-#define SCRWIDTH	 800
-#define SCRHEIGHT	 600
+#define SCRWIDTH	800
+#define SCRHEIGHT	600
+#define MAXDEPTH	10
 
 #include "template.h"
 

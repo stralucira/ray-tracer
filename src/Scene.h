@@ -14,4 +14,7 @@ public:
 
 	Light* lights[2];
 	Primitive* primitives[8];
+
+	//Light* lights[1];
+	//Primitive* primitives[2];
 };

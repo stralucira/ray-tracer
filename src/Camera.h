@@ -20,12 +20,13 @@ public:
 
 	float d;
 	float aspectRatio;
+	float width, height;
 
-	void TransformCamera(glm::mat4 transMatrix);
+	void TransCamera(glm::mat4 transMatrix);
 
 	glm::mat4 transMatrix;
 
-	vec3 wUp;
-	vec3 rUp;
-	vec3 rRight;
+	vec3 up;
+	vec3 rotY;
+	vec3 rotX;
 };

@@ -19,23 +19,40 @@ void Game::Shutdown() { }
 // Input handling
 // -----------------------------------------------------------
 void Game::HandleInput( float dt ) { }
+
+
 void Game::KeyDown(int a_Key)
 {
+	Camera* camera = rayTracer->scene->camera;
+	glm::mat4 transform = camera->transMatrix;
+	glm::mat4 prevTransform = transform;
+
+	float rotationSpeed = 0.05f;
+
 	if (a_Key == 79)
 	{
-		rayTracer->scene->camera->pos.x += 0.1;
+		transform = rotate(transform, rotationSpeed, camera->rotY);
+		camera->TransCamera(transform);
+		camera->transMatrix = prevTransform;
+
 	}
 	if (a_Key == 80)
 	{
-		rayTracer->scene->camera->pos.x -= 0.1;
+		transform = rotate(transform, -rotationSpeed, camera->rotY);
+		camera->TransCamera(transform);
+		camera->transMatrix = prevTransform;
 	}
 	if (a_Key == 81)
 	{
-		rayTracer->scene->camera->pos.z -= 0.1;
+		transform = rotate(transform, -rotationSpeed, camera->rotX);
+		camera->TransCamera(transform);
+		camera->transMatrix = prevTransform;
 	}
 	if (a_Key == 82)
 	{
-		rayTracer->scene->camera->pos.z += 0.1;
+		transform = rotate(transform, rotationSpeed, camera->rotX);
+		camera->TransCamera(transform);
+		camera->transMatrix = prevTransform;
 	}
 }
 

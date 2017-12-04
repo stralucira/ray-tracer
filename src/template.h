@@ -5,8 +5,8 @@
 #pragma once
 
 #define GLM_FORCE_RADIANS
-//#define GLM_SWIZZLE
 #define GLM_ENABLE_EXPERIMENTAL
+#define GLM_FORCE_LEFT_HANDED
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?
@@ -345,18 +345,3 @@ public:
 mat4 operator * ( const mat4& a, const mat4& b );
 
 }; // namespace Tmpl8
-
-// TODO: Include your own headers for your own code here
-
-//#include "Primitive.h"
-//#include "Sphere.h"
-//#include "Triangle.h"
-//#include "Camera.h"
-//#include "Light.h"
-//#include "Material.h"
-//#include "Ray.h"
-//#include "RayTracer.h"
-//#include "Scene.h"
-
-
-
