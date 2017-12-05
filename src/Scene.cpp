@@ -61,9 +61,9 @@ Scene::Scene()
 	primitives[3]->material = Material(vec3(0.75f, 0.8f, 0.7f), Material::Shader::DIFFUSE);
 
 #elif TINYOBJLOADER
-	lights[0] = new Light(vec3(-2.0f, 6.0f, 3.0f), vec3(200, 2002, 200));
+	lights[0] = new Light(vec3(-1.0f, 0.0f, 1.0f), vec3(100, 100, 100));
 
-	std::string inputfile = "lowpolytree.obj";
+	std::string inputfile = "cube.obj";
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;

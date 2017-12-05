@@ -25,6 +25,6 @@ public:
 	Primitive* primitives[2];
 #elif TINYOBJLOADER
 	Light* lights[1];
-	Primitive* primitives[130];
+	Primitive* primitives[12];
 #endif
 };
