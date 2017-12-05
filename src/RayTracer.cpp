@@ -12,7 +12,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 {
 	if (depth > MAXDEPTH)
 	{
-		return vec3(0.0f);
+		return BACKGROUND_COLOR;
 	}
 
 	float nearest = INFINITY;
@@ -32,7 +32,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	// ray does not intersect
 	if (nearest == INFINITY)
 	{
-		return vec3(0.0f);
+		return BACKGROUND_COLOR;
 	}
 
 	// ray intersects
@@ -73,11 +73,12 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			bool outside = dot(ray->dir, normal) < 0;
 			vec3 bias = 0.001f * primHit->getNormal(hitPoint);
 			// compute refraction if it is not a case of total internal reflection
-			if (kr < 1) {
+			if (kr < 1)
+			{
 				vec3 refractDir = normalize(refract(ray->dir, normal, 1.33f));
 				vec3 refractRayOrig = outside ? hitPoint - bias : hitPoint + bias;
 				
-				Ray* refractRay = new Ray(hitPoint, refract(ray->dir, normal, 1.33f));
+				Ray* refractRay = new Ray(hitPoint, refract(refractRayOrig, refractDir, 1.33f));
 				refractColor = GetColor(x, y, refractRay, depth += 1);
 				delete refractRay;
 
@@ -94,7 +95,8 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			//vec3 reflectColor = GetColor(reflectionRayOrig, reflectionDirection, objects, lights, options, depth + 1);
 
 			// mix the two
-			color += reflectColor * kr + refractColor * (1 - kr);
+			//color += reflectColor * kr + refractColor * (1 - kr);
+			color += refractColor * (1 - kr);
 		}
 
 		return color;

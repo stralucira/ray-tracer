@@ -7,6 +7,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_LEFT_HANDED
+#define BACKGROUND_COLOR vec3(0.0f, 0.0f, 0.1f);
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?
