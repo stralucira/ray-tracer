@@ -7,3 +7,8 @@ Ray::Ray(vec3 orig, vec3 dir)
 	this->dir = dir;
 	this->t = INFINITY;
 }
+
+Ray::Ray()
+{
+	this->t = INFINITY;
+}

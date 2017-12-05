@@ -10,7 +10,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 {
-	if (depth > MAXDEPTH)
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
 	{
 		return BACKGROUND_COLOR;
 	}
@@ -19,13 +19,12 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	Primitive* primHit;
 
 	// check intersection
-	int primCount = sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]);
-	for (int i = 0; i < primCount; i++)
+	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
-		if (this->scene->primitives[i]->intersect(ray) && nearest > ray->t)
+		if (this->scene->primList[i]->intersect(ray) && nearest > ray->t)
 		{
 			nearest = ray->t;
-			primHit = this->scene->primitives[i];
+			primHit = this->scene->primList[i];
 		}
 	}
 
@@ -45,12 +44,11 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		// DIFFUSE material shader hit
 		if (primHit->material.shader == Material::Shader::DIFFUSE)
 		{
-			int lightCount = sizeof(this->scene->lights) / sizeof(this->scene->lights[0]);
-			for (int i = 0; i < lightCount; i++)
+			for (size_t i = 0; i < this->scene->lightList.size(); i++)
 			{
-				vec3 dir = normalize(scene->lights[i]->pos - hitPoint);
+				vec3 dir = normalize(scene->lightList[i]->pos - hitPoint);
 				if (dot(dir, normal) < 0) continue;
-				color += DirectIllumination(hitPoint, dir, normal, scene->lights[i], primHit->material);
+				color += DirectIllumination(hitPoint, dir, normal, scene->lightList[i], primHit->material);
 			}
 			ray->t = INFINITY;
 		}
@@ -67,6 +65,32 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		// GLASS material shader hit
 		if (primHit->material.shader == Material::Shader::GLASS)
 		{
+			float incommingAngle = dot(normal, ray->dir);
+
+			float cosi = clamp(-1.0f, 1.0f, incommingAngle);
+			float etai = 1, etat = 1.33f;
+			vec3 n = normal;
+			if (cosi < 0) { cosi = -cosi; }
+			else { std::swap(etai, etat); n = -normal; }
+			float eta = etai / etat;
+			float k = 1 - eta * eta * (1 - cosi * cosi);
+
+			if (k < 0)
+			{
+				return color;
+			}
+			else
+			{
+				Ray* refractionRay = new Ray();
+				
+				refractionRay->orig = hitPoint;
+				refractionRay->dir = eta * ray->dir + (eta * cosi - sqrtf(k)) * n;
+				vec3 hitEpsilon = refractionRay->orig + refractionRay->dir * 0.01f;
+				refractionRay->orig = hitEpsilon;
+				color += this->GetColor(x,y,refractionRay, depth += 1);
+				delete refractionRay;
+			}
+			/*
 			vec3 refractColor = vec3(0.0f);
 			// compute fresnel
 			float kr = Fresnel(ray->dir, normal, 1.33f);
@@ -96,7 +120,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 
 			// mix the two
 			//color += reflectColor * kr + refractColor * (1 - kr);
-			color += refractColor * (1 - kr);
+			color += refractColor * (1 - kr);*/
 		}
 
 		return color;
@@ -112,10 +136,9 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	float lightInt = 0.0f;
 	float tToLight = (light->pos.x - hitEpsilon.x) / dir.x;
 
-	int primCount = sizeof(this->scene->primitives) / sizeof(this->scene->primitives[0]);
-	for (int i = 0; i < primCount; i++)
+	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
-		this->scene->primitives[i]->intersect(&shadowRay);
+		this->scene->primList[i]->intersect(&shadowRay);
 		if (shadowRay.t < tToLight)
 		{
 			return vec3(0.0f);
@@ -131,7 +154,7 @@ vec3 RayTracer::Reflect(vec3 dir, vec3 normal)
 	return dir - 2 * dot(dir, normal) * normal;
 }
 
-vec3 RayTracer::Refract(vec3 dir, vec3 normal, float index)
+float RayTracer::Refract(vec3 dir, vec3 normal, float index)
 {
 	float cosi = clamp(dot(dir,normal),-1.0f,1.0f);
 	float etai = 1, etat = index;
@@ -150,7 +173,7 @@ vec3 RayTracer::Refract(vec3 dir, vec3 normal, float index)
 	float eta = etai / etat;
 	float k = 1 - eta * eta * (1 - cosi * cosi);
 	//return k < 0.0f ? 0.0f : eta * dir + (eta * cosi - sqrtf(k)) * n;
-	return vec3(1.0f);
+	return 1;
 }
 
 float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)

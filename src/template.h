@@ -7,7 +7,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_LEFT_HANDED
-#define BACKGROUND_COLOR vec3(0.0f, 0.0f, 0.1f);
+#define BACKGROUND_COLOR vec3(0.0f, 0.0f, 0.0f);
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?
@@ -42,6 +42,7 @@ typedef unsigned char byte;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <sstream>
 
 #ifdef __linux__
 #include <FreeImage.h>
