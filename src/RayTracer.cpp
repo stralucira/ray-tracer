@@ -65,64 +65,44 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		// GLASS material shader hit
 		if (primHit->material.shader == Material::Shader::GLASS)
 		{
-			float incommingAngle = dot(normal, ray->dir);
+			vec3 refractColor = vec3(0.0f);
+			
+			float kr = Fresnel(ray->dir, normal, 1.33f);
+			bool outside = dot(ray->dir, normal) < 0;
+			vec3 bias = 0.001f * primHit->getNormal(hitPoint);
 
-			float cosi = clamp(-1.0f, 1.0f, incommingAngle);
+			float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
 			float etai = 1, etat = 1.33f;
 			vec3 n = normal;
 			if (cosi < 0) { cosi = -cosi; }
 			else { std::swap(etai, etat); n = -normal; }
 			float eta = etai / etat;
 			float k = 1 - eta * eta * (1 - cosi * cosi);
-
+			
 			if (k < 0)
 			{
 				return color;
 			}
 			else
 			{
-				Ray* refractionRay = new Ray();
+				Ray* refractRay = new Ray();
+				refractRay->orig = hitPoint;
+				refractRay->dir = eta * ray->dir + (eta * cosi - sqrtf(k)) * n;	
 				
-				refractionRay->orig = hitPoint;
-				refractionRay->dir = eta * ray->dir + (eta * cosi - sqrtf(k)) * n;
-				vec3 hitEpsilon = refractionRay->orig + refractionRay->dir * 0.01f;
-				refractionRay->orig = hitEpsilon;
-				color += this->GetColor(x,y,refractionRay, depth += 1);
-				delete refractionRay;
-			}
-			/*
-			vec3 refractColor = vec3(0.0f);
-			// compute fresnel
-			float kr = Fresnel(ray->dir, normal, 1.33f);
-			bool outside = dot(ray->dir, normal) < 0;
-			vec3 bias = 0.001f * primHit->getNormal(hitPoint);
-			// compute refraction if it is not a case of total internal reflection
-			if (kr < 1)
-			{
-				vec3 refractDir = normalize(refract(ray->dir, normal, 1.33f));
-				vec3 refractRayOrig = outside ? hitPoint - bias : hitPoint + bias;
-				
-				Ray* refractRay = new Ray(hitPoint, refract(refractRayOrig, refractDir, 1.33f));
-				refractColor = GetColor(x, y, refractRay, depth += 1);
+				vec3 hitEpsilon = refractRay->orig + refractRay->dir * 0.01f;
+				refractRay->orig = hitEpsilon;
+
+				refractColor = this->GetColor(x, y, refractRay, depth + 1);
 				delete refractRay;
-
-				//refractColor = GetColor(refractionRayOrig, refractionDirection, objects, lights, options, depth + 1);
 			}
-
-			vec3 reflectDir = normalize(reflect(ray->dir, normal));
-			vec3 reflectRayOrig = outside ? hitPoint + bias : hitPoint - bias;
-			
+		
 			Ray* reflectRay = new Ray(hitPoint, reflect(ray->dir, normal));
-			vec3 reflectColor = GetColor(x, y, reflectRay, depth += 1);
+			vec3 reflectColor = primHit->material.color * 0.8f * GetColor(x, y, reflectRay, depth += 1);
+			ray->t = INFINITY;
 			delete reflectRay;
 
-			//vec3 reflectColor = GetColor(reflectionRayOrig, reflectionDirection, objects, lights, options, depth + 1);
-
-			// mix the two
-			//color += reflectColor * kr + refractColor * (1 - kr);
-			color += refractColor * (1 - kr);*/
+			color += reflectColor * kr + refractColor * (1 - kr);
 		}
-
 		return color;
 	}
 }
@@ -152,28 +132,6 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 vec3 RayTracer::Reflect(vec3 dir, vec3 normal)
 {
 	return dir - 2 * dot(dir, normal) * normal;
-}
-
-float RayTracer::Refract(vec3 dir, vec3 normal, float index)
-{
-	float cosi = clamp(dot(dir,normal),-1.0f,1.0f);
-	float etai = 1, etat = index;
-	vec3 n = normal;
-
-	if (cosi < 0)
-	{
-		cosi = -cosi;
-	}
-	else
-	{
-		std::swap(etai, etat);
-		n = -normal;
-	}
-
-	float eta = etai / etat;
-	float k = 1 - eta * eta * (1 - cosi * cosi);
-	//return k < 0.0f ? 0.0f : eta * dir + (eta * cosi - sqrtf(k)) * n;
-	return 1;
 }
 
 float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)

@@ -27,33 +27,60 @@ void Game::KeyDown(int a_Key)
 	glm::mat4 transform = camera->transMatrix;
 	glm::mat4 prevTransform = transform;
 
-	float rotationSpeed = 0.05f;
+	float rotSpeed = 0.05f;
+	float movSpeed = 0.1f;
 
-	if (a_Key == 79)
+	if (a_Key == SDL_SCANCODE_RIGHT)
 	{
-		transform = rotate(transform, rotationSpeed, camera->rotY);
+		transform = rotate(transform, rotSpeed, camera->rotY);
 		camera->TransCamera(transform);
 		camera->transMatrix = prevTransform;
 
 	}
-	if (a_Key == 80)
+	if (a_Key == SDL_SCANCODE_LEFT)
 	{
-		transform = rotate(transform, -rotationSpeed, camera->rotY);
+		transform = rotate(transform, -rotSpeed, camera->rotY);
 		camera->TransCamera(transform);
 		camera->transMatrix = prevTransform;
 	}
-	if (a_Key == 81)
+	if (a_Key == SDL_SCANCODE_DOWN)
 	{
-		transform = rotate(transform, -rotationSpeed, camera->rotX);
+		transform = rotate(transform, -rotSpeed, camera->rotX);
 		camera->TransCamera(transform);
 		camera->transMatrix = prevTransform;
 	}
-	if (a_Key == 82)
+	if (a_Key == SDL_SCANCODE_UP)
 	{
-		transform = rotate(transform, rotationSpeed, camera->rotX);
+		transform = rotate(transform, rotSpeed, camera->rotX);
 		camera->TransCamera(transform);
 		camera->transMatrix = prevTransform;
 	}
+
+	if (a_Key == SDL_SCANCODE_W)
+	{
+		camera->pos.z += movSpeed;
+		camera->CalculateScreen();
+		camera->UpdateRays();
+	}
+	if (a_Key == SDL_SCANCODE_A)
+	{
+		camera->pos.x -= movSpeed;
+		camera->CalculateScreen();
+		camera->UpdateRays();
+	}
+	if (a_Key == SDL_SCANCODE_S)
+	{
+		camera->pos.z -= movSpeed;
+		camera->CalculateScreen();
+		camera->UpdateRays();
+	}
+	if (a_Key == SDL_SCANCODE_D)
+	{
+		camera->pos.x += movSpeed;
+		camera->CalculateScreen();
+		camera->UpdateRays();
+	}
+
 }
 
 // -----------------------------------------------------------

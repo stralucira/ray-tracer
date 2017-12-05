@@ -34,7 +34,7 @@ void Camera::UpdatePosition()
 {
 	this->rotX = vec3(this->transMatrix[0]);
 	this->rotY = vec3(this->transMatrix[1]);
-	this->dir = vec3(this->transMatrix[2]);
+	this->dir = normalize(vec3(this->transMatrix[2]));
 	this->pos = vec3(this->transMatrix[3]);
 
 	this->screenCenter = pos + dir * d;
@@ -42,6 +42,15 @@ void Camera::UpdatePosition()
 	this->p0 = (transMatrix * vec4(p0, 1.0f));
 	this->p1 = (transMatrix * vec4(p1, 1.0f));
 	this->p2 = (transMatrix * vec4(p2, 1.0f));
+}
+
+void Camera::CalculateScreen()
+{
+	this->screenCenter = pos + dir * d;
+
+	this->p0 = screenCenter + vec3(-1.0f, -aspectRatio, 0.0f);
+	this->p1 = screenCenter + vec3(1.0f, -aspectRatio, 0.0f);
+	this->p2 = screenCenter + vec3(-1.0f, aspectRatio, 0.0f);
 }
 
 void Camera::TransCamera(glm::mat4 transMatrix)

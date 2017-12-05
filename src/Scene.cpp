@@ -4,6 +4,11 @@
 #include "Triangle.h"
 #include "Plane.h"
 
+#define SCENE1	0;
+#define SCENE2	1;
+#define SCENE3	0;
+#define TINYOBJLOADER 0;
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
@@ -13,9 +18,10 @@ Scene::Scene()
 	camera = new Camera();
 
 #if SCENE1
-	lights[0] = new Light(vec3(0, 0, 0), vec3(100, 100, 100));
-	primitives[0] = new Triangle(vec3(0, 1, 2), vec3(1, 0, 2), vec3(-1, 0, 2));
-	primitives[0]->material = Material(vec3(1, 0, 1), Material::Shader::DIFFUSE);
+	lightList.push_back(new Light(vec3(0.0f, 0.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
+	
+	primList.push_back(new Triangle(vec3(0, 1, 2), vec3(1, 0, 2), vec3(-1, 0, 2)));
+	primList.back()->material = Material(vec3(1, 0, 1), Material::Shader::DIFFUSE);
 
 #elif SCENE2
 	lightList.push_back(new Light(vec3(-1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
@@ -25,7 +31,7 @@ Scene::Scene()
 	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Sphere(vec3(1.5f, -1.0f, 3.0f), 0.7f));
-	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::GLASS);
+	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
 
 	primList.push_back(new Triangle(vec3(0.1f, 2.0f, 4.0f), vec3(0.75f, 0.1f, 4.0f), vec3(-0.5, 0.5, 3)));
 	primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
@@ -34,7 +40,7 @@ Scene::Scene()
 	primList.back()->material = Material(vec3(0.0f, 0.5f, 0.7f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Plane(vec3(0, 5, 5), vec3(0, -1, 0))); // bottom
-	primList.back()->material = Material(vec3(0.0f, 0.8f, 0.2f), Material::Shader::DIFFUSE);
+	primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
 	
 	primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left
 	primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
@@ -46,23 +52,23 @@ Scene::Scene()
 	primList.back()->material = Material(vec3(0.8f, 0.4f, 0.2f), Material::Shader::DIFFUSE);
 
 #elif SCENE3
-	lights[0] = new Light(vec3(10, 0, 1), vec3(100, 100, 100));
+	lightList.push_back(new Light(vec3(10, 0, 1), vec3(100, 100, 100)));
 
-	primitives[0] = new Sphere(vec3(0.0f, 0.0f, 0.5f), 1.0f);
-	primitives[0]->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
+	primList.push_back(new Sphere(vec3(0.0f, 0.0f, 0.5f), 1.0f));
+	primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
 
-	primitives[1] = new Sphere(vec3(0.0f, 0.0f, 10.0f), 4.0f);
-	primitives[1]->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+	primList.push_back(new Sphere(vec3(0.0f, 0.0f, 10.0f), 4.0f));
+	primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
 
-	primitives[2] = new Triangle(vec3(4, 4, 5), vec3(1, 1, 5), vec3(2, 5, 5));
-	primitives[2]->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
+	primList.push_back(new Triangle(vec3(4, 4, 5), vec3(1, 1, 5), vec3(2, 5, 5)));
+	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
 
-	primitives[3] = new Plane(vec3(0, 0, 15), vec3(0, 0, 1));
-	primitives[3]->material = Material(vec3(0.75f, 0.8f, 0.7f), Material::Shader::DIFFUSE);
+	primList.push_back(new Plane(vec3(0, 0, 15), vec3(0, 0, 1)));
+	primList.back()->material = Material(vec3(0.75f, 0.8f, 0.7f), Material::Shader::DIFFUSE);
 
 #elif TINYOBJLOADER
 	
-	lightList.push_back(new Light(vec3(-1.0f, 0.0f, 1.0f), vec3(100, 100, 100)));
+	lightList.push_back(new Light(vec3(-1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 
 	std::string inputfile = "cube.obj";
 	tinyobj::attrib_t attrib;

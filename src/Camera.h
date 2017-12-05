@@ -22,6 +22,7 @@ public:
 	float aspectRatio;
 	float width, height;
 
+	void CalculateScreen();
 	void TransCamera(glm::mat4 transMatrix);
 
 	glm::mat4 transMatrix;
@@ -29,4 +30,5 @@ public:
 	vec3 up;
 	vec3 rotY;
 	vec3 rotX;
+
 };
