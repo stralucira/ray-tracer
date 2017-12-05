@@ -1,4 +1,4 @@
-﻿#include "template.h"
+#include "template.h"
 #include "RayTracer.h"
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
@@ -161,14 +161,14 @@ float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)
 	{
 		std::swap(etai, etat);
 	}
-	float sint = etai / etat * sqrtf(max(0.0f, 1 - cosi * cosi));
+    float sint = etai / etat * sqrtf(glm::max(0.0f, 1 - cosi * cosi));
 	if (sint >= 1)
 	{
 		return 1;
 	}
 	else
 	{
-		float cost = sqrtf(max(0.0f, 1 - sint * sint));
+        float cost = sqrtf(glm::max(0.0f, 1 - sint * sint));
 		cosi = fabsf(cosi);
 		float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
 		float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
@@ -187,9 +187,9 @@ void RayTracer::Render()
 			vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x], 0);
 
 			color *= 255.0f;
-			int r = min((int)color.x, 255);
-			int g = min((int)color.y, 255);
-			int b = min((int)color.z, 255);
+            int r = glm::min((int)color.x, 255);
+            int g = glm::min((int)color.y, 255);
+            int b = glm::min((int)color.z, 255);
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
