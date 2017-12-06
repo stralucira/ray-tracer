@@ -23,12 +23,16 @@ public:
 	float width, height;
 
 	void CalculateScreen();
-	void TransCamera(glm::mat4 transMatrix);
 
 	glm::mat4 transMatrix;
 
 	vec3 up;
+	vec3 right;
 	vec3 rotY;
 	vec3 rotX;
 
+	vec3 viewDirNorm;
+	vec3 topLeft;
+	vec3 topRight;
+	vec3 bottomLeft;
 };

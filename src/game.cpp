@@ -24,59 +24,82 @@ void Game::HandleInput( float dt ) { }
 void Game::KeyDown(int a_Key)
 {
 	Camera* camera = rayTracer->scene->camera;
-	glm::mat4 transform = camera->transMatrix;
-	glm::mat4 prevTransform = transform;
+	bool update = false;
 
-	float rotSpeed = 0.05f;
-	float movSpeed = 0.1f;
-
+	// rotate camera
 	if (a_Key == SDL_SCANCODE_RIGHT)
 	{
-		transform = rotate(transform, rotSpeed, camera->rotY);
-		camera->TransCamera(transform);
-		camera->transMatrix = prevTransform;
-
+		camera->dir += camera->right * 0.05f;
+		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_LEFT)
 	{
-		transform = rotate(transform, -rotSpeed, camera->rotY);
-		camera->TransCamera(transform);
-		camera->transMatrix = prevTransform;
+		camera->dir -= camera->right * 0.05f;
+		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_DOWN)
 	{
-		transform = rotate(transform, -rotSpeed, camera->rotX);
-		camera->TransCamera(transform);
-		camera->transMatrix = prevTransform;
+		camera->dir -= camera->up * 0.05f;
+		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_UP)
 	{
-		transform = rotate(transform, rotSpeed, camera->rotX);
-		camera->TransCamera(transform);
-		camera->transMatrix = prevTransform;
+		camera->dir += camera->up * 0.05f;
+		update = true;
 	}
 
+	// move camera
 	if (a_Key == SDL_SCANCODE_W)
 	{
-		camera->pos.z += movSpeed;
-		camera->CalculateScreen();
-		camera->UpdateRays();
+		camera->pos += camera->viewDirNorm * 0.10f;
+		update = true;
+		
 	}
 	if (a_Key == SDL_SCANCODE_A)
 	{
-		camera->pos.x -= movSpeed;
-		camera->CalculateScreen();
-		camera->UpdateRays();
+		camera->pos -= camera->right * 0.10f;
+		camera->dir -= camera->right * 0.10f;
+		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_S)
 	{
-		camera->pos.z -= movSpeed;
-		camera->CalculateScreen();
-		camera->UpdateRays();
+		camera->pos -= camera->viewDirNorm * 0.10f;
+		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_D)
 	{
-		camera->pos.x += movSpeed;
+		camera->pos += camera->right * 0.10f;
+		camera->dir += camera->right * 0.10f;
+		update = true;
+	}
+	if (a_Key == SDL_SCANCODE_Q)
+	{
+		camera->pos += camera->up * 0.10f;
+		camera->dir += camera->up * 0.10f;
+		update = true;
+	}
+	if (a_Key == SDL_SCANCODE_E)
+	{
+		camera->pos -= camera->up * 0.10f;
+		camera->dir -= camera->up * 0.10f;
+		update = true;
+	}
+
+	// zoom camera
+	if (a_Key == SDL_SCANCODE_EQUALS)
+	{
+		camera->d += 0.05f;
+		update = true;
+	}
+	if (a_Key == SDL_SCANCODE_MINUS)
+	{
+		camera->d -= 0.05f;
+		update = true;
+	}
+
+	// update screen and rays
+	if (update)
+	{
 		camera->CalculateScreen();
 		camera->UpdateRays();
 	}

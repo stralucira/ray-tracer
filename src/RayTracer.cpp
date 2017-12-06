@@ -67,12 +67,12 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		{
 			vec3 refractColor = vec3(0.0f);
 			
-			float kr = Fresnel(ray->dir, normal, 1.33f);
+			float kr = Fresnel(ray->dir, normal, 1.52f);
 			bool outside = dot(ray->dir, normal) < 0;
 			vec3 bias = 0.001f * primHit->getNormal(hitPoint);
 
 			float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
-			float etai = 1, etat = 1.33f;
+			float etai = 1, etat = 1.52f;
 			vec3 n = normal;
 			if (cosi < 0) { cosi = -cosi; }
 			else { std::swap(etai, etat); n = -normal; }

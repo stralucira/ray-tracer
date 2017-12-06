@@ -11,53 +11,29 @@ Camera::Camera()
 // Initialize camera and the transformation matrix
 void Camera::Init()
 {
-	this->pos = vec3(0.0f);
+	this->pos = vec3(0.5f, 0.0f, -3.0f);
 	this->dir = vec3(0.0f, 0.0f, 1.0f);
 	this->d = 1.0f;
+	this->up = vec3(0.0f, -1.0f, 0.0f);
+	this->right = vec3(1.0f, 0.0f, 0.0f);
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
 
 	this->screenCenter = pos + dir * d;
 
-	this->p0 = screenCenter + vec3(-1.0f, -aspectRatio, 0.0f);
-	this->p1 = screenCenter + vec3(1.0f, -aspectRatio, 0.0f);
-	this->p2 = screenCenter + vec3(-1.0f, aspectRatio, 0.0f);
-
-	// transformation matrix part
-	this->up = vec3(0.0f, 1.0f, 0.0f);
-	this->transMatrix = inverse(lookAt(pos, screenCenter, up));
-	this->rotX = vec3(this->transMatrix[0]);
-	this->rotY = vec3(this->transMatrix[1]);
-	this->dir = vec3(this->transMatrix[2]);
-}
-
-void Camera::UpdatePosition()
-{
-	this->rotX = vec3(this->transMatrix[0]);
-	this->rotY = vec3(this->transMatrix[1]);
-	this->dir = normalize(vec3(this->transMatrix[2]));
-	this->pos = vec3(this->transMatrix[3]);
-
-	this->screenCenter = pos + dir * d;
-
-	this->p0 = (transMatrix * vec4(p0, 1.0f));
-	this->p1 = (transMatrix * vec4(p1, 1.0f));
-	this->p2 = (transMatrix * vec4(p2, 1.0f));
+	CalculateScreen();
 }
 
 void Camera::CalculateScreen()
 {
-	this->screenCenter = pos + dir * d;
+	this->viewDirNorm = glm::normalize(this->dir - this->pos);
+	this->right = glm::cross(this->up, this->viewDirNorm);
+	this->up = glm::cross(this->viewDirNorm, this->right);
 
-	this->p0 = screenCenter + vec3(-1.0f, -aspectRatio, 0.0f);
-	this->p1 = screenCenter + vec3(1.0f, -aspectRatio, 0.0f);
-	this->p2 = screenCenter + vec3(-1.0f, aspectRatio, 0.0f);
-}
+	vec3 center = this->pos + d * this->viewDirNorm;
 
-void Camera::TransCamera(glm::mat4 transMatrix)
-{
-	this->transMatrix = transMatrix;
-	this->UpdatePosition();
-	this->UpdateRays();
+	this->topLeft = center - this->right + this->up * aspectRatio;
+	this->topRight = center + this->right + this->up * aspectRatio;
+	this->bottomLeft = center - this->right - this->up * aspectRatio;
 }
 
 // Generate rays for every screen pixel and store them inside cameraRays
@@ -74,8 +50,8 @@ void Camera::GenerateRays()
 			u = (float)x / SCRWIDTH;
 			v = (float)y / SCRHEIGHT;
 
-			vec3 point = p0 + (p1 - p0) * u + (p2 - p0) * v;
-			vec3 rayDir = normalize(point - pos);
+			vec3 rayDir = normalize((this->topLeft + ((float)x / (float)SCRWIDTH) * (this->topRight - this->topLeft) + ((float)y / (float)SCRHEIGHT) * (this->bottomLeft - this->topLeft)) - this->pos);
+
 			Ray* ray = new Ray(pos, rayDir);
 
 			cameraRays[y * SCRWIDTH + x] = ray;
@@ -96,12 +72,12 @@ void Camera::UpdateRays()
 			u = (float)x / SCRWIDTH;
 			v = (float)y / SCRHEIGHT;
 
-			vec3 point = p0 + (p1 - p0) * u + (p2 - p0) * v;
-			vec3 rayDir = normalize(point - pos);
+			vec3 rayDir = normalize((this->topLeft + ((float)x / (float)SCRWIDTH) * (this->topRight - this->topLeft) + ((float)y / (float)SCRHEIGHT) * (this->bottomLeft - this->topLeft)) - this->pos);
+
 			Ray* ray = cameraRays[y * SCRWIDTH + x];
 
 			ray->dir = rayDir;
-			ray->orig = pos;
+			ray->orig = this->pos;
 			ray->t = INFINITY;
 		}
 	}

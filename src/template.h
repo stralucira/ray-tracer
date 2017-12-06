@@ -3,11 +3,9 @@
 // Credits to Mathijs Molenaar for making it both Windows, Linux, and Mac compatible
 
 #pragma once
-
 #define GLM_FORCE_RADIANS
 #define GLM_ENABLE_EXPERIMENTAL
-#define GLM_FORCE_LEFT_HANDED
-#define BACKGROUND_COLOR vec3(0.0f, 0.0f, 0.0f);
+#define BACKGROUND_COLOR vec3(0.4f, 0.4f, 0.4f);
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?
