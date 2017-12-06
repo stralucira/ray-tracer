@@ -4,9 +4,9 @@
 class Cylinder : public Primitive
 {
 public:
-	Cylinder(vec3 pos, vec3 up, float radius, float height) : Primitive(pos)
+	Cylinder(vec3 position, vec3 up, float radius, float height) : Primitive(position)
 	{
-		this->pos = pos;
+		this->pos = position;
 		this->up = up;
 		this->radius = radius;
 		this->height = height;

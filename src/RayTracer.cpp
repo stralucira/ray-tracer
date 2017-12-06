@@ -1,6 +1,8 @@
 #include "template.h"
 #include "RayTracer.h"
 
+int iCPU2 = omp_get_num_procs();
+
 RayTracer::RayTracer(Scene* scene, Surface* screen)
 {
 	this->scene = scene;
@@ -74,8 +76,16 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
 			float etai = 1, etat = 1.52f;
 			vec3 n = normal;
-			if (cosi < 0) { cosi = -cosi; }
-			else { std::swap(etai, etat); n = -normal; }
+			
+			if (cosi < 0)
+			{
+				cosi = -cosi;
+			}
+			else
+			{
+				std::swap(etai, etat);
+				n = -normal;
+			}
 			float eta = etai / etat;
 			float k = 1 - eta * eta * (1 - cosi * cosi);
 			
@@ -87,7 +97,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			{
 				Ray* refractRay = new Ray();
 				refractRay->orig = hitPoint;
-				refractRay->dir = eta * ray->dir + (eta * cosi - sqrtf(k)) * n;	
+				refractRay->dir = eta * ray->dir + (eta * cosi - sqrtf(k)) * n;
 				
 				vec3 hitEpsilon = refractRay->orig + refractRay->dir * 0.01f;
 				refractRay->orig = hitEpsilon;
@@ -114,7 +124,7 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	shadowRay.t = INFINITY;
 
 	float lightInt = 0.0f;
-	float tToLight = (light->pos.x - hitEpsilon.x) / dir.x;
+	float tToLight = length(light->pos - hitEpsilon);
 
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
@@ -159,11 +169,13 @@ float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)
 
 void RayTracer::Render()
 {
-#pragma omp parallel for
+	omp_set_num_threads(iCPU2);
+	int x = 0;
+	
+	#pragma omp parallel for private(x)
 	for (int y = 0; y < SCRHEIGHT; y++)
 	{
-#pragma omp parallel for
-		for (int x = 0; x < SCRWIDTH; x++)
+		for (x = 0; x < SCRWIDTH; x++)
 		{
 			vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x], 0);
 
@@ -174,11 +186,11 @@ void RayTracer::Render()
 			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 		}
 	}
-#pragma omp parallel for
+	
+	#pragma omp parallel for private(x)
 	for (int y = 0; y < SCRHEIGHT; y++)
 	{
-#pragma omp parallel for
-		for (int x = 0; x < SCRWIDTH; x++)
+		for (x = 0; x < SCRWIDTH; x++)
 		{
 			this->screen->Plot(x, y, this->buffer[y][x]);
 		}

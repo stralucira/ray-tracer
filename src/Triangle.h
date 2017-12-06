@@ -4,12 +4,12 @@
 class Triangle : public Primitive
 {
 public:
-	Triangle(vec3 pos, vec3 b, vec3 c) : Primitive(pos)
+	Triangle(vec3 position, vec3 b, vec3 c) : Primitive(position)
 	{
-		this->a = pos;
+		this->a = position;
 		this->b = b;
 		this->c = c;
-		this->normal = normalize(cross(pos - b, b - c));
+		this->normal = normalize(cross(position - b, b - c));
 	}
 
 	bool intersect(Ray* ray);
@@ -17,5 +17,4 @@ public:
 
 	vec3 a, b, c;
 	vec3 normal;
-
 };

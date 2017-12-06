@@ -4,11 +4,11 @@
 class Sphere : public Primitive
 {
 public:
-	Sphere(vec3 pos, float r) : Primitive(pos)
+	Sphere(vec3 position, float radius) : Primitive(position)
 	{
-		this->center = pos;
-		this->radius = r;
-		this->radius2 = r*r;
+		this->center = position;
+		this->radius = radius;
+		this->radius2 = radius * radius;
 	}
 
 	bool intersect(Ray* ray);

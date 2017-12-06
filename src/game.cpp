@@ -51,7 +51,7 @@ void Game::KeyDown(int a_Key)
 	// move camera
 	if (a_Key == SDL_SCANCODE_W)
 	{
-		camera->pos += camera->viewDirNorm * 0.10f;
+		camera->pos += camera->viewDir * 0.10f;
 		update = true;
 		
 	}
@@ -63,7 +63,7 @@ void Game::KeyDown(int a_Key)
 	}
 	if (a_Key == SDL_SCANCODE_S)
 	{
-		camera->pos -= camera->viewDirNorm * 0.10f;
+		camera->pos -= camera->viewDir * 0.10f;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_D)

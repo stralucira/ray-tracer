@@ -4,10 +4,10 @@
 class Plane : public Primitive
 {
 public:
-	Plane(vec3 pos, vec3 normal) : Primitive(pos)
+	Plane(vec3 position, vec3 normal) : Primitive(position)
 	{
 		this->normal = normal;
-		this->pos = pos;
+		this->pos = position;
 	}
 
 	bool intersect(Ray* ray);

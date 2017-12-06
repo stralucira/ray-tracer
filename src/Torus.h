@@ -5,7 +5,7 @@
 class Torus : public Primitive
 {
 public:
-	Torus(float R, float r, vec3 pos, vec3 axis) : Primitive(pos)
+	Torus(vec3 pos, vec3 axis, float R, float r) : Primitive(pos)
 	{
 		this->position = pos;
 		this->R = R;

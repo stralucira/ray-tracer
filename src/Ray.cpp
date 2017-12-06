@@ -1,10 +1,10 @@
 ﻿#include "template.h"
 #include "Ray.h"
 
-Ray::Ray(vec3 orig, vec3 dir)
+Ray::Ray(vec3 origin, vec3 direction)
 {
-	this->orig = orig;
-	this->dir = dir;
+	this->orig = origin;
+	this->dir = direction;
 	this->t = INFINITY;
 }
 
