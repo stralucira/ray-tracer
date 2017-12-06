@@ -103,7 +103,6 @@ void Game::KeyDown(int a_Key)
 		camera->CalculateScreen();
 		camera->UpdateRays();
 	}
-
 }
 
 // -----------------------------------------------------------

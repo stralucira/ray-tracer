@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿// Basar Oguz - 6084990
+// Satwiko Wirawan Indrawanto - 6201539
+
+#pragma once
 #include "Ray.h"
 #include "template.h"
 #include "Scene.h"

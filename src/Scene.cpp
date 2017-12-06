@@ -3,6 +3,8 @@
 #include "Sphere.h"
 #include "Triangle.h"
 #include "Plane.h"
+#include "Cylinder.h"
+#include "Torus.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -21,6 +23,12 @@ Scene::Scene()
 
 	primList.push_back(new Sphere(vec3(1.5f, -1.0f, 3.0f), 0.7f));
 	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
+
+	primList.push_back(new Cylinder(vec3(-2.0f, 1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
+	primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
+	
+	primList.push_back(new Torus(0.5f, 0.2f, vec3(-1.0f, 2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f)));
+	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Triangle(vec3(0.1f, 2.0f, 4.0f), vec3(0.75f, 0.1f, 4.0f), vec3(-0.5, 0.5, 3)));
 	primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
