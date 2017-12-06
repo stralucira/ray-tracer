@@ -1,13 +1,8 @@
-﻿#include "template.h"
+#include "template.h"
 #include "Scene.h"
 #include "Sphere.h"
 #include "Triangle.h"
 #include "Plane.h"
-
-#define SCENE1	0;
-#define SCENE2	1;
-#define SCENE3	0;
-#define TINYOBJLOADER 0;
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -17,13 +12,13 @@ Scene::Scene()
 {
 	camera = new Camera();
 
-#if SCENE1
+    /*
 	lightList.push_back(new Light(vec3(0.0f, 0.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
 	
 	primList.push_back(new Triangle(vec3(0, 1, 2), vec3(1, 0, 2), vec3(-1, 0, 2)));
 	primList.back()->material = Material(vec3(1, 0, 1), Material::Shader::DIFFUSE);
+     */
 
-#elif SCENE2
 	lightList.push_back(new Light(vec3(-1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 	lightList.push_back(new Light(vec3(0.0f,-2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
@@ -51,7 +46,7 @@ Scene::Scene()
 	primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back
 	primList.back()->material = Material(vec3(0.8f, 0.4f, 0.2f), Material::Shader::DIFFUSE);
 
-#elif SCENE3
+    /*
 	lightList.push_back(new Light(vec3(10, 0, 1), vec3(100, 100, 100)));
 
 	primList.push_back(new Sphere(vec3(0.0f, 0.0f, 0.5f), 1.0f));
@@ -65,8 +60,7 @@ Scene::Scene()
 
 	primList.push_back(new Plane(vec3(0, 0, 15), vec3(0, 0, 1)));
 	primList.back()->material = Material(vec3(0.75f, 0.8f, 0.7f), Material::Shader::DIFFUSE);
-
-#elif TINYOBJLOADER
+     */
 	
 	lightList.push_back(new Light(vec3(-1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 
@@ -125,6 +119,4 @@ Scene::Scene()
 			primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
 		}
 	}
-
-#endif
 }
