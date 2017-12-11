@@ -101,7 +101,7 @@ void Game::KeyDown(int a_Key)
 	if (update)
 	{
 		camera->CalculateScreen();
-		camera->UpdateRays();
+		//camera->UpdateRays();
 	}
 }
 

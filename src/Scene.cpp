@@ -40,7 +40,7 @@ Scene::Scene()
 	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
-	primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
 
 	primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
 	primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);

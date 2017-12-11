@@ -7,7 +7,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 {
 	this->scene = scene;
 	this->screen = screen;
-	this->scene->camera->GenerateRays();
+	//this->scene->camera->GenerateRays();
 }
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
@@ -59,7 +59,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		if (primHit->material.shader == Material::Shader::MIRROR)
 		{
 			Ray* reflectRay = new Ray(hitPoint, Reflect(ray->dir, normal));
-			color += primHit->material.color * 0.8f * GetColor(x, y, reflectRay, depth += 1);
+			color += primHit->material.color * GetColor(x, y, reflectRay, depth += 1);
 			ray->t = INFINITY;
 			delete reflectRay;
 		}
@@ -67,7 +67,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		// GLASS material shader hit
 		if (primHit->material.shader == Material::Shader::GLASS)
 		{
-			vec3 refractColor = vec3(0.0f);
+			vec3 refractColor = BLACK;
 			
 			float kr = Fresnel(ray->dir, normal, 1.52f);
 			bool outside = dot(ray->dir, normal) < 0;
@@ -131,12 +131,12 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 		this->scene->primList[i]->intersect(&shadowRay);
 		if (shadowRay.t < tToLight)
 		{
-			return vec3(0.0f);
+			return BLACK;
 		}
 	}
 
 	float euclidianDistanceToLight = distance(hitPoint, light->pos);
-	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.color / PI);
+	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.color * INVPI);
 }
 
 vec3 RayTracer::Reflect(vec3 dir, vec3 normal)
@@ -177,7 +177,8 @@ void RayTracer::Render()
 	{
 		for (x = 0; x < SCRWIDTH; x++)
 		{
-			vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x], 0);
+			//vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x], 0);
+			vec3 color = GetColor(x, y, this->scene->camera->GenerateRay(x,y), 0);
 
 			color *= 255.0f;
             int r = glm::min((int)color.x, 255);

@@ -36,7 +36,8 @@ void Camera::CalculateScreen()
 	this->p2 = screenCenter - this->right - this->up * aspectRatio; // bottom left corner
 }
 
-// Generate rays for every screen pixel and store them inside cameraRays
+// Generate rays for every screen pixel and store them inside cameraRays (obsolete)
+/*
 void Camera::GenerateRays()
 {
 	omp_set_num_threads(iCPU);
@@ -81,4 +82,15 @@ void Camera::UpdateRays()
 			ray->t = INFINITY;
 		}
 	}
+}
+*/
+
+// Generate ray
+Ray* Camera::GenerateRay(int x, int y)
+{
+	vec3 rayDir = normalize((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
+	Ray* ray = new Ray(this->pos, rayDir);
+	ray->t = INFINITY;
+
+	return ray;
 }
