@@ -53,29 +53,29 @@ AABB* Triangle::calculateAABB()
 	float minY = INFINITY;
 	float minZ = INFINITY;
 
-	if (a.x >= maxX) { maxX = a.x; };
-	if (b.x >= maxX) { maxX = b.x; };
-	if (c.x >= maxX) { maxX = c.x; };
+	if (a.x >= maxX) { maxX = a.x; }
+	if (b.x >= maxX) { maxX = b.x; }
+	if (c.x >= maxX) { maxX = c.x; }
 
-	if (a.y >= maxY) { maxY = a.y; };
-	if (b.y >= maxY) { maxY = b.y; };
-	if (c.y >= maxY) { maxY = c.y; };
+	if (a.y >= maxY) { maxY = a.y; }
+	if (b.y >= maxY) { maxY = b.y; }
+	if (c.y >= maxY) { maxY = c.y; }
 
-	if (a.z >= maxZ) { maxZ = a.z; };
-	if (b.z >= maxZ) { maxZ = b.z; };
-	if (c.z >= maxZ) { maxZ = c.z; };
+	if (a.z >= maxZ) { maxZ = a.z; }
+	if (b.z >= maxZ) { maxZ = b.z; }
+	if (c.z >= maxZ) { maxZ = c.z; }
 
-	if (a.x <= minX) { minX = a.x; };
-	if (b.x <= minX) { minX = b.x; };
-	if (c.x <= minX) { minX = c.x; };
+	if (a.x <= minX) { minX = a.x; }
+	if (b.x <= minX) { minX = b.x; }
+	if (c.x <= minX) { minX = c.x; }
 
-	if (a.y <= minY) { minY = a.y; };
-	if (b.y <= minY) { minY = b.y; };
-	if (c.y <= minY) { minY = c.y; };
+	if (a.y <= minY) { minY = a.y; }
+	if (b.y <= minY) { minY = b.y; }
+	if (c.y <= minY) { minY = c.y; }
 
-	if (a.z <= minZ) { minZ = a.z; };
-	if (b.z <= minZ) { minZ = b.z; };
-	if (c.z <= minZ) { minZ = c.z; };
+	if (a.z <= minZ) { minZ = a.z; }
+	if (b.z <= minZ) { minZ = b.z; }
+	if (c.z <= minZ) { minZ = c.z; }
 
 	return new AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }

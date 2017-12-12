@@ -11,7 +11,7 @@ public:
 		this->r = r;
 		this->axis = normalize(axis);
 
-		this->center = position;
+		this->centroid = position;
 		this->boundingBox = calculateAABB();
 	}
 

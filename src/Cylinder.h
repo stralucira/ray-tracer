@@ -10,7 +10,7 @@ public:
 		this->radius = radius;
 		this->height = height;
 
-		this->center = position;
+		this->centroid = position;
 		this->boundingBox = calculateAABB();
 	}
 

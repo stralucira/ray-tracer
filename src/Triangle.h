@@ -11,7 +11,7 @@ public:
 		this->c = c;
 		this->normal = normalize(cross(a - b, b - c));
 	
-		this->center = calculateCentroid();
+		this->centroid = calculateCentroid();
 		this->boundingBox = calculateAABB();
 	}
 

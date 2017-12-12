@@ -8,7 +8,7 @@ public:
 	{
 		this->normal = normal;
 		
-		this->center = position;
+		this->centroid = position;
 		this->boundingBox = calculateAABB();
 	}
 

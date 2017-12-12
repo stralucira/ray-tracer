@@ -6,7 +6,7 @@ bool Torus::intersect(Ray* ray)
 	vec3 rayOriginPosition = ray->orig;
 	vec3 rayDirection = ray->dir;
 
-	vec3 centerToRayOrigin = rayOriginPosition - this->center;
+	vec3 centerToRayOrigin = rayOriginPosition - this->centroid;
 	const float centerToRayOriginDotDirection = dot(rayDirection, centerToRayOrigin);
 	float centerToRayOriginDotDirectionSquared = dot(centerToRayOrigin, centerToRayOrigin);
 	float r2 = r * r;
@@ -54,10 +54,10 @@ bool Torus::intersect(Ray* ray)
 
 vec3 Torus::getNormal(vec3 point)
 {
-	vec3 centerToPoint = point - this->center;
+	vec3 centerToPoint = point - this->centroid;
 	float centerToPointDotAxis = dot(axis, centerToPoint);
 	vec3 direction = normalize(centerToPoint - axis * centerToPointDotAxis);
-	vec3 normal = normalize(point - this->center + direction * R);
+	vec3 normal = normalize(point - this->centroid + direction * R);
 	return normal;
 }
 
