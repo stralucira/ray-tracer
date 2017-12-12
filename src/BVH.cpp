@@ -4,5 +4,4 @@
 void BVH::Traverse(Ray* ray)
 {
 	float prevRayT = ray->t;
-	Primitive* prevHit = ray->hit;
 }

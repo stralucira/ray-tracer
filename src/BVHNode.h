@@ -1,11 +1,10 @@
 #pragma once
+#include "AABB.h"
 
 struct BVHNode
 {
 public:
-	AABB bounds;
-	int leftFirst;
-	int count;
+	BVHNode() {};
 
 	BVHNode(AABB bounds, int leftFirst, int count)
 	{
@@ -13,4 +12,10 @@ public:
 		this->leftFirst = leftFirst;
 		this->count = count;
 	}
-}
+
+	bool isLeaf();
+
+	AABB bounds;
+	int leftFirst;
+	int count;
+};

@@ -5,9 +5,9 @@ bool Cylinder::intersect(Ray* ray)
 {
 	vector<float> points;
 	vec3 alpha = up * dot(ray->dir, up);
-	vec3 deltaP = (ray->orig - pos);
+	vec3 deltaP = (ray->orig - this->center);
 	vec3 beta = up * dot(deltaP, up);
-	vec3 pos2 = pos + up * height;
+	vec3 pos2 = this->center + up * height;
 
 	float a = length2(ray->dir - alpha);
 	float b = 2 * dot((ray->dir - alpha), (deltaP - beta));
@@ -22,14 +22,14 @@ bool Cylinder::intersect(Ray* ray)
 		float t2 = ((-1 * b) - discriminant) / (2 * a);
 		if (t1 >= 0)
 		{
-			if (dot(up, ((ray->orig - pos) + ray->dir * t1)) > 0 && dot(up, ((ray->orig - pos2) + ray->dir * t1)) < 0)
+			if (dot(up, ((ray->orig - this->center) + ray->dir * t1)) > 0 && dot(up, ((ray->orig - pos2) + ray->dir * t1)) < 0)
 			{
 				points.push_back(t1);
 			}
 		}
 		if (t2 >= 0)
 		{
-			if (dot(up, ((ray->orig - pos) + ray->dir * t2)) > 0 && dot(up, ((ray->orig - pos2) + ray->dir * t2)) < 0)
+			if (dot(up, ((ray->orig - this->center) + ray->dir * t2)) > 0 && dot(up, ((ray->orig - pos2) + ray->dir * t2)) < 0)
 			{
 				points.push_back(t2);
 			}
@@ -39,7 +39,7 @@ bool Cylinder::intersect(Ray* ray)
 	float denom = dot(ray->dir, up);
 	if (denom > 1e-6)
 	{
-		vec3 co = pos - ray->orig;
+		vec3 co = this->center - ray->orig;
 		float t3 = dot(co, up) / denom;
 		if (t3 > 0 && length2(ray->dir * t3 - co) <= radius * radius)
 		{
@@ -79,7 +79,7 @@ bool Cylinder::intersect(Ray* ray)
 
 vec3 Cylinder::getNormal(vec3 point)
 {
-	vec3 co = point - pos;
+	vec3 co = point - this->center;
 	vec3 co2 = co - up * height;
 	if (length2(co) <= radius * radius)
 	{
@@ -92,4 +92,9 @@ vec3 Cylinder::getNormal(vec3 point)
 	vec3 normal = co - (up * (dot(co, up) / length2(up)));
 
 	return normalize(normal);
+}
+
+AABB* Cylinder::calculateAABB()
+{
+	return new AABB(vec3(-INFINITY, -INFINITY, -INFINITY), vec3(INFINITY, INFINITY, INFINITY));
 }

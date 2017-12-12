@@ -6,7 +6,7 @@ bool Sphere::intersect(Ray* ray)
 {
 	float t0, t1; // solutions for t if the ray intersects
 
-	vec3 L = center - ray->orig;
+	vec3 L = this->center - ray->orig;
 	float tca = dot(L, ray->dir);
 	if (tca < 0) return false;
 	float d2 = dot(L, L) - tca * tca;
@@ -29,5 +29,10 @@ bool Sphere::intersect(Ray* ray)
 
 vec3 Sphere::getNormal(vec3 point)
 {
-	return normalize(point - center);
+	return normalize(point - this->center);
+}
+
+AABB* Sphere::calculateAABB()
+{
+	return new AABB(this->center - radius, this->center + radius);
 }

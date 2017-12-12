@@ -7,12 +7,15 @@ public:
 	Plane(vec3 position, vec3 normal) : Primitive(position)
 	{
 		this->normal = normal;
-		this->pos = position;
+		
+		this->center = position;
+		this->boundingBox = calculateAABB();
 	}
 
 	bool intersect(Ray* ray);
 	vec3 getNormal(vec3 point);
 
-	vec3 pos;
+	AABB* calculateAABB();
+
 	vec3 normal;
 };

@@ -8,11 +8,12 @@ public:
 	Camera();
 	void Init();
 	void CalculateScreen();
-	void GenerateRays();
-	void UpdateRays();
 
-	//Ray* cameraRays[SCRWIDTH*SCRHEIGHT];
 	Ray* GenerateRay(int x, int y);
+
+	//void GenerateRays();
+	//void UpdateRays();
+	//Ray* cameraRays[SCRWIDTH*SCRHEIGHT];
 
 	vec3 pos;
 	vec3 dir;

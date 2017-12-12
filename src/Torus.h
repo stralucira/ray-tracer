@@ -5,17 +5,21 @@
 class Torus : public Primitive
 {
 public:
-	Torus(vec3 pos, vec3 axis, float R, float r) : Primitive(pos)
+	Torus(vec3 position, vec3 axis, float R, float r) : Primitive(position)
 	{
-		this->position = pos;
 		this->R = R;
 		this->r = r;
 		this->axis = normalize(axis);
+
+		this->center = position;
+		this->boundingBox = calculateAABB();
 	}
 
 	bool intersect(Ray* ray);
 	vec3 getNormal(vec3 point);
 
+	AABB* calculateAABB();
+
 	float R, r;
-	vec3 position, axis;
+	vec3 axis;
 };

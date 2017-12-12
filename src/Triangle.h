@@ -4,16 +4,22 @@
 class Triangle : public Primitive
 {
 public:
-	Triangle(vec3 position, vec3 b, vec3 c) : Primitive(position)
+	Triangle(vec3 a, vec3 b, vec3 c) : Primitive(a)
 	{
-		this->a = position;
+		this->a = a;
 		this->b = b;
 		this->c = c;
-		this->normal = normalize(cross(position - b, b - c));
+		this->normal = normalize(cross(a - b, b - c));
+	
+		this->center = calculateCentroid();
+		this->boundingBox = calculateAABB();
 	}
 
 	bool intersect(Ray* ray);
 	vec3 getNormal(vec3 point);
+
+	AABB* calculateAABB();
+	vec3 calculateCentroid();
 
 	vec3 a, b, c;
 	vec3 normal;
