@@ -19,6 +19,59 @@ void BVH::ConstructBVH(Primitive** primitives)
 	root->Subdivide(pool, primitives, poolPtr);
 }
 
+void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
+{
+	float prevT = ray->t;
+	Primitive* prevHit = ray->hit;
+
+	if (isShadowRay && prevT != INFINITY)
+	{
+		return;
+	}
+
+	if (!ray->Intersect(node->bounds))
+	{
+		return;
+	}
+
+	if (node->isLeaf())
+	{
+		float currentT = IntersectPrim(ray, node);
+		if (currentT > prevT)
+		{
+			ray->t = prevT;
+			ray->hit = prevHit;
+		}
+	}
+
+	else
+	{
+		this->Traverse(ray, pool[node->leftFirst], isShadowRay);
+		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+	}
+}
+
+float BVH::IntersectPrim(Ray* ray, BVHNode* node)
+{
+	float nearest = INFINITY;
+
+	for (int i = node->leftFirst; i < node->count; i++)
+	{
+		if (primitives[i]->intersect(ray) && nearest > ray->t)
+		{
+			nearest = ray->t;
+			ray->hit = primitives[i];
+		}
+	}
+
+	if (ray->t > nearest)
+	{
+		ray->t = nearest;
+	}
+
+	return ray->t;
+}
+
 AABB BVH::CalculateBounds(Primitive** primitives, int first, int last)
 {
 	float maxX = -INFINITY;
@@ -40,9 +93,4 @@ AABB BVH::CalculateBounds(Primitive** primitives, int first, int last)
 		if (primitives[i]->boundingBox->min.z < minZ) { minZ = primitives[i]->boundingBox->min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
-}
-
-void BVH::Traverse(Ray* ray)
-{
-	float prevRayT = ray->t;
 }

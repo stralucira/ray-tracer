@@ -1,13 +1,20 @@
 ﻿#pragma once
+#include "AABB.h"
 
+class Primitive;
 class Ray
 {
 public:
-	Ray();
 	Ray(vec3 origin, vec3 direction);
-
-	vec3 orig;
-	vec3 dir;	
 	
 	float t;
+	vec3 orig;
+	vec3 dir;	
+
+	// BVH helpers
+	bool Intersect(AABB bounds);
+
+	int sign[3];
+	vec3 invDir;
+	Primitive* hit;	
 };

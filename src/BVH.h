@@ -6,12 +6,23 @@
 class BVH
 {
 public:
-	void ConstructBVH(Primitive** primitives);
-	static AABB CalculateBounds(Primitive** primitives, int first, int last);
-	void Traverse(Ray* ray);
+	// Contructors
+	BVH(Primitive** primitives, uint N)
+	{
+		this->N = N;
+		this->primitives = primitives;
+		ConstructBVH(primitives);
+	}
 
+	// Functions
+	void ConstructBVH(Primitive** primitives);
+	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay);
+	float IntersectPrim(Ray* ray, BVHNode* node);
+	static AABB CalculateBounds(Primitive** primitives, int first, int last);
+
+	// Variables
 	uint N, poolPtr;
-	
 	BVHNode* root;
 	BVHNode** pool;
+	Primitive** primitives;
 };

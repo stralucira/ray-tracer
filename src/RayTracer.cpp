@@ -95,9 +95,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			}
 			else
 			{
-				Ray* refractRay = new Ray();
-				refractRay->orig = hitPoint;
-				refractRay->dir = eta * ray->dir + (eta * cosi - sqrtf(k)) * n;
+				Ray* refractRay = new Ray(hitPoint, eta * ray->dir + (eta * cosi - sqrtf(k)) * n);
 				
 				vec3 hitEpsilon = refractRay->orig + refractRay->dir * 0.01f;
 				refractRay->orig = hitEpsilon;
