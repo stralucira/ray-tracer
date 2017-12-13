@@ -16,7 +16,7 @@ void BVH::ConstructBVH(Primitive** primitives)
 	root->leftFirst = 0;
 	root->count = N;
 	root->bounds = CalculateBounds(primitives, 0, N);
-	root->Subdivide();
+	root->Subdivide(pool, primitives, poolPtr);
 }
 
 AABB BVH::CalculateBounds(Primitive** primitives, int first, int last)

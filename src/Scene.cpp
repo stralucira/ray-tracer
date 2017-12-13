@@ -18,17 +18,17 @@ Scene::Scene()
 	lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 	lightList.push_back(new Light(vec3(0.0f,2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
-	//primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
-	//primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
+	primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
+	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
 
 	primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
 	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
 
-	//primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
-	//primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
+	primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
+	primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
 	
-	//primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
-	//primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
+	primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
+	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
 	primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
@@ -40,10 +40,10 @@ Scene::Scene()
 	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
-	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+	primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
 
 	primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
-	primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+	primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
 
 	primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
 	primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
