@@ -12,8 +12,8 @@ public:
 	}
 
 	// Functions
-	float AABB::CalculateVolume();
-	vec3 AABB::CalculateCentroid();
+	float CalculateVolume();
+	vec3 CalculateCentroid();
 
 	// Variables
 	vec3 min;
