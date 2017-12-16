@@ -132,8 +132,8 @@ struct Timer
 	typedef std::chrono::high_resolution_clock Clock;
 #ifdef __linux__
 	typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
-#else // Both OS X and Windows
-	typedef std::chrono::time_point<std::chrono::_V2::system_clock> TimePoint;
+#else// Both OS X and Windows
+	typedef std::chrono::steady_clock::time_point TimePoint;
 #endif
 	typedef std::chrono::microseconds MicroSeconds;
 

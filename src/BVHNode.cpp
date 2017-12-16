@@ -27,7 +27,7 @@ bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, uint& poolPtr)
 
 	int dimension;
 
-	float biggest = glm::max(lengthX, glm::max(lengthY, lengthZ));
+	float biggest = max(lengthX, max(lengthY, lengthZ));
 	if (biggest == lengthX)
 	{
 		dimension = 0;
