@@ -2,6 +2,7 @@
 #include "Primitive.h"
 #include "Light.h"
 #include "Camera.h"
+#include "BVH.h"
 
 class Scene
 {
@@ -11,4 +12,8 @@ public:
 
 	std::vector<Primitive*> primList;
 	std::vector<Light*> lightList;
+
+	// bvh helpers
+	AABB* sceneBounds;
+	BVH* bvh;
 };

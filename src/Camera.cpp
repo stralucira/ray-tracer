@@ -37,7 +37,6 @@ void Camera::CalculateScreen()
 }
 
 // Generate rays for every screen pixel and store them inside cameraRays (obsolete)
-/*
 void Camera::GenerateRays()
 {
 	omp_set_num_threads(iCPU);
@@ -83,14 +82,15 @@ void Camera::UpdateRays()
 		}
 	}
 }
-*/
 
 // Generate ray
-Ray* Camera::GenerateRay(int x, int y)
+
+Ray Camera::GenerateRay(int x, int y)
 {
 	vec3 rayDir = normalize((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
-	Ray* ray = new Ray(this->pos, rayDir);
-	ray->t = INFINITY;
+	//Ray* ray = new Ray(this->pos, rayDir);
+	//ray->t = INFINITY;
 
-	return ray;
+	//return ray;
+	return Ray(this->pos, rayDir);
 }

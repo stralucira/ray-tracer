@@ -1,13 +1,15 @@
 #include "template.h"
 #include "RayTracer.h"
 
+#define USEBVH 1
+
 int iCPU2 = omp_get_num_procs();
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
 {
 	this->scene = scene;
 	this->screen = screen;
-	//this->scene->camera->GenerateRays();
+	this->scene->camera->GenerateRays();
 }
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
@@ -175,8 +177,7 @@ void RayTracer::Render()
 	{
 		for (x = 0; x < SCRWIDTH; x++)
 		{
-			//vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x], 0);
-			vec3 color = GetColor(x, y, this->scene->camera->GenerateRay(x,y), 0);
+			vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x], 0);
 
 			color *= 255.0f;
             int r = glm::min((int)color.x, 255);
