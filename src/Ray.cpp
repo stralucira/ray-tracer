@@ -23,17 +23,17 @@ bool Ray::Intersect(AABB bounds)
 	tymin = (bounds.min.y - this->orig.y) * this->invDir.y;
 	tymax = (bounds.max.y - this->orig.y) * this->invDir.y;
 
-	tmin = min(txmin, txmax);
-	tmax = max(txmin, txmax);
+	tmin = glm::min(txmin, txmax);
+	tmax = glm::max(txmin, txmax);
 
-	tmin = max(tmin, min(tymin, tymax));
-	tmax = min(tmax, max(tymin, tymax));
+	tmin = glm::max(tmin, min(tymin, tymax));
+	tmax = glm::min(tmax, max(tymin, tymax));
 
 	tzmin = (bounds.min.z - this->orig.z) * this->invDir.z;
 	tzmax = (bounds.max.z - this->orig.z) * this->invDir.z;
 
-	tmin = max(tmin, min(tzmin, tzmax));
-	tmax = min(tmax, max(tzmin, tzmax));
+	tmin = glm::max(tmin, min(tzmin, tzmax));
+	tmax = glm::min(tmax, max(tzmin, tzmax));
 
 	return tmax >= tmin && tmax >= 0;
 
