@@ -11,9 +11,9 @@ public:
 
 	Ray GenerateRay(int x, int y);
 
-	void GenerateRays();
-	void UpdateRays();
-	Ray* cameraRays[SCRWIDTH*SCRHEIGHT];
+	//void GenerateRays();
+	//void UpdateRays();
+	//Ray* cameraRays[SCRWIDTH*SCRHEIGHT];
 
 	vec3 pos;
 	vec3 dir;

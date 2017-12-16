@@ -9,7 +9,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 {
 	this->scene = scene;
 	this->screen = screen;
-	this->scene->camera->GenerateRays();
+	//this->scene->camera->GenerateRays();
 }
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
@@ -60,10 +60,10 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		// MIRROR material shader hit
 		if (primHit->material.shader == Material::Shader::MIRROR)
 		{
-			Ray* reflectRay = new Ray(hitPoint, Reflect(ray->dir, normal));
-			color += primHit->material.color * GetColor(x, y, reflectRay, depth += 1);
+			Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
+			color += primHit->material.color * GetColor(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
-			delete reflectRay;
+			//delete reflectRay;
 		}
 
 		// GLASS material shader hit
@@ -97,19 +97,19 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			}
 			else
 			{
-				Ray* refractRay = new Ray(hitPoint, eta * ray->dir + (eta * cosi - sqrtf(k)) * n);
+				Ray refractRay = Ray(hitPoint, eta * ray->dir + (eta * cosi - sqrtf(k)) * n);
 				
-				vec3 hitEpsilon = refractRay->orig + refractRay->dir * 0.01f;
-				refractRay->orig = hitEpsilon;
+				vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
+				refractRay.orig = hitEpsilon;
 
-				refractColor = this->GetColor(x, y, refractRay, depth + 1);
-				delete refractRay;
+				refractColor = this->GetColor(x, y, &refractRay, depth + 1);
+				//delete refractRay;
 			}
 		
-			Ray* reflectRay = new Ray(hitPoint, reflect(ray->dir, normal));
-			vec3 reflectColor = primHit->material.color * 0.8f * GetColor(x, y, reflectRay, depth += 1);
+			Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
+			vec3 reflectColor = primHit->material.color * GetColor(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
-			delete reflectRay;
+			//delete reflectRay;
 
 			color += reflectColor * kr + refractColor * (1 - kr);
 		}
@@ -177,7 +177,8 @@ void RayTracer::Render()
 	{
 		for (x = 0; x < SCRWIDTH; x++)
 		{
-			vec3 color = GetColor(x, y, this->scene->camera->cameraRays[y*SCRWIDTH + x], 0);
+			Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
+			vec3 color = GetColor(x, y, &ray, 0);
 
 			color *= 255.0f;
             int r = glm::min((int)color.x, 255);
