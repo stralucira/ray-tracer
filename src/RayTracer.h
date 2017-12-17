@@ -11,7 +11,7 @@ class RayTracer
 public:
 	Surface* screen;
 	Scene* scene;
-	//Pixel buffer[SCRHEIGHT][SCRWIDTH];
+	Pixel buffer[SCRHEIGHT][SCRWIDTH];
 	
 	RayTracer(Scene* scene, Surface* screen);
 

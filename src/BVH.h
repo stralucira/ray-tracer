@@ -25,7 +25,6 @@ public:
 	BVHNode* root;
 	BVHNode** pool;
 	std::vector<Primitive*> primitives;
-	Primitive** primitives2;
 
 	byte* whichChildFirst;
 	vec4* dists;

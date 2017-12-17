@@ -35,20 +35,14 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 	float prevT = ray->t;
 	Primitive* prevHit = ray->hit;
 
-	if (isShadowRay && prevT != INFINITY)
-	{
-		return;
-	}
+	if (isShadowRay && prevT != INFINITY) { return; }
 
-	if (!ray->Intersect(node->bounds))
-	{
-		return;
-	}
+	if (!ray->Intersect(node->bounds)) { return; }
 
 	if (node->isLeaf())
 	{
-		float currentT = IntersectPrim(ray, node);
-		if (currentT > prevT)
+		//float currentT = IntersectPrim(ray, node);
+		if (IntersectPrim(ray, node) > prevT)
 		{
 			ray->t = prevT;
 			ray->hit = prevHit;
@@ -75,10 +69,7 @@ float BVH::IntersectPrim(Ray* ray, BVHNode* node)
 		}
 	}
 
-	if (ray->t > nearest)
-	{
-		ray->t = nearest;
-	}
+	if (ray->t > nearest) { ray->t = nearest; }
 
 	return ray->t;
 }
