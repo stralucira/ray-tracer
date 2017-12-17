@@ -1,7 +1,7 @@
 #include "template.h"
 #include "RayTracer.h"
 
-#define USEBVH 1
+#define ENABLEBVH 1
 
 int iCPU2 = omp_get_num_procs();
 
@@ -20,17 +20,21 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	}
 
 	float nearest = INFINITY;
-	Primitive* primHit;
 
 	// check intersection
+#if ENABLEBVH
+	scene->bvh->Traverse(ray, scene->bvh->root);
+	nearest = ray->t;
+#else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
 		if (this->scene->primList[i]->intersect(ray) && nearest > ray->t)
 		{
 			nearest = ray->t;
-			primHit = this->scene->primList[i];
+			ray->hit = this->scene->primList[i];
 		}
 	}
+#endif
 
 	// ray does not intersect
 	if (nearest == INFINITY)
@@ -42,38 +46,38 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	else
 	{
 		vec3 hitPoint = ray->orig + ray->dir * nearest;
-		vec3 normal = primHit->getNormal(hitPoint);
+		vec3 normal = ray->hit->getNormal(hitPoint);
 		vec3 color = vec3(0.0f);
 		
 		// DIFFUSE material shader hit
-		if (primHit->material.shader == Material::Shader::DIFFUSE)
+		if (ray->hit->material.shader == Material::Shader::DIFFUSE)
 		{
 			for (size_t i = 0; i < this->scene->lightList.size(); i++)
 			{
 				vec3 dir = normalize(scene->lightList[i]->pos - hitPoint);
 				if (dot(dir, normal) < 0) continue;
-				color += DirectIllumination(hitPoint, dir, normal, scene->lightList[i], primHit->material);
+				color += DirectIllumination(hitPoint, dir, normal, scene->lightList[i], ray->hit->material);
 			}
 			ray->t = INFINITY;
 		}
 
 		// MIRROR material shader hit
-		if (primHit->material.shader == Material::Shader::MIRROR)
+		if (ray->hit->material.shader == Material::Shader::MIRROR)
 		{
 			Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
-			color += primHit->material.color * GetColor(x, y, &reflectRay, depth += 1);
+			color += ray->hit->material.color * GetColor(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
 			//delete reflectRay;
 		}
 
 		// GLASS material shader hit
-		if (primHit->material.shader == Material::Shader::GLASS)
+		if (ray->hit->material.shader == Material::Shader::GLASS)
 		{
 			vec3 refractColor = BLACK;
 			
 			float kr = Fresnel(ray->dir, normal, 1.52f);
 			bool outside = dot(ray->dir, normal) < 0;
-			vec3 bias = 0.001f * primHit->getNormal(hitPoint);
+			vec3 bias = 0.001f * ray->hit->getNormal(hitPoint);
 
 			float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
 			float etai = 1, etat = 1.52f;
@@ -107,7 +111,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			}
 		
 			Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
-			vec3 reflectColor = primHit->material.color * GetColor(x, y, &reflectRay, depth += 1);
+			vec3 reflectColor = ray->hit->material.color * GetColor(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
 			//delete reflectRay;
 
@@ -184,10 +188,13 @@ void RayTracer::Render()
             int r = glm::min((int)color.x, 255);
             int g = glm::min((int)color.y, 255);
             int b = glm::min((int)color.z, 255);
-			buffer[y][x] = ((r << 16) + (g << 8) + (b));
+			
+			//buffer[y][x] = ((r << 16) + (g << 8) + (b));
+			this->screen->Plot(x, y, ((r << 16) + (g << 8) + (b)));
 		}
 	}
 	
+	/*
 	#pragma omp parallel for private(x)
 	for (int y = 0; y < SCRHEIGHT; y++)
 	{
@@ -195,5 +202,5 @@ void RayTracer::Render()
 		{
 			this->screen->Plot(x, y, this->buffer[y][x]);
 		}
-	}
+	}*/
 }

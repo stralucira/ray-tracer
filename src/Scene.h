@@ -14,6 +14,8 @@ public:
 	std::vector<Light*> lightList;
 
 	// bvh helpers
+	AABB* CalculateSceneBounds();
+
 	AABB* sceneBounds;
 	BVH* bvh;
 };

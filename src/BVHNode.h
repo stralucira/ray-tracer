@@ -2,7 +2,7 @@
 #include "AABB.h"
 #include "Primitive.h"
 
-struct BVHNode
+class BVHNode
 {
 public:
 	// Constructors
@@ -15,8 +15,8 @@ public:
 	}
 
 	// Functions
-	void Subdivide(BVHNode** pool, Primitive** primitives, uint& poolPtr);
-	bool Partition(BVHNode** pool, Primitive** primitives, uint& poolPtr);
+	void Subdivide(BVHNode** pool, std::vector<Primitive*> primitives, glm::uint& poolPtr);
+	bool Partition(BVHNode** pool, std::vector<Primitive*> primitives, glm::uint& poolPtr);
 	bool isLeaf();
 
 	// Variables

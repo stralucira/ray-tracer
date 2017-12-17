@@ -1,7 +1,7 @@
 #include "template.h"
 #include "BVH.h"
 
-void BVH::ConstructBVH(Primitive** primitives)
+void BVH::ConstructBVH(std::vector<Primitive*> primitives)
 {
 	// create index array
 	//indices = new uint[N];
@@ -9,6 +9,17 @@ void BVH::ConstructBVH(Primitive** primitives)
 
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];
+
+	whichChildFirst = new byte[N * 2 - 1];
+	dists = new vec4[N * 2 - 1];
+
+	for (glm::uint i = 0; i < (N * 2 - 1); i++)
+	{
+		pool[i] = new BVHNode();
+		whichChildFirst[i] = 0;
+		dists[i] = vec4(0);
+	}
+
 	root = pool[0];
 	poolPtr = 2;
 
@@ -72,7 +83,7 @@ float BVH::IntersectPrim(Ray* ray, BVHNode* node)
 	return ray->t;
 }
 
-AABB BVH::CalculateBounds(Primitive** primitives, int first, int last)
+AABB BVH::CalculateBounds(std::vector<Primitive*> primitives, int first, int last)
 {
 	float maxX = -INFINITY;
 	float maxY = -INFINITY;

@@ -2,7 +2,7 @@
 #include "BVH.h"
 #include "BVHNode.h"
 
-void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, uint& poolPtr)
+void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*> primitives, uint& poolPtr)
 {
 	if (count - this->leftFirst < 5) return;
 
@@ -19,7 +19,7 @@ void BVHNode::Subdivide(BVHNode** pool, Primitive** primitives, uint& poolPtr)
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode** pool, Primitive** primitives, uint& poolPtr)
+bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*> primitives, uint& poolPtr)
 {
 	float lengthX = this->bounds.max.x - this->bounds.min.x;
 	float lengthY = this->bounds.max.y - this->bounds.min.y;
