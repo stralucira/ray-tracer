@@ -15,7 +15,7 @@ public:
 	}
 
 	// Functions
-	void ConstructBVH(std::vector<Primitive*>* primitives);
+	void ConstructBVH(std::vector<Primitive*>* primitives);	
 	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false);
 	float IntersectPrim(Ray* ray, BVHNode* node);
 	static AABB CalculateBounds(std::vector<Primitive*>* primitives, int first, int last);
@@ -24,6 +24,7 @@ public:
 	uint N, poolPtr;
 	BVHNode* root;
 	BVHNode** pool;
+	
 	std::vector<Primitive*>* primitives;
 
 	byte* whichChildFirst;

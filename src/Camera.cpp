@@ -13,7 +13,7 @@ Camera::Camera()
 // Initialize camera and the transformation matrix
 void Camera::Init()
 {
-	this->pos = vec3(-0.5f, 0.0f, -3.0f);
+	this->pos = vec3(0.0f, 0.0f, -2.0f);
 	this->dir = vec3(0.0f, 0.0f, 1.0f);
 	this->d = 1.0f;
 	this->up = vec3(0.0f, 1.0f, 0.0f);

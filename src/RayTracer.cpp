@@ -14,10 +14,10 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 {
-	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
+	/*if (depth > MAXDEPTH || sizeof(this->scene->primList) / sizeof(this->scene->primList[0]) == 0)
 	{
 		return BACKGROUND_COLOR;
-	}
+	}*/
 
 	float nearest = INFINITY;
 
@@ -47,7 +47,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	{
 		vec3 hitPoint = ray->orig + ray->dir * nearest;
 		vec3 normal = ray->hit->getNormal(hitPoint);
-		vec3 color = vec3(0.0f);
+		vec3 color = BLACK;
 		
 		// DIFFUSE material shader hit
 		if (ray->hit->material.shader == Material::Shader::DIFFUSE)
@@ -130,6 +130,13 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	float lightInt = 0.0f;
 	float tToLight = length(light->pos - hitEpsilon);
 
+#if ENABLEBVH
+	scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+	if (shadowRay.t < tToLight)
+	{
+		return BLACK;
+	}
+#else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
 		this->scene->primList[i]->intersect(&shadowRay);
@@ -138,6 +145,7 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 			return BLACK;
 		}
 	}
+#endif
 
 	float euclidianDistanceToLight = distance(hitPoint, light->pos);
 	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.color * INVPI);
@@ -189,12 +197,11 @@ void RayTracer::Render()
             int g = glm::min((int)color.y, 255);
             int b = glm::min((int)color.z, 255);
 			
-			//buffer[y][x] = ((r << 16) + (g << 8) + (b));
+			buffer[y][x] = ((r << 16) + (g << 8) + (b));
 			this->screen->Plot(x, y, ((r << 16) + (g << 8) + (b)));
 		}
 	}
 	
-	/*
 	#pragma omp parallel for private(x)
 	for (int y = 0; y < SCRHEIGHT; y++)
 	{
@@ -202,5 +209,5 @@ void RayTracer::Render()
 		{
 			this->screen->Plot(x, y, this->buffer[y][x]);
 		}
-	}*/
+	}
 }

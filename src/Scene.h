@@ -10,8 +10,8 @@ public:
 	Scene();
 	Camera* camera;
 
-	std::vector<Primitive*> primList;
 	std::vector<Light*> lightList;
+	std::vector<Primitive*> primList;
 
 	// bvh helpers
 	AABB* CalculateSceneBounds();

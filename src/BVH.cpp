@@ -9,17 +9,10 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
 
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];
-
-	//whichChildFirst = new byte[N * 2 - 1];
-	//dists = new vec4[N * 2 - 1];
-
 	for (glm::uint i = 0; i < (N * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
-		//whichChildFirst[i] = 0;
-		//dists[i] = vec4(0);
 	}
-
 	root = pool[0];
 	poolPtr = 2;
 
@@ -35,20 +28,14 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 	float prevT = ray->t;
 	Primitive* prevHit = ray->hit;
 
-	if (isShadowRay && prevT != INFINITY)
-	{
-		return;
-	}
+	if (isShadowRay && prevT != INFINITY) { return; }
 
-	if (!ray->Intersect(node->bounds))
-	{
-		return;
-	}
+	if (!ray->Intersect(node->bounds)) { return; }
 
 	if (node->isLeaf())
 	{
-		float currentT = IntersectPrim(ray, node);
-		if (currentT > prevT)
+		//float currentT = IntersectPrim(ray, node);
+		if (IntersectPrim(ray, node) > prevT)
 		{
 			ray->t = prevT;
 			ray->hit = prevHit;
@@ -75,10 +62,7 @@ float BVH::IntersectPrim(Ray* ray, BVHNode* node)
 		}
 	}
 
-	if (ray->t > nearest)
-	{
-		ray->t = nearest;
-	}
+	if (ray->t > nearest) { ray->t = nearest; }
 
 	return ray->t;
 }
