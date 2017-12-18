@@ -119,7 +119,7 @@ Scene::Scene()
 	// BVH helpers
 	sceneBounds = this->CalculateSceneBounds();
 #if USEVECTOR
-	bvh = new BVH(primList, primList.size());
+	bvh = new BVH(&primList, primList.size());
 #else
 	bvh = new BVH(primList, sizeof(this->primList) / sizeof(this->primList[0]));
 #endif

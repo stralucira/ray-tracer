@@ -2,7 +2,7 @@
 #include "BVH.h"
 #include "BVHNode.h"
 
-void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*> primitives, glm::uint& poolPtr)
+void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primitives, glm::uint& poolPtr)
 {
 	//if (count - this->leftFirst < 5) return;
 
@@ -19,7 +19,7 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*> primitives, glm:
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*> primitives, uint& poolPtr)
+bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primitives, uint& poolPtr)
 {
 	float parentNodeCost = this->bounds.CalculateVolume() * (count - leftFirst);
 	float lowestNodeCost = INFINITY;
@@ -31,7 +31,7 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*> primitives, uint
 	{
 		for (int dimension = 0; dimension < 3; dimension++)
 		{
-			float splitCoordinate = primitives[i]->centroid[dimension];
+			float splitCoordinate = (*primitives)[i]->centroid[dimension];
 			int leftCounter = 0;
 			int rightCounter = 0;
 
@@ -42,15 +42,15 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*> primitives, uint
 
 			for (int i = leftFirst; i < count; i++)
 			{
-				if (primitives[i]->centroid[dimension] < splitCoordinate)
+				if ((*primitives)[i]->centroid[dimension] < splitCoordinate)
 				{
-					AABB* bounds = primitives[i]->boundingBox;
+					AABB* bounds = (*primitives)[i]->boundingBox;
 					AdjustBounds(bounds, minLeft, maxLeft);
 					leftCounter++;
 				}
 				else
 				{
-					AABB* bounds = primitives[i]->boundingBox;
+					AABB* bounds = (*primitives)[i]->boundingBox;
 					AdjustBounds(bounds, minRight, maxRight);
 					rightCounter++;
 				}
@@ -72,9 +72,9 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*> primitives, uint
 	int mid = leftFirst;
 	for (int i = leftFirst; i < count; i++)
 	{
-		if (primitives[i]->centroid[bestDimension] < bestCoordinate)
+		if ((*primitives)[i]->centroid[bestDimension] < bestCoordinate)
 		{
-			std::swap(primitives[i], primitives[mid]);
+			std::swap((*primitives)[i], (*primitives)[mid]);
 			mid++;
 		}
 	}
