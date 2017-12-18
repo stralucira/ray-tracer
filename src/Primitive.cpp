@@ -4,8 +4,3 @@
 Primitive::Primitive(vec3 pos)
 {
 };
-
-vec3 Primitive::GetPosition()
-{
-	return this->centroid;
-};

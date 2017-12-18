@@ -7,7 +7,6 @@ class Primitive
 {
 public:
 	Primitive(vec3 pos);
-	vec3 GetPosition();
 
 	// default material color and shader
 	Material material = Material(vec3(0.5f, 0.5f, 0.5f), Material::Shader::DIFFUSE);

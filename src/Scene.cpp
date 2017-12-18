@@ -53,7 +53,7 @@ Scene::Scene()
 	//primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
 
 	// wavefront .obj file loader
-	std::string inputfile = "f16.obj";
+	std::string inputfile = "bunnysmall.obj";
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -105,24 +105,14 @@ Scene::Scene()
 			// per-face material
 			//shapes[s].mesh.material_ids[f];
 
-#if USEVECTOR
 			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2]));
 			primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
-#else
-			primList[counter] = new Triangle(vertices[0], vertices[1], vertices[2]);
-			primList[counter]->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
-#endif
-			counter++;
 		}
 	}
 
 	// BVH helpers
 	sceneBounds = this->CalculateSceneBounds();
-#if USEVECTOR
 	bvh = new BVH(&primList, primList.size());
-#else
-	bvh = new BVH(primList, sizeof(this->primList) / sizeof(this->primList[0]));
-#endif
 }
 
 AABB* Scene::CalculateSceneBounds()
@@ -134,11 +124,8 @@ AABB* Scene::CalculateSceneBounds()
 	float minX = INFINITY;
 	float minY = INFINITY;
 	float minZ = INFINITY;
-#if USEVECTOR
+
 	for (size_t i = 0; i < primList.size(); i++)
-#else
-	for (size_t i = 0; i < sizeof(this->primList) / sizeof(this->primList[0]); i++)
-#endif
 	{
 		if (primList[i]->boundingBox->max.x > maxX) { maxX = primList[i]->boundingBox->max.x; }
 		if (primList[i]->boundingBox->max.y > maxY) { maxY = primList[i]->boundingBox->max.y; }

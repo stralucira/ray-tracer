@@ -112,6 +112,6 @@ void Game::Tick( float dt )
 	rayTracer->Render();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f \n", 1 / dt);
+	sprintf(buffer, "FPS: %f TRIANGLES: %i \n", 1 / dt, rayTracer->scene->bvh->N);
 	screen->Print(buffer, 2, 2, 0xffffff);	
 }
