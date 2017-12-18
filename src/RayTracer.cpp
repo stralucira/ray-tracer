@@ -14,10 +14,10 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 {
-	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
+	/*if (depth > MAXDEPTH || sizeof(this->scene->primList) / sizeof(this->scene->primList[0]) == 0)
 	{
 		return BACKGROUND_COLOR;
-	}
+	}*/
 
 	float nearest = INFINITY;
 

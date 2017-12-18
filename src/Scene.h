@@ -10,8 +10,13 @@ public:
 	Scene();
 	Camera* camera;
 
-	std::vector<Primitive*> primList;
 	std::vector<Light*> lightList;
+
+#if USEVECTOR
+	std::vector<Primitive*> primList;
+#else
+	Primitive* primList[4056];
+#endif
 
 	// bvh helpers
 	AABB* CalculateSceneBounds();

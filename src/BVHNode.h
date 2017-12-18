@@ -16,8 +16,13 @@ public:
 
 	// Functions
 	void AdjustBounds(AABB* bounds, vec3& min, vec3& max);
+	
 	void Subdivide(BVHNode** pool, std::vector<Primitive*> primitives, glm::uint& poolPtr);
 	bool Partition(BVHNode** pool, std::vector<Primitive*> primitives, glm::uint& poolPtr);
+
+	void Subdivide(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr);
+	bool Partition(BVHNode** pool, Primitive** primitives, glm::uint& poolPtr);
+	
 	bool isLeaf();
 
 	// Variables
