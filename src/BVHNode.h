@@ -15,8 +15,8 @@ public:
 	}
 
 	// Functions
-	void Subdivide(BVHNode** pool, std::vector<Primitive*> primitives, glm::uint& poolPtr);
-	bool Partition(BVHNode** pool, std::vector<Primitive*> primitives, glm::uint& poolPtr);
+	void Subdivide(BVHNode** pool, std::vector<Primitive*>* primitives, glm::uint& poolPtr);
+	bool Partition(BVHNode** pool, std::vector<Primitive*>* primitives, glm::uint& poolPtr);
 	bool isLeaf();
 
 	// Variables

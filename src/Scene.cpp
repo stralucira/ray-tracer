@@ -105,7 +105,7 @@ Scene::Scene()
 
 	// BVH helpers
 	sceneBounds = this->CalculateSceneBounds();
-	bvh = new BVH(primList, primList.size());
+	bvh = new BVH(&primList, primList.size());
 }
 
 AABB* Scene::CalculateSceneBounds()

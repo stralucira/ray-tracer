@@ -96,5 +96,5 @@ vec3 Cylinder::getNormal(vec3 point)
 
 AABB* Cylinder::calculateAABB()
 {
-	return new AABB(vec3(-INFINITY, -INFINITY, -INFINITY), vec3(INFINITY, INFINITY, INFINITY));
+	return new AABB(this->centroid - radius, this->centroid + radius);
 }

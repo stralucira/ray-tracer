@@ -1,7 +1,7 @@
 #include "template.h"
 #include "BVH.h"
 
-void BVH::ConstructBVH(std::vector<Primitive*> primitives)
+void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
 {
 	// create index array
 	//indices = new uint[N];
@@ -10,14 +10,14 @@ void BVH::ConstructBVH(std::vector<Primitive*> primitives)
 	// allocate BVH root node
 	pool = new BVHNode*[N * 2 - 1];
 
-	whichChildFirst = new byte[N * 2 - 1];
-	dists = new vec4[N * 2 - 1];
+	//whichChildFirst = new byte[N * 2 - 1];
+	//dists = new vec4[N * 2 - 1];
 
 	for (glm::uint i = 0; i < (N * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
-		whichChildFirst[i] = 0;
-		dists[i] = vec4(0);
+		//whichChildFirst[i] = 0;
+		//dists[i] = vec4(0);
 	}
 
 	root = pool[0];
@@ -68,10 +68,10 @@ float BVH::IntersectPrim(Ray* ray, BVHNode* node)
 
 	for (int i = node->leftFirst; i < node->count; i++)
 	{
-		if (primitives[i]->intersect(ray) && nearest > ray->t)
+		if ((*primitives)[i]->intersect(ray) && nearest > ray->t)
 		{
 			nearest = ray->t;
-			ray->hit = primitives[i];
+			ray->hit = (*primitives)[i];
 		}
 	}
 
@@ -83,7 +83,7 @@ float BVH::IntersectPrim(Ray* ray, BVHNode* node)
 	return ray->t;
 }
 
-AABB BVH::CalculateBounds(std::vector<Primitive*> primitives, int first, int last)
+AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int last)
 {
 	float maxX = -INFINITY;
 	float maxY = -INFINITY;
@@ -95,13 +95,13 @@ AABB BVH::CalculateBounds(std::vector<Primitive*> primitives, int first, int las
 
 	for (int i = first; i < last; i++)
 	{
-		if (primitives[i]->boundingBox->max.x > maxX) { maxX = primitives[i]->boundingBox->max.x; }
-		if (primitives[i]->boundingBox->max.y > maxY) { maxY = primitives[i]->boundingBox->max.y; }
-		if (primitives[i]->boundingBox->max.z > maxZ) { maxZ = primitives[i]->boundingBox->max.z; }
+		if ((*primitives)[i]->boundingBox->max.x > maxX) { maxX = (*primitives)[i]->boundingBox->max.x; }
+		if ((*primitives)[i]->boundingBox->max.y > maxY) { maxY = (*primitives)[i]->boundingBox->max.y; }
+		if ((*primitives)[i]->boundingBox->max.z > maxZ) { maxZ = (*primitives)[i]->boundingBox->max.z; }
 		
-		if (primitives[i]->boundingBox->min.x < minX) { minX = primitives[i]->boundingBox->min.x; }
-		if (primitives[i]->boundingBox->min.y < minY) { minY = primitives[i]->boundingBox->min.y; }
-		if (primitives[i]->boundingBox->min.z < minZ) { minZ = primitives[i]->boundingBox->min.z; }
+		if ((*primitives)[i]->boundingBox->min.x < minX) { minX = (*primitives)[i]->boundingBox->min.x; }
+		if ((*primitives)[i]->boundingBox->min.y < minY) { minY = (*primitives)[i]->boundingBox->min.y; }
+		if ((*primitives)[i]->boundingBox->min.z < minZ) { minZ = (*primitives)[i]->boundingBox->min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }

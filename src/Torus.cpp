@@ -63,5 +63,5 @@ vec3 Torus::getNormal(vec3 point)
 
 AABB* Torus::calculateAABB()
 {
-	return new AABB(vec3(-INFINITY, -INFINITY, -INFINITY), vec3(INFINITY, INFINITY, INFINITY));
+	return new AABB(this->centroid - R, this->centroid + R);
 }
