@@ -53,7 +53,7 @@ Scene::Scene()
 	//primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
 
 	// wavefront .obj file loader
-	std::string inputfile = "bunnysmall.obj";
+	std::string inputfile = "f-16.obj";
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
