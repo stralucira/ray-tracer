@@ -3,7 +3,7 @@
 #include "Ray.h"
 #include <random>
 
-#define CAMERADEBUG 1
+#define CAMERADEBUG 0
 
 int iCPU = omp_get_num_procs();
 
@@ -15,10 +15,10 @@ Camera::Camera()
 // Initialize camera and the transformation matrix
 void Camera::Init()
 {
-	this->pos = vec3(0.0f, 0.0f, -1.0f);
-	this->dir = vec3(0.0f, 0.0f, 1.0f);
+	this->pos = vec3(0.0f, 0.0f, 0.0f);
+	this->lookAt = vec3(0.0f, 0.0f, 1.0f);
 	this->d = 1.0f;
-	this->up = vec3(0.0f, 1.0f, 0.0f);
+	this->up = vec3(0.0f, -1.0f, 0.0f);
 	this->right = vec3(1.0f, 0.0f, 0.0f);
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
 
@@ -27,7 +27,7 @@ void Camera::Init()
 
 void Camera::CalculateScreen()
 {
-	this->viewDir = glm::normalize(this->dir - this->pos);
+	this->viewDir = glm::normalize(this->lookAt - this->pos);
 	this->right = glm::cross(this->up, this->viewDir);
 	this->up = glm::cross(this->viewDir, this->right);
 
@@ -53,6 +53,18 @@ void Camera::CalculateScreen()
 	printf("p2: %.2f %.2f %.2f \n", p2.x, p2.y, p2.z);
 	printf("\n");
 #endif
+}
+
+void Camera::Axial(float inc)
+{
+	pos += inc * dir;
+	CalculateScreen();
+}
+
+void Camera::Horizontal(float inc)
+{
+	pos += inc * right;
+	CalculateScreen();
 }
 
 // Generate ray

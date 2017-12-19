@@ -10,12 +10,15 @@ public:
 	void CalculateScreen();
 
 	Ray GenerateRay(int x, int y);
+	void Axial(float inc);
+	void Horizontal(float inc);
 
 	//void GenerateRays();
 	//void UpdateRays();
 	//Ray* cameraRays[SCRWIDTH*SCRHEIGHT];
 
 	vec3 pos;
+	vec3 lookAt;
 	vec3 dir;
 	vec3 p0, p1, p2;
 

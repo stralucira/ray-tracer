@@ -2,8 +2,8 @@
 #include "Scene.h"
 #include "RayTracer.h"
 
-#define ROTATEMODIFIER 2.50f
-#define MOVEMODIFIER 5.00f
+#define ROTATEMODIFIER 0.05f
+#define MOVEMODIFIER 0.10f
 
 RayTracer* rayTracer;
 
@@ -26,6 +26,23 @@ void Game::HandleInput( float dt ) { }
 
 void Game::KeyDown(int a_Key)
 {
+	switch (a_Key)
+	{
+	case SDL_SCANCODE_W:
+		rayTracer->scene->camera->Axial(0.10f);
+		break;
+	case SDL_SCANCODE_A:
+		rayTracer->scene->camera->Horizontal(-0.10f);
+		break;
+	case SDL_SCANCODE_S:
+		rayTracer->scene->camera->Axial(-0.10f);
+		break;
+	case SDL_SCANCODE_D:
+		rayTracer->scene->camera->Horizontal(0.10f);
+		break;
+	}
+
+	/*
 	//Camera* camera = rayTracer->scene->camera;
 	bool update = false;
 
@@ -54,7 +71,7 @@ void Game::KeyDown(int a_Key)
 	// move camera
 	if (a_Key == SDL_SCANCODE_W)
 	{
-		rayTracer->scene->camera->pos += rayTracer->scene->camera->viewDir * MOVEMODIFIER;
+		rayTracer->scene->camera->pos += rayTracer->scene->camera->dir * MOVEMODIFIER;
 		update = true;
 		
 	}
@@ -66,7 +83,7 @@ void Game::KeyDown(int a_Key)
 	}
 	if (a_Key == SDL_SCANCODE_S)
 	{
-		rayTracer->scene->camera->pos -= rayTracer->scene->camera->viewDir * MOVEMODIFIER;
+		rayTracer->scene->camera->pos -= rayTracer->scene->camera->dir * MOVEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_D)
@@ -102,7 +119,7 @@ void Game::KeyDown(int a_Key)
 
 	if (a_Key = SDL_SCANCODE_P)
 	{
-		rayTracer->scene->camera->pos = vec3(0.0f, 100.0f, -300.0f);
+		//rayTracer->scene->camera->pos = vec3(0.0f, 100.0f, -300.0f);
 		//rayTracer->scene->camera->dir = vec3(0.0f, 0.0f, 1.0f);
 		//rayTracer->scene->camera->d = 1.0f;
 		//rayTracer->scene->camera->up = vec3(0.0f, 1.0f, 0.0f);
@@ -114,7 +131,7 @@ void Game::KeyDown(int a_Key)
 	if (update)
 	{
 		rayTracer->scene->camera->CalculateScreen();
-	}
+	}*/
 }
 
 // -----------------------------------------------------------
