@@ -16,10 +16,10 @@ Camera::Camera()
 void Camera::Init()
 {
 	this->pos = vec3(0.0f, 0.0f, 0.0f);
-	this->lookAt = vec3(0.0f, 0.0f, 1.0f);
+	this->viewDir = vec3(0.0f, 0.0f, 1.0f);	
+	this->dir = glm::normalize(viewDir - pos);
 	this->d = 1.0f;
-	this->up = vec3(0.0f, -1.0f, 0.0f);
-	this->right = vec3(1.0f, 0.0f, 0.0f);
+	this->up = vec3(0.0f, 1.0f, 0.0f);
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
 
 	CalculateScreen();
@@ -27,11 +27,10 @@ void Camera::Init()
 
 void Camera::CalculateScreen()
 {
-	this->viewDir = glm::normalize(this->lookAt - this->pos);
-	this->right = glm::cross(this->up, this->viewDir);
-	this->up = glm::cross(this->viewDir, this->right);
+	this->right = glm::cross(this->up, this->dir);
+	this->up = glm::cross(this->dir, this->right);
 
-	vec3 screenCenter = this->pos + this->d * this->viewDir;
+	vec3 screenCenter = this->pos + this->d * this->dir;
 
 	this->p0 = screenCenter - this->right + this->up * this->aspectRatio; // top left corner
 	this->p1 = screenCenter + this->right + this->up * this->aspectRatio; // top right corner
@@ -55,15 +54,70 @@ void Camera::CalculateScreen()
 #endif
 }
 
-void Camera::Axial(float inc)
+// Camera Movement
+// Translations:
+void Camera::Surge(float speed)
 {
-	pos += inc * dir;
+	pos += dir * speed;
 	CalculateScreen();
 }
-
-void Camera::Horizontal(float inc)
+void Camera::Sway(float speed)
 {
-	pos += inc * right;
+	pos += right * speed;
+	CalculateScreen();
+}
+void Camera::Heave(float speed)
+{
+	pos += up * speed;
+	CalculateScreen();
+}
+// Rotations:
+void Camera::Roll(float angle)
+{
+	float x = dir.x;
+	float y = dir.y;
+
+	float rad = angle * PIOVER180;
+	float c = glm::cos(rad);
+	float s = glm::sin(rad);
+
+	dir.x = x * c - y * s;
+	dir.y = y * c + x * s;
+
+	CalculateScreen();
+}
+void Camera::Pitch(float angle)
+{
+	float y = dir.y;
+	float z = dir.z;
+
+	float rad = angle * PIOVER180;
+	float c = glm::cos(rad);
+	float s = glm::sin(rad);
+
+	dir.y = y * c - z * s;
+	dir.z = z * c + y * s;
+
+	CalculateScreen();
+}
+void Camera::Yaw(float angle)
+{
+	float x = dir.x;
+	float z = dir.z;
+
+	float rad = angle * PIOVER180;
+	float c = glm::cos(rad);
+	float s = glm::sin(rad);
+
+	dir.x = x * c - z * s;
+	dir.z = z * c + x * s;
+
+	CalculateScreen();
+}
+// Zooming:
+void Camera::Zoom(float distance)
+{
+	d += distance;
 	CalculateScreen();
 }
 

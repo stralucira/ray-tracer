@@ -21,7 +21,7 @@ public:
 	bool isLeaf();
 
 	// Variables
-	AABB bounds; // 24 bytes ( 6 x 4 bytes )
-	int leftFirst; // 4 bytes
-	int count; // 4 bytes
+	AABB bounds;	// 24 bytes ( 6 x 4 bytes )
+	int leftFirst;	// 4 bytes
+	int count;		// 4 bytes
 };
