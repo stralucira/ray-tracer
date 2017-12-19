@@ -5,6 +5,8 @@
 #define ROTATEMODIFIER 0.05f
 #define MOVEMODIFIER 0.10f
 
+
+
 RayTracer* rayTracer;
 
 // -----------------------------------------------------------
@@ -29,16 +31,16 @@ void Game::KeyDown(int a_Key)
 	switch (a_Key)
 	{
 	case SDL_SCANCODE_W:
-		rayTracer->scene->camera->Axial(0.10f);
+		rayTracer->scene->camera->Axial(MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_A:
-		rayTracer->scene->camera->Horizontal(-0.10f);
+		rayTracer->scene->camera->Horizontal(-MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_S:
-		rayTracer->scene->camera->Axial(-0.10f);
+		rayTracer->scene->camera->Axial(-MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_D:
-		rayTracer->scene->camera->Horizontal(0.10f);
+		rayTracer->scene->camera->Horizontal(MOVEMODIFIER);
 		break;
 	}
 

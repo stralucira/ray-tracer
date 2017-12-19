@@ -39,7 +39,7 @@ void Camera::CalculateScreen()
 
 #if CAMERADEBUG
 	printf("------------------------------\n");
-	printf("dir: %.2f %.2f %.2f\n", dir.x, dir.y, dir.z);
+	printf("dir: %.2f %.2f %.2f\n", lookAt.x, lookAt.y, lookAt.z);
 	printf("pos: %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
 	printf("\n");
 	printf("viewDir: %.2f %.2f %.2f \n", viewDir.x, viewDir.y, viewDir.z);
@@ -57,7 +57,8 @@ void Camera::CalculateScreen()
 
 void Camera::Axial(float inc)
 {
-	pos += inc * dir;
+	pos += inc * lookAt;
+
 	CalculateScreen();
 }
 
