@@ -8,8 +8,8 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
 	//for (int i = 0; i < N; i++) indices[i] = i;
 
 	// allocate BVH root node
-	pool = new BVHNode*[N * 2 - 1];
-	for (glm::uint i = 0; i < (N * 2 - 1); i++)
+	pool = new BVHNode*[primitives->size() * 2 - 1];
+	for (glm::uint i = 0; i < (primitives->size() * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
 	}
@@ -18,8 +18,8 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
 
 	// subdivide root node
 	root->leftFirst = 0;
-	root->count = N;
-	root->bounds = CalculateBounds(primitives, 0, N);
+	root->count = primitives->size();
+	root->bounds = CalculateBounds(primitives, 0, primitives->size());
 	root->Subdivide(pool, primitives, poolPtr);
 }
 

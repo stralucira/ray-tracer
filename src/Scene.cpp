@@ -18,9 +18,9 @@ Scene::Scene()
 	//lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 	//lightList.push_back(new Light(vec3(0.0f,2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
-	lightList.push_back(new Light(vec3(-3.0f, 2.0f, -3.0f), vec3(50.0f, 50.0f, 50.0f)));
-	lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(50.0f, 50.0f, 50.0f)));
-
+	//lightList.push_back(new Light(vec3(-3.0f, 2.0f, -3.0f), vec3(50.0f, 50.0f, 50.0f)));
+	//lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(50.0f, 50.0f, 50.0f)));
+	lightList.push_back(new Light(vec3(0.0f, 500.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
 
 	//primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
 	//primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
@@ -53,7 +53,7 @@ Scene::Scene()
 	//primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
 
 	// wavefront .obj file loader
-	std::string inputfile = "f-16.obj";
+	std::string inputfile = "bb8.obj";
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -67,9 +67,6 @@ Scene::Scene()
 	}
 
 	// Loop over shapes
-
-	int counter = 0;
-
 	for (size_t s = 0; s < shapes.size(); s++)
 	{
 		// Loop over faces(polygon)
@@ -79,10 +76,15 @@ Scene::Scene()
 			int fv = shapes[s].mesh.num_face_vertices[f];
 
 			vec3 vertices[3];
+			vec3 normal;
+			vec3 color;
+			vec2 texcoord;
 
 			// Loop over vertices in the face.
 			for (int v = 0; v < fv; v++)
 			{
+				color = vec3(1.0f);
+
 				// access to vertex
 				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 				float vx = attrib.vertices[3 * idx.vertex_index + 0];
@@ -94,25 +96,27 @@ Scene::Scene()
 				//tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
 				//tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
 				// Optional: vertex colors
-				// tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
-				// tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
-				// tinyobj::real_t blue = attrib.colors[3*idx.vertex_index+2];
+				//tinyobj::real_t red = attrib.colors[3 * idx.vertex_index + 0];
+				//tinyobj::real_t green = attrib.colors[3 * idx.vertex_index + 1];
+				//tinyobj::real_t blue = attrib.colors[3 * idx.vertex_index + 2];
 
 				vertices[v] = vec3(vx, vy, vz);
+				normal = vec3(nx, ny, nz);
 			}
 			index_offset += fv;
 			
+
 			// per-face material
 			//shapes[s].mesh.material_ids[f];
 
-			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2]));
+			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 			primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
 		}
 	}
 
 	// BVH helpers
 	sceneBounds = this->CalculateSceneBounds();
-	bvh = new BVH(&primList, primList.size());
+	bvh = new BVH(&primList);
 }
 
 AABB* Scene::CalculateSceneBounds()

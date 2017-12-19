@@ -7,9 +7,8 @@ class BVH
 {
 public:
 	// Contructors
-	BVH(std::vector<Primitive*>* primitives, uint N)
+	BVH(std::vector<Primitive*>* primitives)
 	{
-		this->N = N;
 		this->primitives = primitives;
 		ConstructBVH(primitives);
 	}
@@ -21,7 +20,7 @@ public:
 	static AABB CalculateBounds(std::vector<Primitive*>* primitives, int first, int last);
 
 	// Variables
-	uint N, poolPtr;
+	uint poolPtr;
 	BVHNode* root;
 	BVHNode** pool;
 	

@@ -2,6 +2,9 @@
 #include "Scene.h"
 #include "RayTracer.h"
 
+#define ROTATEMODIFIER 2.50f
+#define MOVEMODIFIER 5.00f
+
 RayTracer* rayTracer;
 
 // -----------------------------------------------------------
@@ -29,59 +32,59 @@ void Game::KeyDown(int a_Key)
 	// rotate camera
 	if (a_Key == SDL_SCANCODE_RIGHT)
 	{
-		rayTracer->scene->camera->dir += rayTracer->scene->camera->right * 0.05f;
+		rayTracer->scene->camera->dir += rayTracer->scene->camera->right * ROTATEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_LEFT)
 	{
-		rayTracer->scene->camera->dir -= rayTracer->scene->camera->right * 0.05f;
+		rayTracer->scene->camera->dir -= rayTracer->scene->camera->right * ROTATEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_DOWN)
 	{
-		rayTracer->scene->camera->dir -= rayTracer->scene->camera->up * 0.05f;
+		rayTracer->scene->camera->dir -= rayTracer->scene->camera->up * ROTATEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_UP)
 	{
-		rayTracer->scene->camera->dir += rayTracer->scene->camera->up * 0.05f;
+		rayTracer->scene->camera->dir += rayTracer->scene->camera->up * ROTATEMODIFIER;
 		update = true;
 	}
 
 	// move camera
 	if (a_Key == SDL_SCANCODE_W)
 	{
-		rayTracer->scene->camera->pos += rayTracer->scene->camera->viewDir * 0.10f;
+		rayTracer->scene->camera->pos += rayTracer->scene->camera->viewDir * MOVEMODIFIER;
 		update = true;
 		
 	}
 	if (a_Key == SDL_SCANCODE_A)
 	{
-		rayTracer->scene->camera->pos -= rayTracer->scene->camera->right * 0.10f;
-		rayTracer->scene->camera->dir -= rayTracer->scene->camera->right * 0.10f;
+		rayTracer->scene->camera->pos -= rayTracer->scene->camera->right * MOVEMODIFIER;
+		rayTracer->scene->camera->dir -= rayTracer->scene->camera->right * MOVEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_S)
 	{
-		rayTracer->scene->camera->pos -= rayTracer->scene->camera->viewDir * 0.10f;
+		rayTracer->scene->camera->pos -= rayTracer->scene->camera->viewDir * MOVEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_D)
 	{
-		rayTracer->scene->camera->pos += rayTracer->scene->camera->right * 0.10f;
-		rayTracer->scene->camera->dir += rayTracer->scene->camera->right * 0.10f;
+		rayTracer->scene->camera->pos += rayTracer->scene->camera->right * MOVEMODIFIER;
+		rayTracer->scene->camera->dir += rayTracer->scene->camera->right * MOVEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_Q)
 	{
-		rayTracer->scene->camera->pos += rayTracer->scene->camera->up * 0.10f;
-		rayTracer->scene->camera->dir += rayTracer->scene->camera->up * 0.10f;
+		rayTracer->scene->camera->pos += rayTracer->scene->camera->up * MOVEMODIFIER;
+		rayTracer->scene->camera->dir += rayTracer->scene->camera->up * MOVEMODIFIER;
 		update = true;
 	}
 	if (a_Key == SDL_SCANCODE_E)
 	{
-		rayTracer->scene->camera->pos -= rayTracer->scene->camera->up * 0.10f;
-		rayTracer->scene->camera->dir -= rayTracer->scene->camera->up * 0.10f;
+		rayTracer->scene->camera->pos -= rayTracer->scene->camera->up * MOVEMODIFIER;
+		rayTracer->scene->camera->dir -= rayTracer->scene->camera->up * MOVEMODIFIER;
 		update = true;
 	}
 
@@ -94,6 +97,16 @@ void Game::KeyDown(int a_Key)
 	if (a_Key == SDL_SCANCODE_MINUS)
 	{
 		rayTracer->scene->camera->d -= 0.05f;
+		update = true;
+	}
+
+	if (a_Key = SDL_SCANCODE_P)
+	{
+		rayTracer->scene->camera->pos = vec3(0.0f, 100.0f, -300.0f);
+		//rayTracer->scene->camera->dir = vec3(0.0f, 0.0f, 1.0f);
+		//rayTracer->scene->camera->d = 1.0f;
+		//rayTracer->scene->camera->up = vec3(0.0f, 1.0f, 0.0f);
+		//rayTracer->scene->camera->right = vec3(1.0f, 0.0f, 0.0f);
 		update = true;
 	}
 
@@ -112,6 +125,6 @@ void Game::Tick( float dt )
 	rayTracer->Render();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f TRIANGLES: %i \n", 1 / dt, rayTracer->scene->bvh->N);
+	sprintf(buffer, "FPS: %f TRIANGLES: %i \n", 1 / dt, rayTracer->scene->bvh->primitives->size());
 	screen->Print(buffer, 2, 2, 0xffffff);	
 }
