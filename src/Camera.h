@@ -8,6 +8,7 @@ public:
 	Camera();
 	void Init();
 	void CalculateScreen();
+	void PrintPosition();
 
 	Ray GenerateRay(int x, int y);
 	

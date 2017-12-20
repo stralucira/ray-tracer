@@ -15,8 +15,8 @@ Camera::Camera()
 // Initialize camera and the transformation matrix
 void Camera::Init()
 {
-	this->pos = vec3(0.0f, 0.0f, 0.0f);
-	this->viewDir = vec3(0.0f, 0.0f, 1.0f);	
+	this->pos = vec3(0.0f, 0.0f, -1.0f);
+	this->viewDir = vec3(0.0f, 0.0f, 1.0f);
 	this->dir = glm::normalize(viewDir - pos);
 	this->d = 1.0f;
 	this->up = vec3(0.0f, 1.0f, 0.0f);
@@ -27,6 +27,7 @@ void Camera::Init()
 
 void Camera::CalculateScreen()
 {
+
 	this->right = glm::cross(this->up, this->dir);
 	this->up = glm::cross(this->dir, this->right);
 
@@ -35,23 +36,21 @@ void Camera::CalculateScreen()
 	this->p0 = screenCenter - this->right + this->up * this->aspectRatio; // top left corner
 	this->p1 = screenCenter + this->right + this->up * this->aspectRatio; // top right corner
 	this->p2 = screenCenter - this->right - this->up * this->aspectRatio; // bottom left corner
+}
 
-#if CAMERADEBUG
+void Camera::PrintPosition()
+{
 	printf("------------------------------\n");
 	printf("dir: %.2f %.2f %.2f\n", dir.x, dir.y, dir.z);
 	printf("pos: %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
 	printf("\n");
-	printf("viewDir: %.2f %.2f %.2f \n", viewDir.x, viewDir.y, viewDir.z);
 	printf("right: %.2f %.2f %.2f \n", right.x, right.y, right.z);
 	printf("up: %.2f %.2f %.2f \n", up.x, up.y, up.z);
-	printf("\n");
-	printf("screenCenter: %.2f %.2f %2f \n", screenCenter.x, screenCenter.y, screenCenter.z);
 	printf("\n");
 	printf("p0: %.2f %.2f %.2f \n", p0.x, p0.y, p0.z);
 	printf("p1: %.2f %.2f %.2f \n", p1.x, p1.y, p1.z);
 	printf("p2: %.2f %.2f %.2f \n", p2.x, p2.y, p2.z);
 	printf("\n");
-#endif
 }
 
 // Camera Movement

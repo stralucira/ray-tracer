@@ -15,12 +15,13 @@ public:
 
 	// Functions
 	void ConstructBVH(std::vector<Primitive*>* primitives);	
-	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false);
+	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false, int* depthRender = NULL);
 	float IntersectPrim(Ray* ray, BVHNode* node);
 	static AABB CalculateBounds(std::vector<Primitive*>* primitives, int first, int last);
 
 	// Variables
 	uint poolPtr;
+	uint* indices;
 	BVHNode* root;
 	BVHNode** pool;
 	

@@ -2,6 +2,8 @@
 #include "RayTracer.h"
 
 #define ENABLEBVH 1
+#define ENABLEDEPTHRENDER 0
+
 
 int iCPU2 = omp_get_num_procs();
 
@@ -21,6 +23,12 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 
 	float nearest = INFINITY;
 
+#if ENABLEDEPTHRENDER
+	int depthRender = 0;
+	scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
+	return vec3(glm::min(0.0f, 1.0f - depthRender * 0.2f), depthRender * 0.2f, 0.0f);
+#endif // ENABLEDEPTH
+
 	// check intersection
 #if ENABLEBVH
 	scene->bvh->Traverse(ray, scene->bvh->root);
@@ -34,7 +42,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			ray->hit = this->scene->primList[i];
 		}
 	}
-#endif
+#endif // ENABLEBVH
 
 	// ray does not intersect
 	if (nearest == INFINITY)

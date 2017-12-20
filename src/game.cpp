@@ -77,7 +77,22 @@ void Game::KeyDown(int a_Key)
 		rayTracer->scene->camera->Zoom(-ZOOMMODIFIER);
 		break;
 
-		// Reset Camera:
+		// Print Camera Position:
+	case SDL_SCANCODE_P:
+		rayTracer->scene->camera->PrintPosition();
+		break;
+
+	case SDL_SCANCODE_L:
+		rayTracer->scene->lightList.back()->pos = rayTracer->scene->camera->pos;
+		//rayTracer->scene->camera->pos = vec3(0.0f, 11.0f, 17.5f);
+		//rayTracer->scene->camera->viewDir = vec3(0.0f, 0.0f, -1.0f);
+		//rayTracer->scene->camera->dir = glm::normalize(rayTracer->scene->camera->viewDir - rayTracer->scene->camera->pos);
+		//rayTracer->scene->camera->d = 1.0f;
+		//rayTracer->scene->camera->up = vec3(0.0f, 1.0f, 0.0f);
+		//rayTracer->scene->camera->CalculateScreen();
+		break;
+
+		// Reset Camera Position:
 	case SDL_SCANCODE_R:
 		rayTracer->scene->camera->Init();
 		break;
@@ -93,5 +108,9 @@ void Game::Tick( float dt )
 
 	char buffer[500];
 	sprintf(buffer, "FPS: %f TRIANGLES: %i \n", 1 / dt, rayTracer->scene->bvh->primitives->size());
-	screen->Print(buffer, 2, 2, 0xffffff);	
+	screen->Print(buffer, 2, 2, 0xffffff);
+	sprintf(buffer, "Position: %.2f %.2f %.2f \n", rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z);
+	screen->Print(buffer, 2, 12, 0xffffff);
+	sprintf(buffer, "Direction: %.2f %.2f %.2f \n", rayTracer->scene->camera->dir.x, rayTracer->scene->camera->dir.y, rayTracer->scene->camera->dir.z);
+	screen->Print(buffer, 2, 22, 0xffffff);	
 }

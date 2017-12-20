@@ -3,11 +3,14 @@
 
 void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
 {
+	printf("Constructing BVH for %i polygons...\n\n", primitives->size());
+
 	// create index array
-	//indices = new uint[N];
-	//for (int i = 0; i < N; i++) indices[i] = i;
+	//indices = new uint[primitives->size()];
+	//for (uint i = 0; i < primitives->size(); i++) indices[i] = i;
 
 	// allocate BVH root node
+	//pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primitives->size() * 2 - 1) * sizeof(BVHNode), 32));
 	pool = new BVHNode*[primitives->size() * 2 - 1];
 	for (glm::uint i = 0; i < (primitives->size() * 2 - 1); i++)
 	{
@@ -23,10 +26,12 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
 	root->Subdivide(pool, primitives, poolPtr);
 }
 
-void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
+void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 {
 	float prevT = ray->t;
 	Primitive* prevHit = ray->hit;
+
+	if (depthRender != NULL) { depthRender[0]++; }
 
 	if (isShadowRay && prevT != INFINITY) { return; }
 
@@ -44,8 +49,8 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay)
 
 	else
 	{
-		this->Traverse(ray, pool[node->leftFirst], isShadowRay);
-		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		this->Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
+		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
 	}
 }
 
@@ -69,6 +74,8 @@ float BVH::IntersectPrim(Ray* ray, BVHNode* node)
 
 AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int last)
 {
+	printf("BVH Node %i: Calculating\n", first);
+	
 	float maxX = -INFINITY;
 	float maxY = -INFINITY;
 	float maxZ = -INFINITY;

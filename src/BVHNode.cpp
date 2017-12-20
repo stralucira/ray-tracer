@@ -4,6 +4,7 @@
 
 void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primitives, glm::uint& poolPtr)
 {
+	printf("BVH Node %i: Subdividing\n", poolPtr);
 	//if (count - this->leftFirst < 5) return;
 
 	uint tempPoolPtr = poolPtr;
@@ -21,6 +22,7 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primitives, glm
 
 bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primitives, uint& poolPtr)
 {
+	printf("BVH Node %i: Partitioning \n", poolPtr);
 	// A * N
 	float parentNodeCost = this->bounds.CalculateVolume() * (count - leftFirst);
 	float lowestNodeCost = INFINITY;
