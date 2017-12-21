@@ -1,20 +1,21 @@
-#pragma once
+﻿#pragma once
+#include "Primitive.h"
 
-#include "template.h"
-
-class Plane :
-	public Primitive
+class Plane : public Primitive
 {
 public:
-	
-	Plane();
-	Plane(float3 position, float3 normal);
-	~Plane();
+	Plane(vec3 position, vec3 normal) : Primitive(position)
+	{
+		this->normal = normal;
+		
+		this->centroid = position;
+		this->boundingBox = calculateAABB();
+	}
 
-	float intersect( Ray* ray );
-	
-	float3 getNormal(float3 point);
+	bool intersect(Ray* ray);
+	vec3 getNormal(vec3 point);
 
-	float3 position;
-	float3 normal;
+	AABB* calculateAABB();
+
+	vec3 normal;
 };

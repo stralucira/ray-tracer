@@ -1,54 +1,51 @@
-#include "template.h"
-#include <math.h> 
-
-Triangle::Triangle()
-{
-	this->a = float3(0, 1, 2);
-	this->b = float3(1, 0, 2);
-	this->c = float3(-1, 0, 2);
-    this->mat = new Material(float4(1,0,1,1));
-}
-
-Triangle::Triangle(float3 a, float3 b, float3 c, Material* mat)
-{
-	this->a = a;
-	this->b = b;
-	this->c = c;
-	this->normal = ((a - b).cross(b - c)).normalized();
-	this->mat = mat;
-}
-
-Triangle::~Triangle()
-{
-}
-
+﻿#include "template.h"
+#include "Triangle.h"
 
 // from https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
-float Triangle::intersect( Ray* ray ) {
+bool Triangle::intersect(Ray* ray)
+{
+	vec3 ab = b - a;
+	vec3 ac = c - a; 
+	vec3 pvec = cross(ray->dir, ac);
+	float det = dot(ab, pvec);
 
-	float t,u,v;
+	if (det > -0.00001f && det < 0.00001f) return false;
+	
+	float invDet = 1.0f / det;
+	vec3 tvec = ray->orig - a;
+	float u = dot(tvec, pvec) * invDet;
 
-	float3 ab = b - a;
-	float3 ac = c - a;
-	float3 pvec = ray->dir.cross(ac);
-	float det = ab.dot(pvec);
+	if (u < 0.0f || u > 1.0f) return false;
 
-	float invDet = 1 / det; 
+	vec3 qvec = cross(tvec, ab);
+	float v = dot(ray->dir, qvec) * invDet;
 
-	float3 tvec = ray->orig - a;
-	u = tvec.dot(pvec)*invDet;
+	if (v < 0.0f || u + v > 1.0f) return false;
 
-	if (u < 0 || u > 1) return -1;
+	float t = dot(ac, qvec) * invDet;
 
-	float3 qvec = tvec.cross(ab);
-	v = ray->dir.dot(qvec) * invDet;
-	if (v < 0 || u + v > 1) return -1;
+	if (t > 0.00001f)
+	{
+		ray->t = t;
+		return true;
+	}
 
-	t = ac.dot(qvec) * invDet;
-	ray->t = t;
-	return t;
-};
+	return false;
+}
 
-float3 Triangle::getNormal(float3 point) {
-    return (a - c).cross(b - c).normalized();
+vec3 Triangle::getNormal(vec3 point)
+{
+	return this->normal;
+}
+
+vec3 Triangle::calculateCentroid()
+{
+	return (a + b + c) / 3.0f;
+}
+
+AABB* Triangle::calculateAABB()
+{
+	vec3 max = glm::max(glm::max(a, b), c);
+	vec3 min = glm::min(glm::min(a, b), c);
+	return new AABB(min, max);
 }

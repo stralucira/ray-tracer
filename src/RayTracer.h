@@ -1,26 +1,24 @@
+﻿// Basar Oguz - 6084990
+// Satwiko Wirawan Indrawanto - 6201539
+
 #pragma once
-
+#include "Ray.h"
 #include "template.h"
-
-struct pointLight
-{
-    Material* mat;
-    float3 pos;
-    pointLight(float3 p, Material* mt)
-    {
-        this->mat = mt;
-        this->pos = p;
-    };
-};
+#include "Scene.h"
 
 class RayTracer
 {
 public:
-	RayTracer();
-	RayTracer(float3 pos, float3 dir);
-	~RayTracer();
-    
-    float3 getColor(int x, int y, Camera* cam, pointLight* light, std::vector<Primitive*> primList);
+	Surface* screen;
+	Scene* scene;
+	Pixel buffer[SCRHEIGHT][SCRWIDTH];
+	
+	RayTracer(Scene* scene, Surface* screen);
 
-    float3 DirectIllumination(float3 hitPoint, float3 reflectionDirection, float3 normal, std::vector<Primitive*> primList, pointLight* light );
+	vec3 GetColor(int x, int y, Ray* ray, unsigned int depth);
+	vec3 DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Material mat);
+
+	vec3 Reflect(vec3 dir, vec3 normal);
+	float Fresnel(vec3 dir, vec3 normal, float index);
+	void Render();
 };

@@ -1,22 +1,37 @@
-#pragma once
-#include "template.h"
-
-#include <stdlib.h>
+﻿#pragma once
+#include "Primitive.h"
 
 class Triangle : public Primitive
 {
 public:
+	Triangle(vec3 a, vec3 b, vec3 c, vec3 normal) : Primitive(a)
+	{
+		this->a = a;
+		this->b = b;
+		this->c = c;
+		this->normal = normal;
 	
-	Triangle();
+		this->centroid = calculateCentroid();
+		this->boundingBox = calculateAABB();
+	}
 
-	Triangle(float3 a, float3 b, float3 c, Material* mat);
-	~Triangle();
-	
-	float intersect( Ray* ray );
-	float3 getNormal(float3 point);
+	Triangle(vec3 a, vec3 b, vec3 c) : Primitive(a)
+	{
+		this->a = a;
+		this->b = b;
+		this->c = c;
+		this->normal = normalize(cross(a - b, b - c));
 
-	float3 a;
-	float3 b;
-	float3 c;
-	float3 normal;
+		this->centroid = calculateCentroid();
+		this->boundingBox = calculateAABB();
+	}
+
+	bool intersect(Ray* ray);
+	vec3 getNormal(vec3 point);
+
+	AABB* calculateAABB();
+	vec3 calculateCentroid();
+
+	vec3 a, b, c;
+	vec3 normal;
 };

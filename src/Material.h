@@ -1,17 +1,16 @@
 #pragma once
 
-#include "template.h"
-
 class Material
 {
 public:
-    Material(){
-        this->specs = float4(1, 1, 1, 1);
-    }
-    
-    Material(float4 specs) {
-        this->specs = specs;
-    }
-    
-	float4 specs;
+	enum class Shader { DIFFUSE, MIRROR, GLASS };
+
+	Material(vec3 color, Shader shader)
+	{
+		this->color = color;
+		this->shader = shader;
+	}
+
+	vec3 color;
+	Shader shader;
 };

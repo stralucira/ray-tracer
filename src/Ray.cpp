@@ -1,16 +1,39 @@
-#include "template.h"
+﻿#include "template.h"
+#include "Ray.h"
 
-Ray::Ray()
+Ray::Ray(vec3 origin, vec3 direction)
 {
+	this->orig = origin;
+	this->dir = direction;
+	this->t = INFINITY;
+
+	// BVH helpers
+	this->invDir = 1.0f / this->dir;
+	//this->sign[0] = (invDir.x < 0);
+	//this->sign[1] = (invDir.y < 0);
+	//this->sign[2] = (invDir.z < 0);
 }
 
-Ray::Ray(float3 orig, float3 dir)
+bool Ray::Intersect(AABB bounds)
 {
-	this->dir = dir.normalized();
-	this->orig = orig;
-	this->t = 0; 
-}
+	float tmin, tmax, txmin, txmax, tymin, tymax, tzmin, tzmax;
 
-Ray::~Ray()
-{
+	txmin = (bounds.min.x - this->orig.x) * this->invDir.x;
+	txmax = (bounds.max.x - this->orig.x) * this->invDir.x;
+	tymin = (bounds.min.y - this->orig.y) * this->invDir.y;
+	tymax = (bounds.max.y - this->orig.y) * this->invDir.y;
+
+	tmin = glm::min(txmin, txmax);
+	tmax = glm::max(txmin, txmax);
+
+	tmin = glm::max(tmin, glm::min(tymin, tymax));
+	tmax = glm::min(tmax, glm::max(tymin, tymax));
+
+	tzmin = (bounds.min.z - this->orig.z) * this->invDir.z;
+	tzmax = (bounds.max.z - this->orig.z) * this->invDir.z;
+
+	tmin = glm::max(tmin, glm::min(tzmin, tzmax));
+	tmax = glm::min(tmax, glm::max(tzmin, tzmax));
+
+	return tmax >= tmin && tmax >= 0;
 }
