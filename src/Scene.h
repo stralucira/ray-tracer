@@ -10,6 +10,8 @@ public:
 	Scene();
 	Camera* camera;
 
+	void LoadObject(std::string filename);
+
 	std::vector<Light*> lightList;
 	std::vector<Primitive*> primList;
 

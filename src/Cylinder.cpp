@@ -96,5 +96,12 @@ vec3 Cylinder::getNormal(vec3 point)
 
 AABB* Cylinder::calculateAABB()
 {
-	return new AABB(this->centroid - radius, this->centroid + radius);
+	if (this->height >= this->radius)
+	{
+		return new AABB(this->centroid - this->height, this->centroid + this->height);
+	}
+	else
+	{
+		return new AABB(this->centroid - this->radius, this->centroid + this->radius);
+	}
 }

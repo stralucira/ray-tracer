@@ -6,6 +6,8 @@
 #include "Cylinder.h"
 #include "Torus.h"
 
+#define STATICSCENE 0
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
@@ -14,47 +16,60 @@ Scene::Scene()
 {
 	camera = new Camera();
 
-	// static scene primitives
-	//lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
-	//lightList.push_back(new Light(vec3(0.0f,2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
+#if STATICSCENE
+	lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
+	lightList.push_back(new Light(vec3(0.0f,2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
-	//lightList.push_back(new Light(vec3(0, 20, 5), vec3(100.0f, 100.0f, 100.0f)));
-	//lightList.push_back(new Light(vec3(150, 20, 300), vec3(100.0f, 100.0f, 100.0f)));
+	primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
+	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
+
+	primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
+	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
+
+	primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
+	primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
+
+	primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
+	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
+
+	primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
+	primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+
+	primList.push_back(new Plane(vec3(0, -5, 5), vec3(0, 1, 0))); // bottom plane
+	primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
+
+	primList.push_back(new Plane(vec3(0, 5, 5), vec3(0, -1, 0))); // top plane
+	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+
+	primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
+	primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+
+	primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
+	primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+
+	primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
+	primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
+
+	this->LoadObject("cube.obj");
+#else
+
 	lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
 	lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(500.0f, 500.0f, 500.0f)));
 
-	//primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
-	//primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
+	this->LoadObject("TIE-fighter.obj");
+#endif
 
-	//primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
-	//primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
+	// BVH helpers
+	sceneBounds = this->CalculateSceneBounds();
+	printf("Constructing BVH for %i polygons...\n", primList.size());
+	bvh = new BVH(&primList);
+	printf("-----------------------\n Done constructing BVH\n-----------------------\n");
+}
 
-	//primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
-	//primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
-	
-	//primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
-	//primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
-
-	//primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
-	//primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
-
-	//primList.push_back(new Plane(vec3(0, -5, 5), vec3(0, 1, 0))); // bottom plane
-	//primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
-
-	//primList.push_back(new Plane(vec3(0, 5, 5), vec3(0, -1, 0))); // top plane
-	//primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-
-	//primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
-	//primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::DIFFUSE);
-
-	//primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
-	//primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-
-	//primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
-	//primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
-
-	// wavefront .obj file loader
-	std::string inputfile = "Mount Wario.obj";
+// wavefront .obj file loader
+void Scene::LoadObject(std::string inputfile)
+{
+	//std::string inputfile = "Mount Wario.obj";
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
@@ -63,7 +78,7 @@ Scene::Scene()
 	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
 
 	if (!err.empty()) // `err` may contain warning message.
-	{ 
+	{
 		std::cerr << err << std::endl;
 	}
 
@@ -104,10 +119,10 @@ Scene::Scene()
 				//texcoord = vec2(tx, ty);
 			}
 			index_offset += fv;
-			
+
 			// per-face material
 			// shapes[s].mesh.material_ids[f];
-			
+
 			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 
 			if (materials.size() > 0)
@@ -118,18 +133,12 @@ Scene::Scene()
 					materials[shapes[s].mesh.material_ids[f]].diffuse[2]),
 					Material::Shader::DIFFUSE);
 			}
-			
+
 			//primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
 			printf("Loading polygon %i \n", primList.size());
 		}
 	}
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
-
-	// BVH helpers
-	sceneBounds = this->CalculateSceneBounds();
-	printf("Constructing BVH for %i polygons...\n", primList.size());
-	bvh = new BVH(&primList);
-	printf("-----------------------\n Done constructing BVH\n-----------------------\n");
 }
 
 AABB* Scene::CalculateSceneBounds()

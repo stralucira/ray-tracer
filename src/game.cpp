@@ -2,9 +2,9 @@
 #include "Scene.h"
 #include "RayTracer.h"
 
-#define MOVEMODIFIER	10.00f
-#define ROTATEMODIFIER	1.50f
-#define ZOOMMODIFIER	1.10f
+float MOVEMODIFIER = 10.00f;
+float ROTATEMODIFIER = 1.50f;
+float ZOOMMODIFIER = 1.10f;
 
 RayTracer* rayTracer;
 

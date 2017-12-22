@@ -27,7 +27,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
 
 		//return vec3((0.0f + depthRender * 0.0025f), (1.0f - depthRender * 0.0025f), 0.0f);
-		return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
+		return vec3(clamp((depthRender * 0.1f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.1f), 0.0f, 1.0f), 0.0f);
 	}
 
 	// Check intersection
