@@ -21,4 +21,6 @@ public:
 	vec3 Reflect(vec3 dir, vec3 normal);
 	float Fresnel(vec3 dir, vec3 normal, float index);
 	void Render();
+
+	bool depthRendering = false;
 };

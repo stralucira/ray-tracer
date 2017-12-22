@@ -2,8 +2,6 @@
 #include "RayTracer.h"
 
 #define ENABLEBVH 1
-#define ENABLEDEPTHRENDER 0
-
 
 int iCPU2 = omp_get_num_procs();
 
@@ -11,7 +9,6 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 {
 	this->scene = scene;
 	this->screen = screen;
-	//this->scene->camera->GenerateRays();
 }
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
@@ -23,13 +20,15 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 
 	float nearest = INFINITY;
 
-#if ENABLEDEPTHRENDER
-	int depthRender = 0;
-	scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
-	return vec3(glm::min(0.0f, 1.0f - depthRender * 0.2f), depthRender * 0.2f, 0.0f);
-#endif // ENABLEDEPTH
+	// BVH depth rendering
+	if (depthRendering)
+	{
+		int depthRender = 0;
+		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
+		return vec3((0.0f + depthRender * 0.005f), (1.0f - depthRender * 0.005f), 0.0f);
+	}
 
-	// check intersection
+	// Check intersection
 #if ENABLEBVH
 	scene->bvh->Traverse(ray, scene->bvh->root);
 	nearest = ray->t;
@@ -44,13 +43,13 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	}
 #endif // ENABLEBVH
 
-	// ray does not intersect
+	// If ray does not intersect
 	if (nearest == INFINITY)
 	{
 		return BACKGROUND_COLOR;
 	}
 
-	// ray intersects
+	// If ray intersects
 	else
 	{
 		vec3 hitPoint = ray->orig + ray->dir * nearest;
@@ -73,9 +72,8 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		if (ray->hit->material.shader == Material::Shader::MIRROR)
 		{
 			Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
-			color += ray->hit->material.color * GetColor(x, y, &reflectRay, depth += 1);
+			color += ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
-			//delete reflectRay;
 		}
 
 		// GLASS material shader hit
@@ -115,13 +113,11 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 				refractRay.orig = hitEpsilon;
 
 				refractColor = this->GetColor(x, y, &refractRay, depth + 1);
-				//delete refractRay;
 			}
 		
 			Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
-			vec3 reflectColor = ray->hit->material.color * GetColor(x, y, &reflectRay, depth += 1);
+			vec3 reflectColor = ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
-			//delete reflectRay;
 
 			color += reflectColor * kr + refractColor * (1 - kr);
 		}
@@ -140,23 +136,17 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 
 #if ENABLEBVH
 	scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
-	if (shadowRay.t < tToLight)
-	{
-		return BLACK;
-	}
+	if (shadowRay.t < tToLight) { return BLACK; }
 #else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
 		this->scene->primList[i]->intersect(&shadowRay);
-		if (shadowRay.t < tToLight)
-		{
-			return BLACK;
-		}
+		if (shadowRay.t < tToLight) { return BLACK; }
 	}
 #endif
 
 	float euclidianDistanceToLight = distance(hitPoint, light->pos);
-	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.color * INVPI);
+	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.Kd * INVPI);
 }
 
 vec3 RayTracer::Reflect(vec3 dir, vec3 normal)

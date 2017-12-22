@@ -5,12 +5,13 @@ class Material
 public:
 	enum class Shader { DIFFUSE, MIRROR, GLASS };
 
-	Material(vec3 color, Shader shader)
+	Material(vec3 diffuseColor, Shader shader)
 	{
-		this->color = color;
+		this->Kd = diffuseColor;
+		this->Ks = vec3(0, 0, 0);
 		this->shader = shader;
 	}
 
-	vec3 color;
+	vec3 Kd, Ks;
 	Shader shader;
 };

@@ -2,9 +2,9 @@
 #include "Scene.h"
 #include "RayTracer.h"
 
-#define MOVEMODIFIER	0.10f
-#define ROTATEMODIFIER	0.50f
-#define ZOOMMODIFIER	0.10f
+#define MOVEMODIFIER	0.50f
+#define ROTATEMODIFIER	1.50f
+#define ZOOMMODIFIER	1.10f
 
 RayTracer* rayTracer;
 
@@ -82,15 +82,22 @@ void Game::KeyDown(int a_Key)
 		rayTracer->scene->camera->PrintPosition();
 		break;
 
+		// Move light to current camera position
 	case SDL_SCANCODE_L:
 		rayTracer->scene->lightList.back()->pos = rayTracer->scene->camera->pos;
+		break;
+
+		// Move light to current camera position
+	case SDL_SCANCODE_B:
+		rayTracer->depthRendering = !rayTracer->depthRendering;
+		break;
+
 		//rayTracer->scene->camera->pos = vec3(0.0f, 11.0f, 17.5f);
 		//rayTracer->scene->camera->viewDir = vec3(0.0f, 0.0f, -1.0f);
 		//rayTracer->scene->camera->dir = glm::normalize(rayTracer->scene->camera->viewDir - rayTracer->scene->camera->pos);
 		//rayTracer->scene->camera->d = 1.0f;
 		//rayTracer->scene->camera->up = vec3(0.0f, 1.0f, 0.0f);
 		//rayTracer->scene->camera->CalculateScreen();
-		break;
 
 		// Reset Camera Position:
 	case SDL_SCANCODE_R:
