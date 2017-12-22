@@ -18,6 +18,8 @@
 
 Makefile
 
+*.DS_Store
+*.exe
 *.cmake
 *.pdb
 *.dll
@@ -30,4 +32,6 @@ Makefile
 *.plist
 *.pbxproj
 *.xcuserstate
-
+*.filters
+*.user
+*.zip

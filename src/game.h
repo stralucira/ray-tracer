@@ -1,7 +1,8 @@
 #pragma once
 
-#define SCRWIDTH	 800
-#define SCRHEIGHT	 600
+#define SCRWIDTH	800
+#define SCRHEIGHT	600
+#define MAXDEPTH	10
 
 #include "template.h"
 
@@ -16,7 +17,6 @@ public:
 	void Init();
 	void Shutdown(); /* implement if you want code to be executed upon app exit */
 	void HandleInput( float dt );
-	//void moveCamera();
 	void Tick( float dt );
 	void MouseUp( int _Button ) { /* implement if you want to detect mouse button presses */ }
 	void MouseDown( int _Button ) { /* implement if you want to detect mouse button presses */ }

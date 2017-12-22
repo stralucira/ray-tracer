@@ -1,21 +1,22 @@
-#pragma once
+﻿#pragma once
+#include "Primitive.h"
 
-#include "template.h"
-
-class Sphere :
-	public Primitive
+class Sphere : public Primitive
 {
 public:
-	Sphere();
+	Sphere(vec3 position, float radius) : Primitive(position)
+	{
+		this->radius = radius;
+		this->radius2 = radius * radius;
+		
+		this->centroid = position;
+		this->boundingBox = calculateAABB();
+	}
 
-	Sphere(float3 c, float r, Material* mat);
-	~Sphere();
+	bool intersect(Ray* ray);
+	vec3 getNormal(vec3 point);
 
-	float intersect( Ray* ray );
-	
-	float3 getNormal(float3 point);
+	AABB* calculateAABB();
 
-	float3 center;
-	float radius;
-	float radius2;
+	float radius, radius2;
 };

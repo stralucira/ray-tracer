@@ -1,44 +1,29 @@
-#include "template.h"
+﻿#include "template.h"
+#include "Plane.h"
 
-Plane::Plane()
+bool Plane::intersect(Ray* ray)
 {
+	float denominator = dot(normal, ray->dir);
 
-	this->mat = new Material(float4(0.1, 0.1, 0.1, 1));
-	this->position = float3(0,0,20);
-	this->normal = float3(0,0,-1);
-
+	if (abs(denominator) > 0.00001f)
+	{
+		float t = dot((this->centroid - ray->orig), normal) / denominator;
+		
+		if (t >= 0.00001f)
+		{
+			ray->t = t;
+			return true;
+		}
+	}
+	return false;
 }
 
-Plane::Plane(float3 position, float3 normal)
+vec3 Plane::getNormal(vec3 point)
 {
-	this->position = position;
-	this->normal = normal;
-	this->mat = new Material(float4(1,0,1,1));
-}
-
-Plane::~Plane()
-{
-}
-
-float3 Plane::getNormal(float3 point) {
 	return this->normal;
 }
 
-float Plane::intersect( Ray* ray )
+AABB* Plane::calculateAABB()
 {
-
-	// denominator in the vector-plane intersection 
-	// equation after solving for t
-	float denominator = dot(normal,ray->dir);
-
-	if(abs(denominator) > 0.00001f)
-	{
-		float tHit = dot((position - ray->orig), normal) / denominator;
-
-		if (tHit>0.00001f) {
-			ray->t = tHit;
-			return tHit;
-		}
-	}
-	return -1;
+	return new AABB(vec3(-INFINITY, -INFINITY, -INFINITY), vec3(INFINITY, INFINITY, INFINITY));
 }

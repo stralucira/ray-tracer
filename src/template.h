@@ -3,10 +3,14 @@
 // Credits to Mathijs Molenaar for making it both Windows, Linux, and Mac compatible
 
 #pragma once
-
 #define GLM_FORCE_RADIANS
-#define GLM_SWIZZLE
-
+#define GLM_ENABLE_EXPERIMENTAL
+#define BLACK				vec3(0.0f);
+#define WHITE				vec3(1.0f);
+#define RED					vec3(1.0f, 0.0f, 0.0f);
+#define GREEN				vec3(0.0f, 1.0f, 0.0f);
+#define BLUE				vec3(0.0f, 0.0f, 1.0f);
+#define BACKGROUND_COLOR	vec3(0.0f, 0.3f, 0.8f);
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?
@@ -38,6 +42,11 @@ typedef unsigned char byte;
 #include <stdlib.h>
 #include <assert.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <sstream>
+#include <omp.h>
 
 #ifdef __linux__
 #include <FreeImage.h>
@@ -70,7 +79,6 @@ extern "C"
 #include <stdio.h>
 #include "fcntl.h"
 #include <memory>
-#include <algorithm>
 #include "emmintrin.h"
 
 //#include <immintrin.h>
@@ -79,7 +87,7 @@ extern "C"
 
 using namespace Tmpl8;				// to use template classes
 using namespace glm;
-//using namespace std;				// to use stl vectors
+using namespace std;				// to use stl vectors
 
 inline float Rand(float range) { return ((float)rand() / RAND_MAX) * range; }
 inline int IRand(int range) { return rand() % range; }
@@ -90,6 +98,7 @@ namespace Tmpl8 {
 
 #define PI					3.14159265358979323846264338327950f
 #define INVPI				0.31830988618379067153776752674503f
+#define PIOVER180			0.01745329251994329576923690768488f
 
 #ifdef WIN32
 #define MALLOC64(x)			_aligned_malloc(x,64)
@@ -124,8 +133,10 @@ struct Timer
 	typedef std::chrono::high_resolution_clock Clock;
 #ifdef __linux__
 	typedef std::chrono::time_point<std::chrono::system_clock> TimePoint;
-#else// Both OS X and Windows
+#elif _WIN32
 	typedef std::chrono::steady_clock::time_point TimePoint;
+#else// Both OS X and Windows
+	typedef std::chrono::time_point<std::chrono::_V2::system_clock> TimePoint;
 #endif
 	typedef std::chrono::microseconds MicroSeconds;
 
@@ -343,15 +354,3 @@ public:
 mat4 operator * ( const mat4& a, const mat4& b );
 
 }; // namespace Tmpl8
-
-// TODO: Include your own headers for your own code here
-#include "Material.h"
-#include "Ray.h"
-#include "Primitive.h"
-#include "Camera.h"
-#include "Triangle.h"
-#include "Sphere.h"
-#include "Plane.h"
-#include "RayTracer.h"
-#include "game.h"
-
