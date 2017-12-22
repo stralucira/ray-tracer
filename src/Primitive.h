@@ -9,7 +9,7 @@ public:
 	Primitive(vec3 pos);
 
 	// default material color and shader
-	Material material = Material(vec3(0.5f, 0.5f, 0.5f), Material::Shader::DIFFUSE);
+	Material material = Material(Material::Shader::DIFFUSE);
 
 	virtual bool intersect(Ray* ray) = 0;
 	virtual vec3 getNormal(vec3 point) = 0;

@@ -8,10 +8,21 @@ public:
 	Material(vec3 diffuseColor, Shader shader)
 	{
 		this->Kd = diffuseColor;
-		this->Ks = vec3(0, 0, 0);
 		this->shader = shader;
 	}
 
-	vec3 Kd, Ks;
+	Material(vec3 diffuseColor, vec3 specularColor)
+	{
+		this->Kd = diffuseColor;
+		this->Ks = specularColor;
+	}
+
+	Material(Shader shader)
+	{
+		this->shader = shader;
+	}
+
+	vec3 Kd = GRAY;
+	vec3 Ks = GRAY;
 	Shader shader;
 };
