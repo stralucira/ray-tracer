@@ -7,21 +7,21 @@ class BVH
 {
 public:
 	// Contructors
-	BVH(std::vector<Primitive*>* primitives)
+	BVH(std::vector<Primitive*>* primList)
 	{
-		this->primitives = primitives;
-		ConstructBVH(primitives);
+		this->primitives = primList;
+		ConstructBVH(primList);
 	}
 
 	// Functions
-	void ConstructBVH(std::vector<Primitive*>* primitives);	
+	void ConstructBVH(std::vector<Primitive*>* primList);
 	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false, int* depthRender = NULL);
 	float IntersectPrim(Ray* ray, BVHNode* node);
-	static AABB CalculateBounds(std::vector<Primitive*>* primitives, int first, int last);
+	static AABB CalculateBounds(std::vector<Primitive*>* primList, int first, int last);
 
 	// Variables
-	uint poolPtr;
-	uint* indices;
+	//uint* indices;
+	glm::uint poolPtr;
 	BVHNode* root;
 	BVHNode** pool;
 	

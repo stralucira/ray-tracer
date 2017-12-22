@@ -40,7 +40,7 @@ void Camera::CalculateScreen()
 
 void Camera::PrintPosition()
 {
-	printf("------------------------------\n");
+	printf("-----------------------\n Camera Position \n-----------------------\n");
 	printf("dir: %.2f %.2f %.2f\n", dir.x, dir.y, dir.z);
 	printf("pos: %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
 	printf("\n");
@@ -50,7 +50,7 @@ void Camera::PrintPosition()
 	printf("p0: %.2f %.2f %.2f \n", p0.x, p0.y, p0.z);
 	printf("p1: %.2f %.2f %.2f \n", p1.x, p1.y, p1.z);
 	printf("p2: %.2f %.2f %.2f \n", p2.x, p2.y, p2.z);
-	printf("\n");
+	printf("-----------------------\n");
 }
 
 // Camera Movement

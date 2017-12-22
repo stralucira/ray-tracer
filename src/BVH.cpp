@@ -1,18 +1,18 @@
 #include "template.h"
 #include "BVH.h"
 
-void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
+void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 {
-	printf("Constructing BVH for %i polygons...\n\n", primitives->size());
+	//printf("Constructing BVH for %i polygons...\n", primList->size());
 
 	// create index array
 	//indices = new uint[primitives->size()];
 	//for (uint i = 0; i < primitives->size(); i++) indices[i] = i;
 
 	// allocate BVH root node
-	//pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primitives->size() * 2 - 1) * sizeof(BVHNode), 32));
-	pool = new BVHNode*[primitives->size() * 2 - 1];
-	for (glm::uint i = 0; i < (primitives->size() * 2 - 1); i++)
+	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primitives->size() * 2 - 1) * sizeof(BVHNode), 64));
+	//pool = new BVHNode*[primList->size() * 2 - 1];
+	for (glm::uint i = 0; i < (primList->size() * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
 	}
@@ -21,9 +21,9 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primitives)
 
 	// subdivide root node
 	root->leftFirst = 0;
-	root->count = primitives->size();
-	root->bounds = CalculateBounds(primitives, 0, primitives->size());
-	root->Subdivide(pool, primitives, poolPtr);
+	root->count = (int)primList->size();
+	root->bounds = CalculateBounds(primList, 0, (int)primList->size());
+	root->Subdivide(pool, primList, poolPtr);
 }
 
 void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
@@ -39,7 +39,6 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 
 	if (node->isLeaf())
 	{
-		//float currentT = IntersectPrim(ray, node);
 		if (IntersectPrim(ray, node) > prevT)
 		{
 			ray->t = prevT;
@@ -74,7 +73,7 @@ float BVH::IntersectPrim(Ray* ray, BVHNode* node)
 
 AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int last)
 {
-	printf("BVH Node %i: Calculating\n", first);
+	//printf("BVH Node %i: Calculating\n", first);
 	
 	float maxX = -INFINITY;
 	float maxY = -INFINITY;

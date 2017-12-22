@@ -1,0 +1,14 @@
+﻿cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  BVH.cpp
+  BVHNode.cpp
+  RayTracer.cpp
+  Scene.cpp
+src\Scene.cpp(204): warning C4477: 'printf' : format string '%i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  src\Scene.cpp(204): note: consider using '%zi' in the format string
+src\Scene.cpp(212): warning C4477: 'printf' : format string '%i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  src\Scene.cpp(212): note: consider using '%zi' in the format string
+  game.cpp
+src\game.cpp(117): warning C4477: 'sprintf' : format string '%i' requires an argument of type 'int', but variadic argument 2 has type 'unsigned __int64'
+  src\game.cpp(117): note: consider using '%zi' in the format string
+  Generating Code...
+  tmpl84.00a_2015.vcxproj -> C:\Users\satwikowirawan\source\repos\ray-tracer\x64\Release\Template.exe

@@ -2,9 +2,11 @@
 #include "BVH.h"
 #include "BVHNode.h"
 
-void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primitives, glm::uint& poolPtr)
+#define ENABLEBINNING 1
+
+void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr)
 {
-	printf("BVH Node %i: Subdividing\n", poolPtr);
+	//printf("BVH Node %i: Subdividing\n", poolPtr);
 	//if (count - this->leftFirst < 5) return;
 
 	uint tempPoolPtr = poolPtr;
@@ -12,29 +14,37 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primitives, glm
 	BVHNode* left = pool[poolPtr]; //this.left = pool[poolPtr++];
 	BVHNode* right = pool[poolPtr + 1]; //this.right = pool[poolPtr++];
 
-	if (!Partition(pool, primitives, poolPtr)) return; //Partition();
+	if (!Partition(pool, primList, poolPtr)) return; //Partition();
 
-	left->Subdivide(pool, primitives, poolPtr); //this.left->Subdivide();
-	right->Subdivide(pool, primitives, poolPtr); //this.right->Subdivide();
+	left->Subdivide(pool, primList, poolPtr); //this.left->Subdivide();
+	right->Subdivide(pool, primList, poolPtr); //this.right->Subdivide();
 
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primitives, uint& poolPtr)
+bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, uint& poolPtr)
 {
-	printf("BVH Node %i: Partitioning \n", poolPtr);
+	//printf("BVH Node %i: Partitioning \n", poolPtr);
 	// A * N
 	float parentNodeCost = this->bounds.CalculateVolume() * (count - leftFirst);
 	float lowestNodeCost = INFINITY;
-
 	float bestCoordinate;
 	int bestDimension;
 
+#if !ENABLEBINNING
 	for (int i = leftFirst; i < count; i++)
 	{
 		for (int dimension = 0; dimension < 3; dimension++)
 		{
-			float splitCoordinate = (*primitives)[i]->centroid[dimension];
+			float splitCoordinate = (*primList)[i]->centroid[dimension];
+#else
+	vec3 lengths = vec3(this->bounds.max - this->bounds.min);
+	for (int i = 1; i < 7; i++)
+	{
+		for (int dimension = 0; dimension < 3; dimension++)
+		{
+			float splitCoordinate = this->bounds.min[dimension] + lengths[dimension] * (i / 7.0f);
+#endif // ENABLEBINNING
 			int leftCounter = 0;
 			int rightCounter = 0;
 
@@ -45,16 +55,14 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primitives, uin
 
 			for (int i = leftFirst; i < count; i++)
 			{
-				if ((*primitives)[i]->centroid[dimension] < splitCoordinate)
+				if ((*primList)[i]->centroid[dimension] < splitCoordinate)
 				{
-					AABB* bounds = (*primitives)[i]->boundingBox;
-					AdjustBounds(bounds, minLeft, maxLeft);
+					AdjustBounds((*primList)[i]->boundingBox, minLeft, maxLeft);
 					leftCounter++;
 				}
 				else
 				{
-					AABB* bounds = (*primitives)[i]->boundingBox;
-					AdjustBounds(bounds, minRight, maxRight);
+					AdjustBounds((*primList)[i]->boundingBox, minRight, maxRight);
 					rightCounter++;
 				}
 			}
@@ -76,9 +84,9 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primitives, uin
 	int mid = leftFirst;
 	for (int i = leftFirst; i < count; i++)
 	{
-		if ((*primitives)[i]->centroid[bestDimension] < bestCoordinate)
+		if ((*primList)[i]->centroid[bestDimension] < bestCoordinate)
 		{
-			std::swap((*primitives)[i], (*primitives)[mid]);
+			std::swap((*primList)[i], (*primList)[mid]);
 			mid++;
 		}
 	}
@@ -86,14 +94,14 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primitives, uin
 	//Left node.
 	pool[poolPtr]->leftFirst = leftFirst;
 	pool[poolPtr]->count = mid;
-	pool[poolPtr]->bounds = BVH::CalculateBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+	pool[poolPtr]->bounds = BVH::CalculateBounds(primList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
 
 	//Right node.
 	pool[poolPtr]->leftFirst = mid;
 	pool[poolPtr]->count = count;
-	pool[poolPtr]->bounds = BVH::CalculateBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+	pool[poolPtr]->bounds = BVH::CalculateBounds(primList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
 

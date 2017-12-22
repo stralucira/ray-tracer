@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "RayTracer.h"
 
-#define MOVEMODIFIER	0.50f
+#define MOVEMODIFIER	10.00f
 #define ROTATEMODIFIER	1.50f
 #define ZOOMMODIFIER	1.10f
 
@@ -114,7 +114,7 @@ void Game::Tick( float dt )
 	rayTracer->Render();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f TRIANGLES: %i \n", 1 / dt, rayTracer->scene->bvh->primitives->size());
+	sprintf(buffer, "FPS: %f Polygons: %i \n", 1 / dt, rayTracer->scene->bvh->primitives->size());
 	screen->Print(buffer, 2, 2, 0xffffff);
 	sprintf(buffer, "Position: %.2f %.2f %.2f \n", rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z);
 	screen->Print(buffer, 2, 12, 0xffffff);
