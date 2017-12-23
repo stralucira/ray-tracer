@@ -42,7 +42,7 @@ bool Torus::intersect(Ray* ray)
 	for (int idx = 0; idx < maxRootsCount; ++idx)
 	{
 		float root = (float)roots[idx];
-		if (root > 0.001 && root < closestRoot)
+		if (root > 0.0001f && root < closestRoot)
 		{
 			closestRoot = root;
 		}

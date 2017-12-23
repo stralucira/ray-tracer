@@ -1,13 +1,31 @@
-# Exported from 3D Builder
-
+newmtl blinn1SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd hair.png
+Ni 1.00
+Ks 0.50 0.50 0.50
+newmtl blinn2SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd han face.png
+Ni 1.00
+Ks 0.50 0.50 0.50
+newmtl blinn3SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Lego-star-wars-han-solo-minifigure.jpg
+Ni 1.00
+Ks 0.50 0.50 0.50
 newmtl blinn4SG
-Kd 0.400000 0.231373 0.160784
-
-newmtl Face
-Kd 0.909804 0.752941 0.505882
-
-newmtl Shirt
-Kd 0.729412 0.729412 0.729412
-
-newmtl Hair
-Kd 0.439216 0.278431 0.117647
+illum 4
+Kd 0.40 0.23 0.16
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50

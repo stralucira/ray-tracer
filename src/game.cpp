@@ -87,17 +87,15 @@ void Game::KeyDown(int a_Key)
 		rayTracer->scene->lightList.back()->pos = rayTracer->scene->camera->pos;
 		break;
 
-		// Move light to current camera position
+		// BVH Depth rendering
 	case SDL_SCANCODE_B:
 		rayTracer->depthRendering = !rayTracer->depthRendering;
 		break;
 
-		//rayTracer->scene->camera->pos = vec3(0.0f, 11.0f, 17.5f);
-		//rayTracer->scene->camera->viewDir = vec3(0.0f, 0.0f, -1.0f);
-		//rayTracer->scene->camera->dir = glm::normalize(rayTracer->scene->camera->viewDir - rayTracer->scene->camera->pos);
-		//rayTracer->scene->camera->d = 1.0f;
-		//rayTracer->scene->camera->up = vec3(0.0f, 1.0f, 0.0f);
-		//rayTracer->scene->camera->CalculateScreen();
+		// Toggle Shadow
+	case SDL_SCANCODE_V:
+		rayTracer->renderShadow = !rayTracer->renderShadow;
+		break;
 
 		// Reset Camera Position:
 	case SDL_SCANCODE_R:
@@ -114,7 +112,7 @@ void Game::Tick( float dt )
 	rayTracer->Render();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f Polygons: %i \n", 1 / dt, rayTracer->scene->bvh->primitives->size());
+	sprintf(buffer, "FPS: %f Polygons: %i \n", 1 / dt, rayTracer->scene->bvh->primList->size());
 	screen->Print(buffer, 2, 2, 0xffffff);
 	sprintf(buffer, "Position: %.2f %.2f %.2f \n", rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z);
 	screen->Print(buffer, 2, 12, 0xffffff);

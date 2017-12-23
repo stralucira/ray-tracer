@@ -23,4 +23,6 @@ public:
 	void Render();
 
 	bool depthRendering = false;
+	bool renderShadow = true;
+	bool inShadowRay;
 };

@@ -5,11 +5,11 @@ bool Plane::intersect(Ray* ray)
 {
 	float denominator = dot(normal, ray->dir);
 
-	if (abs(denominator) > 0.00001f)
+	if (abs(denominator) > 0.0001f)
 	{
 		float t = dot((this->centroid - ray->orig), normal) / denominator;
 		
-		if (t >= 0.00001f)
+		if (t >= 0.0001f)
 		{
 			ray->t = t;
 			return true;

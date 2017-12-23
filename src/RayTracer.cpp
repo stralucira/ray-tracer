@@ -2,6 +2,7 @@
 #include "RayTracer.h"
 
 #define ENABLEBVH 1
+#define ALTERNATERENDERMODE 1
 
 int iCPU2 = omp_get_num_procs();
 
@@ -27,10 +28,10 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
 
 		//return vec3((0.0f + depthRender * 0.0025f), (1.0f - depthRender * 0.0025f), 0.0f);
-		return vec3(clamp((depthRender * 0.1f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.1f), 0.0f, 1.0f), 0.0f);
+		return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
 	}
 
-	// Check intersection
+	// Trace function
 #if ENABLEBVH
 	scene->bvh->Traverse(ray, scene->bvh->root);
 	nearest = ray->t;
@@ -51,6 +52,52 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		return BACKGROUND_COLOR;
 	}
 
+#if ALTERNATERENDERMODE // Phong
+	else
+	{
+		vec3 hitPoint = ray->orig + ray->dir * nearest;
+		vec3 normal = ray->hit->getNormal(hitPoint);
+		vec3 diffuseColor = BLACK;
+		vec3 specularColor = BLACK;
+		vec3 color = BLACK;
+
+		vec3 shadowPointOrig = (dot(ray->dir, normal) < 0) ?
+			hitPoint + normal * 0.00001f : 
+			hitPoint - normal * 0.00001f;
+
+		for (size_t i = 0; i < this->scene->lightList.size(); i++)
+		{
+			vec3 lightDir = this->scene->lightList[i]->pos - hitPoint;
+			//float lightDistance2 = dot(lightDir, lightDir);
+			lightDir = normalize(lightDir);
+
+			if (dot(lightDir, normal) < 0) { continue; }
+			
+			/*
+			Ray shadowRay = Ray(hitPoint, lightDir);
+			float tToLight = length(scene->lightList[i]->pos - shadowPointOrig);
+
+			if (renderShadow)
+			{
+				scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+				if (shadowRay.t < tToLight) { diffuseColor = BLACK; }
+			}
+			
+			
+				float euclidianDistanceToLight = distance(hitPoint, scene->lightList[i]->pos);
+				diffuseColor += scene->lightList[i]->color * dot(normal, lightDir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (ray->hit->material.Kd * INVPI);
+			*/
+
+			diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], ray->hit->material);
+
+			vec3 reflectionDirection = reflect(-lightDir, normal);
+			specularColor += powf(glm::max(0.0f, -dot(reflectionDirection, ray->dir)), ray->hit->material.Ns);// * this->scene->lightList[i]->color;
+		}
+		ray->t = INFINITY;
+
+		return color = diffuseColor + specularColor * ray->hit->material.Ks;
+	}
+#else
 	// If ray intersects
 	else
 	{
@@ -125,27 +172,31 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		}
 		return color;
 	}
+#endif
 }
 
 vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Material mat)
 {
-	vec3 hitEpsilon = hitPoint + dir * 0.01f;
+	vec3 hitEpsilon = hitPoint + dir * 0.0001f;
 	Ray shadowRay = Ray(hitPoint, dir);
 	shadowRay.t = INFINITY;
 
 	float lightInt = 0.0f;
 	float tToLight = length(light->pos - hitEpsilon);
 
-#if ENABLEBVH
-	scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
-	if (shadowRay.t < tToLight) { return BLACK; }
-#else
-	for (size_t i = 0; i < this->scene->primList.size(); i++)
+	if (renderShadow)
 	{
-		this->scene->primList[i]->intersect(&shadowRay);
+#if ENABLEBVH
+		scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
 		if (shadowRay.t < tToLight) { return BLACK; }
-	}
+#else
+		for (size_t i = 0; i < this->scene->primList.size(); i++)
+		{
+			this->scene->primList[i]->intersect(&shadowRay);
+			if (shadowRay.t < tToLight) { return BLACK; }
+		}
 #endif
+	}
 
 	float euclidianDistanceToLight = distance(hitPoint, light->pos);
 	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.Kd * INVPI);

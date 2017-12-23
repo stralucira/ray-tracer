@@ -10,7 +10,7 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 	//for (uint i = 0; i < primitives->size(); i++) indices[i] = i;
 
 	// allocate BVH root node
-	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primitives->size() * 2 - 1) * sizeof(BVHNode), 64));
+	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 32));
 	//pool = new BVHNode*[primList->size() * 2 - 1];
 	for (glm::uint i = 0; i < (primList->size() * 2 - 1); i++)
 	{
@@ -21,8 +21,8 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 
 	// subdivide root node
 	root->leftFirst = 0;
-	root->count = (int)primList->size();
-	root->bounds = CalculateBounds(primList, 0, (int)primList->size());
+	root->count = primList->size();
+	root->bounds = CalculateBounds(primList, 0, primList->size());
 	root->Subdivide(pool, primList, poolPtr);
 }
 
@@ -39,7 +39,7 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 
 	if (node->isLeaf())
 	{
-		if (IntersectPrim(ray, node) > prevT)
+		if (Trace(ray, node) > prevT)
 		{
 			ray->t = prevT;
 			ray->hit = prevHit;
@@ -53,16 +53,16 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 	}
 }
 
-float BVH::IntersectPrim(Ray* ray, BVHNode* node)
+float BVH::Trace(Ray* ray, BVHNode* node)
 {
 	float nearest = INFINITY;
 
 	for (int i = node->leftFirst; i < node->count; i++)
 	{
-		if ((*primitives)[i]->intersect(ray) && nearest > ray->t)
+		if ((*this->primList)[i]->intersect(ray) && nearest > ray->t)
 		{
 			nearest = ray->t;
-			ray->hit = (*primitives)[i];
+			ray->hit = (*this->primList)[i];
 		}
 	}
 

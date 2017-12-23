@@ -9,14 +9,14 @@ public:
 	// Contructors
 	BVH(std::vector<Primitive*>* primList)
 	{
-		this->primitives = primList;
+		this->primList = primList;
 		ConstructBVH(primList);
 	}
 
 	// Functions
 	void ConstructBVH(std::vector<Primitive*>* primList);
 	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false, int* depthRender = NULL);
-	float IntersectPrim(Ray* ray, BVHNode* node);
+	float Trace(Ray* ray, BVHNode* node);
 	static AABB CalculateBounds(std::vector<Primitive*>* primList, int first, int last);
 
 	// Variables
@@ -25,7 +25,7 @@ public:
 	BVHNode* root;
 	BVHNode** pool;
 	
-	std::vector<Primitive*>* primitives;
+	std::vector<Primitive*>* primList;
 
 	byte* whichChildFirst;
 	vec4* dists;
