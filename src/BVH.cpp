@@ -1,10 +1,10 @@
 #include "template.h"
 #include "BVH.h"
 
-void BVH::ConstructTopBVH(std::vector<std::vector<Primitive*>>* objectList, std::vector<AABB*>* objectBounds)
+void BVH::ConstructTopBVH(std::vector<AABB*>* objectBounds)
 {
-	topPool = new BVHNode*[objectList->size() * 2 - 1];
-	for (glm::uint i = 0; i < (objectList->size() * 2 - 1); i++)
+	topPool = new BVHNode*[objectBounds->size() * 2 - 1];
+	for (glm::uint i = 0; i < (objectBounds->size() * 2 - 1); i++)
 	{
 		topPool[i] = new BVHNode();
 	}
@@ -12,9 +12,9 @@ void BVH::ConstructTopBVH(std::vector<std::vector<Primitive*>>* objectList, std:
 	topPoolPtr = 2;
 
 	topRoot->leftFirst = 0;
-	topRoot->count = objectList->size();
-	topRoot->bounds = CalculateTopBounds(objectBounds, 0, objectList->size());
-	topRoot->SubdivideTop(topPool, objectList, topPoolPtr);
+	topRoot->count = objectBounds->size();
+	topRoot->bounds = CalculateTopBounds(objectBounds, 0, objectBounds->size());
+	topRoot->SubdivideTop(topPool, objectBounds, topPoolPtr);
 }
 
 void BVH::ConstructBVH(std::vector<Primitive*>* primList)

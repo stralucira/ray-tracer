@@ -20,7 +20,8 @@ public:
 	bool Partition(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr);
 	bool isLeaf();
 
-	void BVHNode::SubdivideTop(BVHNode** topPool, std::vector<std::vector<Primitive*>>* objectList, glm::uint& topPoolPtr);
+	void SubdivideTop(BVHNode** topPool, std::vector<AABB*>* objectBounds, glm::uint& topPoolPtr);
+	bool PartitionTop(BVHNode** topPool, std::vector<AABB*>* objectBounds, glm::uint& topPoolPtr);
 
 	// Variables
 	AABB bounds;	// 24 bytes ( 6 x 4 bytes )

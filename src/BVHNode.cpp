@@ -22,12 +22,21 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, glm::
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-void BVHNode::SubdivideTop(BVHNode** topPool, std::vector<std::vector<Primitive*>>* objectList, glm::uint& topPoolPtr)
+void BVHNode::SubdivideTop(BVHNode** topPool, std::vector<AABB*>* objectBounds, glm::uint& topPoolPtr)
 {
+	if (count - this->leftFirst < 5) return;
+
 	uint tempTopPoolPtr = topPoolPtr;
 
-	BVHNode* Left = topPool[topPoolPtr];
-	BVHNode* right = topPool[topPoolPtr];
+	BVHNode* topLeft = topPool[topPoolPtr];
+	BVHNode* topRight = topPool[topPoolPtr];
+
+	if (!PartitionTop(topPool, objectBounds, topPoolPtr)) return;
+
+	topLeft->SubdivideTop(topPool, objectBounds, topPoolPtr);
+	topRight->SubdivideTop(topPool, objectBounds, topPoolPtr);
+
+	this->leftFirst = tempTopPoolPtr; count = 0;
 }
 
 bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr)
@@ -110,6 +119,52 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, glm::
 	pool[poolPtr]->leftFirst = mid;
 	pool[poolPtr]->count = count;
 	pool[poolPtr]->bounds = BVH::CalculateBounds(primList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	return true;
+}
+
+bool BVHNode::PartitionTop(BVHNode** topPool, std::vector<AABB*>* objectBounds, glm::uint& topPoolPtr)
+{
+	//Median split
+	float xwidth = this->bounds.max.x - this->bounds.min.x;
+	float ywidth = this->bounds.max.y - this->bounds.min.y;
+	float zwidth = this->bounds.max.z - this->bounds.min.z;
+
+	int dimension;
+
+	float biggest = max(xwidth, max(ywidth, zwidth));
+	if (biggest == xwidth)
+		dimension = 0;
+	else if (biggest == ywidth)
+		dimension = 1;
+	else
+		dimension = 2;
+
+	float splitCoord = 0.5f*(bounds.max[dimension] + bounds.min[dimension]);
+
+	uint32_t mid = leftFirst;
+	for (uint32_t i = leftFirst; i < count; i++)
+	{
+		if (primitives[i]->centroid[dimension] < splitCoord)
+		{
+			std::swap(primitives[i], primitives[mid]);
+			mid++;
+		}
+	}
+
+	//Left node.
+	pool[poolPtr]->leftFirst = leftFirst;
+	pool[poolPtr]->count = mid;
+	pool[poolPtr]->bounds = BVH::CalculateTopBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	//Right node.
+	pool[poolPtr]->leftFirst = mid;
+	pool[poolPtr]->count = count;
+	pool[poolPtr]->bounds = BVH::CalculateTopBounds(primitives, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
 

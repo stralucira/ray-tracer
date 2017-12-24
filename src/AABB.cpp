@@ -9,6 +9,5 @@ float AABB::CalculateVolume()
 
 vec3 AABB::CalculateCentroid()
 {
-	vec3 length = this->max - this->min;
-	return (length * 0.5f) + this->min;
+	return ((this->max - this->min) * 0.5f);
 }
