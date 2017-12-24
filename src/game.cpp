@@ -7,6 +7,7 @@ float ROTATEMODIFIER = 1.50f;
 float ZOOMMODIFIER = 1.10f;
 
 RayTracer* rayTracer;
+int polyCount;
 
 // -----------------------------------------------------------
 // Initialize the game
@@ -16,6 +17,11 @@ void Game::Init()
 {    
 	Scene* testScene = new Scene();
 	rayTracer = new RayTracer(testScene, screen);
+
+	for (size_t i = 0; i < rayTracer->scene->bvh.size(); i++)
+	{
+		polyCount += rayTracer->scene->bvh[0]->primList->size();
+	}
 }
 
 void Game::Shutdown() { }
@@ -112,7 +118,7 @@ void Game::Tick( float dt )
 	rayTracer->Render();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f Polygons: %i \n", 1 / dt, rayTracer->scene->bvh[0]->primList->size());
+	sprintf(buffer, "FPS: %f Polygons: %i \n", 1 / dt, polyCount);
 	screen->Print(buffer, 2, 2, 0xffffff);
 	sprintf(buffer, "Position: %.2f %.2f %.2f \n", rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z);
 	screen->Print(buffer, 2, 12, 0xffffff);

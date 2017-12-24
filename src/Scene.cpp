@@ -61,9 +61,11 @@ Scene::Scene()
 	// BVH helpers	
 	for (size_t i = 0; i < objectList.size(); i++)
 	{
-		printf("Constructing BVH for %i polygons...\n", objectList[i].size());
+		printf("Constructing BVH %i for %i polygons...\n", i + 1, objectList[i].size());
 		bvh.push_back(new BVH(&objectList[i]));
 	}
+	printf("Constructing Top BVH for %i objects...\n", objectList.size());
+	topbvh = new BVH(&objectList, &objectBounds);
 	printf("-----------------------\n Done constructing BVH\n-----------------------\n");
 }
 

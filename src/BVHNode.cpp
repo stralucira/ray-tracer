@@ -22,6 +22,14 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, glm::
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
+void BVHNode::SubdivideTop(BVHNode** topPool, std::vector<std::vector<Primitive*>>* objectList, glm::uint& topPoolPtr)
+{
+	uint tempTopPoolPtr = topPoolPtr;
+
+	BVHNode* Left = topPool[topPoolPtr];
+	BVHNode* right = topPool[topPoolPtr];
+}
+
 bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr)
 {
 	//printf("BVH Node %i: Partitioning \n", poolPtr);

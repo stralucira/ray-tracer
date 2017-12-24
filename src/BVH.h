@@ -26,4 +26,19 @@ public:
 	BVHNode** pool;
 	
 	std::vector<Primitive*>* primList;
+	
+
+	BVH(std::vector<std::vector<Primitive*>>* objectList, std::vector<AABB*>* objectBounds)
+	{
+		this->objectList = objectList;
+		ConstructTopBVH(objectList, objectBounds);
+	}
+	void ConstructTopBVH(std::vector<std::vector<Primitive*>>* objectList, std::vector<AABB*>* objectBounds);
+	AABB CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int last);
+	
+	uint topPoolPtr = 2;
+	BVHNode* topRoot;
+	BVHNode** topPool;
+
+	std::vector<std::vector<Primitive*>>* objectList;
 };

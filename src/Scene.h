@@ -19,8 +19,7 @@ public:
 
 	// bvh helpers
 	AABB* CalculateObjectBounds(std::vector<Primitive*> primList);
-	AABB* CalculateSceneBounds();
 
 	AABB* sceneBounds;
-	//BVH* bvh;
+	BVH* topbvh;
 };
