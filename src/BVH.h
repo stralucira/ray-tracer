@@ -26,7 +26,4 @@ public:
 	BVHNode** pool;
 	
 	std::vector<Primitive*>* primList;
-
-	byte* whichChildFirst;
-	vec4* dists;
 };

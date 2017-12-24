@@ -21,10 +21,10 @@ Scene::Scene()
 	lightList.push_back(new Light(vec3(0.0f,2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
 	primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
-	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
+	primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
-	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::GLASS);
 
 	primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
 	primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
@@ -55,13 +55,15 @@ Scene::Scene()
 	lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
 	lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(500.0f, 500.0f, 500.0f)));
 
-	this->LoadObject("TIE-fighter.obj");
+	this->LoadObject("x-wing.obj");
 #endif
 
-	// BVH helpers
-	sceneBounds = this->CalculateSceneBounds();
-	printf("Constructing BVH for %i polygons...\n", primList.size());
-	bvh = new BVH(&primList);
+	// BVH helpers	
+	for (size_t i = 0; i < objectList.size(); i++)
+	{
+		printf("Constructing BVH for %i polygons...\n", objectList[i].size());
+		bvh.push_back(new BVH(&objectList[i]));
+	}
 	printf("-----------------------\n Done constructing BVH\n-----------------------\n");
 }
 
@@ -71,6 +73,8 @@ void Scene::LoadObject(std::string inputfile)
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
+	
+	std::vector<Primitive*> primList;
 
 	std::string err;
 	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
@@ -124,7 +128,7 @@ void Scene::LoadObject(std::string inputfile)
 			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 
 			if (materials.size() > 0)
-			{
+			{ 
 				primList.back()->material = Material(
 					vec3(
 						materials[shapes[s].mesh.material_ids[f]].diffuse[0],	// Kd red
@@ -135,18 +139,28 @@ void Scene::LoadObject(std::string inputfile)
 						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks green
 						materials[shapes[s].mesh.material_ids[f]].specular[0]),	// Kd blue
 					materials[shapes[s].mesh.material_ids[f]].shininess,	// Ns
-					Material::Shader::DIFFUSE
+					materials[shapes[s].mesh.material_ids[f]].dissolve
 				);
-			}
 
+				if (materials[shapes[s].mesh.material_ids[f]].dissolve < 1.0f)
+				{
+					primList.back()->material.shader = Material::Shader::GLASS;
+				}
+				else
+				{
+					primList.back()->material.shader = Material::Shader::DIFFUSE;
+				}
+			}
 			//primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
-			printf("Loading polygon %i \n", primList.size());
+			//printf("Loading polygon %i \n", primList.size());
 		}
 	}
+	objectBounds.push_back(CalculateObjectBounds(primList));
+	objectList.push_back(primList);
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
 }
 
-AABB* Scene::CalculateSceneBounds()
+AABB* Scene::CalculateObjectBounds(std::vector<Primitive*> primList)
 {
 	float maxX = -INFINITY;
 	float maxY = -INFINITY;

@@ -19,6 +19,14 @@ public:
 		this->shader = shader;
 	}
 
+	Material(vec3 diffuseColor, vec3 specularColor, float shininess, float dissolve)
+	{
+		this->Kd = diffuseColor;
+		this->Ks = specularColor;
+		this->Ns = shininess;
+		this->dissolve = dissolve;
+	}
+
 	Material(Shader shader)
 	{
 		this->shader = shader;
@@ -28,5 +36,6 @@ public:
 	vec3 Kd = BLACK; // Diffuse color
 	vec3 Ks = BLACK; // Specular color
 	float Ns = 0;
+	float dissolve = 1;
 	Shader shader;
 };

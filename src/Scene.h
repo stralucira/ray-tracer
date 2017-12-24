@@ -13,11 +13,14 @@ public:
 	void LoadObject(std::string filename);
 
 	std::vector<Light*> lightList;
-	std::vector<Primitive*> primList;
+	std::vector<std::vector<Primitive*>> objectList;
+	std::vector<AABB*> objectBounds;
+	std::vector<BVH*> bvh;
 
 	// bvh helpers
+	AABB* CalculateObjectBounds(std::vector<Primitive*> primList);
 	AABB* CalculateSceneBounds();
 
 	AABB* sceneBounds;
-	BVH* bvh;
+	//BVH* bvh;
 };

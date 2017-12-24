@@ -14,7 +14,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 {
-	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
+	if (depth > MAXDEPTH || this->scene->objectList.size() == 0)
 	{
 		return BACKGROUND_COLOR;
 	}
@@ -25,16 +25,20 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	if (depthRendering)
 	{
 		int depthRender = 0;
-		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
-
-		//return vec3((0.0f + depthRender * 0.0025f), (1.0f - depthRender * 0.0025f), 0.0f);
-		return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
+		for (size_t i = 0; i < scene->bvh.size(); i++)
+		{
+			scene->bvh[i]->Traverse(ray, scene->bvh[i]->root, 0, &depthRender);
+			return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
+		}
 	}
 
 	// Trace function
 #if ENABLEBVH
-	scene->bvh->Traverse(ray, scene->bvh->root);
-	nearest = ray->t;
+	for (size_t i = 0; i < scene->bvh.size(); i++)
+	{
+		scene->bvh[i]->Traverse(ray, scene->bvh[i]->root);
+		nearest = ray->t;
+	}
 #else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
@@ -55,47 +59,73 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 #if ALTERNATERENDERMODE // Phong
 	else
 	{
-		vec3 hitPoint = ray->orig + ray->dir * nearest;
-		vec3 normal = ray->hit->getNormal(hitPoint);
-		vec3 diffuseColor = BLACK;
-		vec3 specularColor = BLACK;
-		vec3 color = BLACK;
-
-		vec3 shadowPointOrig = (dot(ray->dir, normal) < 0) ?
-			hitPoint + normal * 0.00001f : 
-			hitPoint - normal * 0.00001f;
-
-		for (size_t i = 0; i < this->scene->lightList.size(); i++)
+		if (renderShadow)
 		{
-			vec3 lightDir = this->scene->lightList[i]->pos - hitPoint;
-			//float lightDistance2 = dot(lightDir, lightDir);
-			lightDir = normalize(lightDir);
+			vec3 hitPoint = ray->orig + ray->dir * nearest;
+			vec3 normal = ray->hit->getNormal(hitPoint);
+			vec3 color = BLACK;
 
-			if (dot(lightDir, normal) < 0) { continue; }
-			
-			/*
-			Ray shadowRay = Ray(hitPoint, lightDir);
-			float tToLight = length(scene->lightList[i]->pos - shadowPointOrig);
+			vec3 shadowPointOrig = (dot(ray->dir, normal) < 0) ?
+				hitPoint + normal * 0.00001f :
+				hitPoint - normal * 0.00001f;
 
-			if (renderShadow)
+			if (ray->hit->material.shader == Material::Shader::DIFFUSE)
 			{
-				scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
-				if (shadowRay.t < tToLight) { diffuseColor = BLACK; }
+				for (size_t i = 0; i < this->scene->lightList.size(); i++)
+				{
+					vec3 diffuseColor = BLACK;
+					vec3 specularColor = BLACK;
+
+					vec3 lightDir = this->scene->lightList[i]->pos - hitPoint;
+					//float lightDistance2 = dot(lightDir, lightDir);
+					lightDir = normalize(lightDir);
+
+					if (dot(lightDir, normal) < 0) { continue; }
+
+					diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], ray->hit->material);
+
+					vec3 reflectionDirection = reflect(-lightDir, normal);
+					specularColor += powf(glm::max(0.0f, -dot(reflectionDirection, ray->dir)), ray->hit->material.Ns);// * this->scene->lightList[i]->color;
+
+					color += diffuseColor + specularColor * ray->hit->material.Ks;
+				}
+				//ray->t = INFINITY;
+			}
+
+			if (ray->hit->material.shader == Material::Shader::MIRROR)
+			{
+				Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
+				color += ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
+				//ray->t = INFINITY;
 			}
 			
-			
-				float euclidianDistanceToLight = distance(hitPoint, scene->lightList[i]->pos);
-				diffuseColor += scene->lightList[i]->color * dot(normal, lightDir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (ray->hit->material.Kd * INVPI);
-			*/
+			if (ray->hit->material.shader == Material::Shader::GLASS)
+			{
+				vec3 reflectionDirection = normalize(reflect(ray->dir, normal));
+				vec3 refractionDirection = normalize(refract(ray->dir, normal, 1.0f));
+				vec3 reflectionRayOrig = (dot(reflectionDirection, normal) < 0) ?
+					hitPoint - normal * 0.0001f :
+					hitPoint + normal * 0.0001f;
+				vec3 refractionRayOrig = (dot(refractionDirection, normal) < 0) ?
+					hitPoint - normal * 0.0001f :
+					hitPoint + normal * 0.0001f;
+				
+				Ray reflectRay = Ray(reflectionRayOrig, reflectionDirection);
+				vec3 reflectionColor = GetColor(x, y, &reflectRay, depth += 1);
+				
+				Ray refractRay = Ray(refractionRayOrig, refractionDirection);
+				vec3 refractionColor = GetColor(x, y, &refractRay, depth += 1);
 
-			diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], ray->hit->material);
+				color += reflectionColor * (ray->hit->material.dissolve) + refractionColor * (1 - ray->hit->material.dissolve);
+			}
+			return color;
 
-			vec3 reflectionDirection = reflect(-lightDir, normal);
-			specularColor += powf(glm::max(0.0f, -dot(reflectionDirection, ray->dir)), ray->hit->material.Ns);// * this->scene->lightList[i]->color;
 		}
-		ray->t = INFINITY;
-
-		return color = diffuseColor + specularColor * ray->hit->material.Ks;
+		else
+		{
+			vec3 color = ray->hit->material.Kd;
+			return color;
+		}
 	}
 #else
 	// If ray intersects
@@ -132,7 +162,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			
 			float kr = Fresnel(ray->dir, normal, 1.52f);
 			bool outside = dot(ray->dir, normal) < 0;
-			vec3 bias = 0.001f * ray->hit->getNormal(hitPoint);
+			vec3 bias = 0.00001f * ray->hit->getNormal(hitPoint);
 
 			float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
 			float etai = 1, etat = 1.52f;
@@ -161,7 +191,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 				vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
 				refractRay.orig = hitEpsilon;
 
-				refractColor = this->GetColor(x, y, &refractRay, depth + 1);
+				refractColor = this->GetColor(x, y, &refractRay, depth += 1);
 			}
 		
 			Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
@@ -187,8 +217,11 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	if (renderShadow)
 	{
 #if ENABLEBVH
-		scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+	for (size_t i = 0; i < scene->bvh.size(); i++)
+	{
+		scene->bvh[i]->Traverse(&shadowRay, scene->bvh[i]->root, true);
 		if (shadowRay.t < tToLight) { return BLACK; }
+	}
 #else
 		for (size_t i = 0; i < this->scene->primList.size(); i++)
 		{

@@ -22,7 +22,7 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, glm::
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, uint& poolPtr)
+bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr)
 {
 	//printf("BVH Node %i: Partitioning \n", poolPtr);
 	// A * N
@@ -108,7 +108,7 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, uint&
 	return true;
 }
 
-void BVHNode::AdjustBounds(AABB* bounds, vec3& min, vec3& max)
+void BVHNode::AdjustBounds(AABB * bounds, vec3& min, vec3& max)
 {
 	if (bounds->max.x > max.x) { max.x = bounds->max.x; }
 	if (bounds->max.y > max.y) { max.y = bounds->max.y; }

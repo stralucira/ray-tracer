@@ -24,5 +24,5 @@ public:
 
 	bool depthRendering = false;
 	bool renderShadow = true;
-	bool inShadowRay;
+	bool inShadow;
 };
