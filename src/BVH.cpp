@@ -1,22 +1,6 @@
 #include "template.h"
 #include "BVH.h"
 
-void BVH::ConstructTopBVH(std::vector<AABB*>* objectBounds)
-{
-	topPool = new BVHNode*[objectBounds->size() * 2 - 1];
-	for (glm::uint i = 0; i < (objectBounds->size() * 2 - 1); i++)
-	{
-		topPool[i] = new BVHNode();
-	}
-	topRoot = topPool[0];
-	topPoolPtr = 2;
-
-	topRoot->leftFirst = 0;
-	topRoot->count = objectBounds->size();
-	topRoot->bounds = CalculateTopBounds(objectBounds, 0, objectBounds->size());
-	topRoot->SubdivideTop(topPool, objectBounds, topPoolPtr);
-}
-
 void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 {
 	//printf("Constructing BVH for %i polygons...\n", primList->size());
@@ -110,6 +94,22 @@ AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int la
 		if ((*primitives)[i]->boundingBox->min.z < minZ) { minZ = (*primitives)[i]->boundingBox->min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
+}
+
+// Top BVH calculations
+void BVH::ConstructTopBVH(std::vector<AABB*>* objectBounds)
+{
+	topPool = new BVHNode*[objectBounds->size() * 2 - 1];
+	for (glm::uint i = 0; i < (objectBounds->size() * 2 - 1); i++)
+	{
+		topPool[i] = new BVHNode();
+	}
+	topRoot = topPool[0];
+	topPoolPtr = 2;
+
+	topRoot->leftFirst = 0;
+	topRoot->count = objectBounds->size();
+	topRoot->bounds = CalculateTopBounds(objectBounds, 0, objectBounds->size());
 }
 
 AABB BVH::CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int last)

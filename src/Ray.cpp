@@ -9,9 +9,6 @@ Ray::Ray(vec3 origin, vec3 direction)
 
 	// BVH helpers
 	this->invDir = 1.0f / this->dir;
-	//this->sign[0] = (invDir.x < 0);
-	//this->sign[1] = (invDir.y < 0);
-	//this->sign[2] = (invDir.z < 0);
 }
 
 bool Ray::Intersect(AABB bounds)
@@ -36,4 +33,5 @@ bool Ray::Intersect(AABB bounds)
 	tmax = glm::min(tmax, glm::max(tzmin, tzmax));
 
 	return tmax >= tmin && tmax >= 0;
+	tHit = tmin;
 }

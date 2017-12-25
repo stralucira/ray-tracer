@@ -11,7 +11,7 @@ public:
 		this->height = height;
 
 		this->centroid = position;
-		//this->boundingBox = calculateAABB();
+		this->boundingBox = calculateAABB();
 	}
 
 	bool intersect(Ray* ray);

@@ -55,6 +55,7 @@ Scene::Scene()
 	lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
 	lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(500.0f, 500.0f, 500.0f)));
 
+	this->LoadObject("cube.obj");
 	this->LoadObject("x-wing.obj");
 #endif
 

@@ -20,7 +20,7 @@ void Game::Init()
 
 	for (size_t i = 0; i < rayTracer->scene->bvh.size(); i++)
 	{
-		polyCount += rayTracer->scene->bvh[0]->primList->size();
+		polyCount += rayTracer->scene->bvh[i]->primList->size();
 	}
 }
 

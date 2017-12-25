@@ -12,7 +12,7 @@ public:
 		this->normal = normal;
 	
 		this->centroid = calculateCentroid();
-		//this->boundingBox = calculateAABB();
+		this->boundingBox = calculateAABB();
 	}
 
 	Triangle(vec3 a, vec3 b, vec3 c) : Primitive(a)
@@ -23,7 +23,7 @@ public:
 		this->normal = normalize(cross(a - b, b - c));
 
 		this->centroid = calculateCentroid();
-		//this->boundingBox = calculateAABB();
+		this->boundingBox = calculateAABB();
 	}
 
 	bool intersect(Ray* ray);
