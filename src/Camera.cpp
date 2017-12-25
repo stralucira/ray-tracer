@@ -16,10 +16,10 @@ Camera::Camera()
 void Camera::Init()
 {
 	this->pos = vec3(0.0f, 0.0f, -1.0f);
-	this->viewDir = vec3(0.0f, 0.0f, 1.0f);
-	this->dir = glm::normalize(viewDir - pos);
+	this->LookAt(vec3(0.0f, 0.0f, 1.0f));
+	this->SetPosition(pos);
+
 	this->d = 1.0f;
-	this->up = vec3(0.0f, 1.0f, 0.0f);
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
 
 	CalculateScreen();
@@ -27,25 +27,23 @@ void Camera::Init()
 
 void Camera::CalculateScreen()
 {
+	this->SetPosition(pos);
+	
+	vec3 screenCenter = this->pos + this->d * this->GetForward();
 
-	this->right = glm::cross(this->up, this->dir);
-	this->up = glm::cross(this->dir, this->right);
-
-	vec3 screenCenter = this->pos + this->d * this->dir;
-
-	this->p0 = screenCenter - this->right + this->up * this->aspectRatio; // top left corner
-	this->p1 = screenCenter + this->right + this->up * this->aspectRatio; // top right corner
-	this->p2 = screenCenter - this->right - this->up * this->aspectRatio; // bottom left corner
+	this->p0 = screenCenter - this->GetRight() + this->GetUp() * this->aspectRatio; // top left corner
+	this->p1 = screenCenter + this->GetRight() + this->GetUp() * this->aspectRatio; // top right corner
+	this->p2 = screenCenter - this->GetRight() - this->GetUp() * this->aspectRatio; // bottom left corner
 }
 
 void Camera::PrintPosition()
 {
 	printf("-----------------------\n Camera Position \n-----------------------\n");
 	printf("dir: %.2f %.2f %.2f\n", dir.x, dir.y, dir.z);
-	printf("pos: %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
+	printf("pos: %.2f %.2f %.2f\n", GetPosition().x, GetPosition().y, GetPosition().z);
 	printf("\n");
-	printf("right: %.2f %.2f %.2f \n", right.x, right.y, right.z);
-	printf("up: %.2f %.2f %.2f \n", up.x, up.y, up.z);
+	printf("right: %.2f %.2f %.2f \n", GetRight().x, GetRight().y, GetRight().z);
+	printf("up: %.2f %.2f %.2f \n", GetUp().x, GetUp().y, GetUp().z);
 	printf("\n");
 	printf("p0: %.2f %.2f %.2f \n", p0.x, p0.y, p0.z);
 	printf("p1: %.2f %.2f %.2f \n", p1.x, p1.y, p1.z);
@@ -57,60 +55,32 @@ void Camera::PrintPosition()
 // Translations:
 void Camera::Surge(float speed)
 {
-	pos += dir * speed;
+	pos += GetForward() * speed;
 	CalculateScreen();
 }
 void Camera::Sway(float speed)
 {
-	pos += right * speed;
+	pos += GetRight() * speed;
 	CalculateScreen();
 }
 void Camera::Heave(float speed)
 {
-	pos += up * speed;
+	pos += GetUp() * speed;
 	CalculateScreen();
 }
 // Rotations:
 void Camera::Roll(float angle)
 {
-	float x = dir.x;
-	float y = dir.y;
-
-	float rad = angle * PIOVER180;
-	float c = glm::cos(rad);
-	float s = glm::sin(rad);
-
-	dir.x = x * c - y * s;
-	dir.y = y * c + x * s;
-
 	CalculateScreen();
 }
 void Camera::Pitch(float angle)
 {
-	float y = dir.y;
-	float z = dir.z;
-
-	float rad = angle * PIOVER180;
-	float c = glm::cos(rad);
-	float s = glm::sin(rad);
-
-	dir.y = y * c - z * s;
-	dir.z = z * c + y * s;
-
+	LookAt(GetPosition() + GetForward() - angle * GetUp());
 	CalculateScreen();
 }
 void Camera::Yaw(float angle)
 {
-	float x = dir.x;
-	float z = dir.z;
-
-	float rad = angle * PIOVER180;
-	float c = glm::cos(rad);
-	float s = glm::sin(rad);
-
-	dir.x = x * c - z * s;
-	dir.z = z * c + x * s;
-
+	LookAt(GetPosition() + GetForward() - angle * GetRight());
 	CalculateScreen();
 }
 // Zooming:

@@ -12,8 +12,9 @@ public:
 	}
 
 	// Functions
-	float CalculateVolume();
 	vec3 CalculateCentroid();
+	float CalculateArea();
+	float CalculateVolume();
 
 	// Variables
 	vec3 min;	// 12 bytes ( 3 x 4 bytes )

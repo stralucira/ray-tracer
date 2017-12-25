@@ -3,8 +3,8 @@
 #include "RayTracer.h"
 
 float MOVEMODIFIER = 10.00f;
-float ROTATEMODIFIER = 1.50f;
-float ZOOMMODIFIER = 1.10f;
+float ROTATEMODIFIER = 0.10f;
+float ZOOMMODIFIER = 0.50f;
 
 RayTracer* rayTracer;
 int polyCount;
@@ -122,6 +122,6 @@ void Game::Tick( float dt )
 	screen->Print(buffer, 2, 2, 0xffffff);
 	sprintf(buffer, "Position: %.2f %.2f %.2f \n", rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z);
 	screen->Print(buffer, 2, 12, 0xffffff);
-	sprintf(buffer, "Direction: %.2f %.2f %.2f \n", rayTracer->scene->camera->dir.x, rayTracer->scene->camera->dir.y, rayTracer->scene->camera->dir.z);
+	sprintf(buffer, "Direction: %.2f %.2f %.2f \n", rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z);
 	screen->Print(buffer, 2, 22, 0xffffff);	
 }

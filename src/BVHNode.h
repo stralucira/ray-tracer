@@ -16,8 +16,9 @@ public:
 
 	// Functions
 	void AdjustBounds(AABB* bounds, vec3& min, vec3& max);
-	void Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr);
-	bool Partition(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr);
+	int FindBestMatch(std::vector<AABB*>* objectBounds, AABB* bounds);
+	void Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr);
+	bool Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr);
 	bool isLeaf();
 
 	// Variables

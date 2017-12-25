@@ -19,9 +19,12 @@ public:
 	float Trace(Ray* ray, BVHNode* node);
 	static AABB CalculateBounds(std::vector<Primitive*>* primList, int first, int last);
 
+	float CalculateDistance2(AABB bounds, vec3 point);
+	int ReturnLargest(vec3 point);
+
 	// Variables
 	//uint* indices;
-	glm::uint poolPtr;
+	unsigned int poolPtr;
 	BVHNode* root;
 	BVHNode** pool;
 	
@@ -40,7 +43,7 @@ public:
 	static AABB CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int last);
 	
 	// Variables
-	uint topPoolPtr = 2;
+	unsigned int topPoolPtr = 2;
 	BVHNode* topRoot;
 	BVHNode** topPool;
 

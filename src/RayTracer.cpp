@@ -28,21 +28,20 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		for (size_t i = 0; i < scene->bvh.size(); i++)
 		{
 			//scene->topbvh->TraverseTop(ray, scene->topbvh->topRoot, 0, &depthRender);
-			scene->bvh[i]->Traverse(ray, scene->bvh[i]->root, 0, &depthRender);
+			scene->bvh[1]->Traverse(ray, scene->bvh[1]->root, 0, &depthRender);
 			return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
 		}
 	}
 
 	// Trace function
 #if ENABLEBVH
-	scene->topbvh->TraverseTop(ray, scene->topbvh->topRoot);
-	nearest = ray->t;
-	//for (size_t i = 0; i < scene->bvh.size(); i++)
-	//{
-	//	//scene->topbvh->TraverseTop(ray, scene->topbvh->topRoot);
-	//	scene->bvh[i]->Traverse(ray, scene->bvh[i]->root);
-	//	nearest = ray->t;
-	//}
+	//scene->topbvh->TraverseTop(ray, scene->topbvh->topRoot);
+	//nearest = ray->t;
+	for (size_t i = 0; i < scene->bvh.size(); i++)
+	{
+		scene->bvh[i]->Traverse(ray, scene->bvh[i]->root);
+		nearest = ray->t;
+	}
 #else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
@@ -224,12 +223,11 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	//scene->topbvh->TraverseTop(&shadowRay, scene->topbvh->topRoot, true);
 	//if (shadowRay.t < tToLight) { return BLACK; }
 
-	//for (size_t i = 0; i < scene->bvh.size(); i++)
-	//{
-	////	scene->topbvh->TraverseTop(&shadowRay, scene->topbvh->topRoot, true);
-	//	scene->bvh[i]->Traverse(&shadowRay, scene->bvh[i]->root, true);
-	//	if (shadowRay.t < tToLight) { return BLACK; }
-	//}
+	for (size_t i = 0; i < scene->bvh.size(); i++)
+	{
+		scene->bvh[i]->Traverse(&shadowRay, scene->bvh[i]->root, true);
+		if (shadowRay.t < tToLight) { return BLACK; }
+	}
 #else
 		for (size_t i = 0; i < this->scene->primList.size(); i++)
 		{

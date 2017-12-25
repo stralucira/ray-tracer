@@ -4,12 +4,12 @@
 
 #define ENABLEBINNING 1
 
-void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr)
+void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr)
 {
 	//printf("BVH Node %i: Subdividing\n", poolPtr);
 	//if (count - this->leftFirst < 5) return;
 
-	uint tempPoolPtr = poolPtr;
+	unsigned int tempPoolPtr = poolPtr;
 
 	BVHNode* left = pool[poolPtr]; //this.left = pool[poolPtr++];
 	BVHNode* right = pool[poolPtr + 1]; //this.right = pool[poolPtr++];
@@ -22,7 +22,7 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, glm::
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, glm::uint& poolPtr)
+bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr)
 {
 	//printf("BVH Node %i: Partitioning \n", poolPtr);
 	// A * N
@@ -123,3 +123,16 @@ bool BVHNode::isLeaf()
 {
 	return count != 0;
 }
+
+/*int BVHNode::FindBestMatch(std::vector<AABB*>* objectBounds, AABB* bounds)
+{
+	float bestArea = INFINITY;
+	for (size_t i = 0; i < objectBounds->size(); i++)
+	{
+		if ((*objectBounds)[i] != bounds)
+		{
+			AABB unionBox = AABB((*objectBounds)[i]->min + bounds->min,(*objectBounds)[i]->max + bounds->max);
+			//float boxArea = &unionBox.CalculateArea;
+		}
+	}
+}*/

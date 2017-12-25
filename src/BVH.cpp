@@ -12,7 +12,7 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 	// allocate BVH root node
 	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 32));
 	//pool = new BVHNode*[primList->size() * 2 - 1];
-	for (glm::uint i = 0; i < (primList->size() * 2 - 1); i++)
+	for (unsigned int i = 0; i < (primList->size() * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
 	}
@@ -48,8 +48,34 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 
 	else
 	{
+		vec3 leftCentroid = pool[node->leftFirst]->bounds.CalculateCentroid();
+		vec3 rightCentroid = pool[node->leftFirst + 1]->bounds.CalculateCentroid();
+
+		vec3 lengths = glm::abs(leftCentroid - rightCentroid);
+		int dimension = ReturnLargest(lengths);
+
+		bool sign = ray->dir[dimension] > 0.0f;
+
 		this->Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
 		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
+
+		/*float leftDistance2 = CalculateDistance2(pool[node->leftFirst]->bounds, ray->orig);
+		float rightDistance2 = CalculateDistance2(pool[node->leftFirst + 1]->bounds, ray->orig);
+		
+		if (leftDistance2 < rightDistance2)
+		{
+			Traverse(ray, pool[node->leftFirst], isShadowRay);
+			if (ray->t * ray->t < rightDistance2) { return; }
+			Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+		}
+		else
+		{
+			Traverse(ray, pool[node->leftFirst + 1], isShadowRay);
+			if (ray->t * ray->t < leftDistance2) { return; }
+			Traverse(ray, pool[node->leftFirst], isShadowRay);
+		}*/
+
+		
 	}
 }
 
@@ -96,20 +122,27 @@ AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int la
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }
 
+float BVH::CalculateDistance2(AABB bounds, vec3 point)
+{
+	float distanceX = glm::max(bounds.min.x - point.x, glm::max(0.0f, point.x - bounds.max.x));
+	float distanceY = glm::max(bounds.min.y - point.y, glm::max(0.0f, point.y - bounds.max.y));
+	float distanceZ = glm::max(bounds.min.z - point.z, glm::max(0.0f, point.z - bounds.max.z));
+
+	return distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ;
+}
+
+int BVH::ReturnLargest(vec3 point)
+{
+	return point.x > point.y ?
+		(point.x > point.z ? 0 : 2) :
+		(point.y > point.z ? 1 : 2);
+}
+
 // Top BVH calculations
 void BVH::ConstructTopBVH(std::vector<AABB*>* objectBounds)
 {
-	topPool = new BVHNode*[objectBounds->size() * 2 - 1];
-	for (glm::uint i = 0; i < (objectBounds->size() * 2 - 1); i++)
-	{
-		topPool[i] = new BVHNode();
-	}
-	topRoot = topPool[0];
-	topPoolPtr = 2;
-
-	topRoot->leftFirst = 0;
-	topRoot->count = objectBounds->size();
-	topRoot->bounds = CalculateTopBounds(objectBounds, 0, objectBounds->size());
+	//AABB* nodeA = objectBounds->front();
+	//AABB* nodeB->FindBestMatch(objectBounds, nodeA);
 }
 
 AABB BVH::CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int last)

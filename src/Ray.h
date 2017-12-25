@@ -14,6 +14,7 @@ public:
 
 	// BVH helpers
 	bool Intersect(AABB bounds);
+	float IntersectT(AABB bounds);
 
 	int sign[3];
 	vec3 invDir;

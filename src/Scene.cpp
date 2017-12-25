@@ -17,6 +17,8 @@ Scene::Scene()
 	camera = new Camera();
 
 #if STATICSCENE
+	std::vector<Primitive*> primList;
+
 	lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 	lightList.push_back(new Light(vec3(0.0f,2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
@@ -51,6 +53,8 @@ Scene::Scene()
 	primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
 
 	this->LoadObject("cube.obj");
+
+	objectList.push_back(primList);
 #else
 	lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
 	lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(500.0f, 500.0f, 500.0f)));
@@ -66,7 +70,7 @@ Scene::Scene()
 		bvh.push_back(new BVH(&objectList[i]));
 	}
 	printf("Constructing Top BVH for %i objects...\n", objectList.size());
-	topbvh = new BVH(&objectList, &objectBounds);
+	//topbvh = new BVH(&objectList, &objectBounds);
 	printf("-----------------------\n Done constructing BVH\n-----------------------\n");
 }
 
