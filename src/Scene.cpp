@@ -76,7 +76,13 @@ Scene::Scene(int scene_id)
 
 	// BVH helpers	
 	printf("Constructing BVH for %i polygons...\n", primList.size());
+	
+	float lastftime = 0;
+	auto timer = Timer();
+	
 	bvh = new BVH(&primList);
+
+	lastftime = timer.elapsed();
 
 	//for (size_t i = 0; i < objectList.size(); i++)
 	//{
@@ -86,7 +92,7 @@ Scene::Scene(int scene_id)
 	//printf("Constructing Top BVH for %i objects...\n", objectList.size());
 	//topbvh = new BVH(&objectList, &objectBounds);
 
-	printf("-----------------------\n Done constructing BVH\n-----------------------\n");
+	printf("-----------------------\n Done constructing BVH in %.2f seconds\n-----------------------\n", lastftime);
 }
 
 // wavefront .obj file loader
@@ -129,8 +135,8 @@ void Scene::LoadObject(std::string inputfile)
 				float nx = attrib.normals[3 * idx.normal_index + 0];
 				float ny = attrib.normals[3 * idx.normal_index + 1];
 				float nz = attrib.normals[3 * idx.normal_index + 2];
-				float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
-				float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+				//float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+				//float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
 				// Optional: vertex colors
 				//tinyobj::real_t red = attrib.colors[3 * idx.vertex_index + 0];
 				//tinyobj::real_t green = attrib.colors[3 * idx.vertex_index + 1];
@@ -138,7 +144,7 @@ void Scene::LoadObject(std::string inputfile)
 
 				vertices[v] = vec3(vx, vy, vz);
 				normal = vec3(nx, ny, nz);
-				texcoord = vec2(tx, ty);
+				//texcoord = vec2(tx, ty);
 			}
 			index_offset += fv;
 

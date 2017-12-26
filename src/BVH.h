@@ -25,9 +25,10 @@ public:
 	// Variables
 	//uint* indices;
 	unsigned int poolPtr;
-	BVHNode* root;
 	BVHNode** pool;
-	
+	BVHNode* root;
+	vec4* lengthsAxis;
+
 	std::vector<Primitive*>* primList;
 	
 	//// Top BVH calculations

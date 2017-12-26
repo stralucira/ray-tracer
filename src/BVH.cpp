@@ -53,6 +53,7 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 		int axis = ReturnLargest(lengths);
 
 		bool sign = ray->dir[axis] > 0.0f;
+		//lengthsAxis[node->leftFirst] = 
 
 		this->Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
 		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
