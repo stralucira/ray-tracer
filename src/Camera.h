@@ -6,7 +6,8 @@ class Camera
 {
 public:
 	Camera();
-	void Init();
+	Camera(vec3 pos, vec3 lookAt);
+	void Init(vec3 pos, vec3 lookAt);
 	void CalculateScreen();
 	void PrintPosition();
 

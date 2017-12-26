@@ -22,7 +22,7 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsig
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr)
+bool BVHNode::Partition(BVHNode ** pool, std::vector<Primitive*>* primList, unsigned int & poolPtr)
 {
 	//printf("BVH Node %i: Partitioning \n", poolPtr);
 	// A * N

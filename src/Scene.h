@@ -7,15 +7,18 @@
 class Scene
 {
 public:
-	Scene();
+	Scene(int scene_id);
 	Camera* camera;
 
 	void LoadObject(std::string filename);
 
 	std::vector<Light*> lightList;
+	std::vector<Primitive*> primList;
 	std::vector<std::vector<Primitive*>> objectList;
 	std::vector<AABB*> objectBounds;
-	std::vector<BVH*> bvh;
+	BVH* bvh;
+
+	vec3 pos, lookAt;
 
 	// bvh helpers
 	AABB* CalculateObjectBounds(std::vector<Primitive*> primList);

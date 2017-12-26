@@ -6,71 +6,86 @@
 #include "Cylinder.h"
 #include "Torus.h"
 
-#define STATICSCENE 1
-
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
 // every primitive should go here
-Scene::Scene()
+Scene::Scene(int scene_id)
 {
-	camera = new Camera();
+	primList.clear();
+	lightList.clear();
 
-#if STATICSCENE
-	std::vector<Primitive*> primList;
+	switch (scene_id)
+	{
+	case 1:
+		pos = vec3(0.0f, 0.0f, -1.0f);
+		lookAt = vec3(0.0f, 0.0f, 1.0f);
+		camera = new Camera(pos, lookAt);
+		//std::vector<Primitive*> primList;
 
-	lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
-	lightList.push_back(new Light(vec3(0.0f,2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
+		lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
-	primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
-	primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
+		primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
 
-	primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
-	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::GLASS);
+		primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
+		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::GLASS);
 
-	primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
-	primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
+		primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
 
-	primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
-	primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
+		primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
 
-	primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
-	primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
+		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
 
-	primList.push_back(new Plane(vec3(0, -5, 5), vec3(0, 1, 0))); // bottom plane
-	primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
+		primList.push_back(new Plane(vec3(0, -5, 5), vec3(0, 1, 0))); // bottom plane
+		primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
 
-	primList.push_back(new Plane(vec3(0, 5, 5), vec3(0, -1, 0))); // top plane
-	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+		primList.push_back(new Plane(vec3(0, 5, 5), vec3(0, -1, 0))); // top plane
+		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 
-	primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
-	primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+		primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
+		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
 
-	primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
-	primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
+		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
 
-	primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
-	primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
+		primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
+		primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
 
-	this->LoadObject("cube.obj");
+		this->LoadObject("cube.obj");
 
-	objectList.push_back(primList);
-#else
-	lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
-	lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(500.0f, 500.0f, 500.0f)));
+		//objectList.push_back(primList);
+		break;
+	case 2:
+		pos = vec3(0.0f, 0.0f, 1.0f);
+		lookAt = vec3(0.0f, 0.0f, -1.0f);
+		camera = new Camera(pos, lookAt);
 
-	this->LoadObject("cube.obj");
-	this->LoadObject("millenium-falcon.obj");
-#endif
+		lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(1000.0f, 1000.0f, 1000.0f)));
+
+		this->LoadObject("x-wing.obj");
+
+		//objectList.push_back(primList);
+		break;
+	}
 
 	// BVH helpers	
-	for (size_t i = 0; i < objectList.size(); i++)
-	{
-		printf("Constructing BVH %i for %i polygons...\n", i + 1, objectList[i].size());
-		bvh.push_back(new BVH(&objectList[i]));
-	}
-	printf("Constructing Top BVH for %i objects...\n", objectList.size());
+	printf("Constructing BVH for %i polygons...\n", primList.size());
+	bvh = new BVH(&primList);
+
+	//for (size_t i = 0; i < objectList.size(); i++)
+	//{
+	//	printf("Constructing BVH %i for %i polygons...\n", i + 1, objectList[i].size());
+	//	bvh.push_back(new BVH(&objectList[i]));
+	//}
+	//printf("Constructing Top BVH for %i objects...\n", objectList.size());
 	//topbvh = new BVH(&objectList, &objectBounds);
+
 	printf("-----------------------\n Done constructing BVH\n-----------------------\n");
 }
 
@@ -80,8 +95,6 @@ void Scene::LoadObject(std::string inputfile)
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
-	
-	std::vector<Primitive*> primList;
 
 	std::string err;
 	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
@@ -162,8 +175,8 @@ void Scene::LoadObject(std::string inputfile)
 			//printf("Loading polygon %i \n", primList.size());
 		}
 	}
-	objectBounds.push_back(CalculateObjectBounds(primList));
-	objectList.push_back(primList);
+	//objectBounds.push_back(CalculateObjectBounds(primList));
+	//objectList.push_back(primList);
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
 }
 

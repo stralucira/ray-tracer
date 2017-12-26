@@ -7,6 +7,7 @@ class BVHNode
 public:
 	// Constructors
 	BVHNode() {};
+	~BVHNode();
 	BVHNode(AABB bounds, int leftFirst, int count)
 	{
 		this->bounds = bounds;

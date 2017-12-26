@@ -14,7 +14,6 @@ public:
 		this->centroid = calculateCentroid();
 		this->boundingBox = calculateAABB();
 	}
-
 	Triangle(vec3 a, vec3 b, vec3 c) : Primitive(a)
 	{
 		this->a = a;
@@ -25,6 +24,7 @@ public:
 		this->centroid = calculateCentroid();
 		this->boundingBox = calculateAABB();
 	}
+	~Triangle();
 
 	bool intersect(Ray* ray);
 	vec3 getNormal(vec3 point);

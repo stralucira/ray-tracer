@@ -3,9 +3,10 @@
 #include "RayTracer.h"
 
 float MOVEMODIFIER = 10.00f;
-float ROTATEMODIFIER = 0.10f;
+float ROTATEMODIFIER = 0.05f;
 float ZOOMMODIFIER = 0.50f;
 
+Scene* testScene;
 RayTracer* rayTracer;
 int polyCount;
 
@@ -15,13 +16,14 @@ int polyCount;
 
 void Game::Init()
 {    
-	Scene* testScene = new Scene();
-	rayTracer = new RayTracer(testScene, screen);
+	LoadScene(2);
+}
 
-	for (size_t i = 0; i < rayTracer->scene->bvh.size(); i++)
-	{
-		polyCount += rayTracer->scene->bvh[i]->primList->size();
-	}
+void Game::LoadScene(int scene_id)
+{
+	testScene = new Scene(scene_id);
+	rayTracer = new RayTracer(testScene, screen);
+	polyCount += rayTracer->scene->bvh->primList->size();
 }
 
 void Game::Shutdown() { }
@@ -35,6 +37,17 @@ void Game::KeyDown(int a_Key)
 {
 	switch (a_Key)
 	{
+		// Scene loader, needs destructor
+	//case SDL_SCANCODE_1:
+	//	LoadScene(1);
+	//	break;
+	//case SDL_SCANCODE_2:
+	//	LoadScene(2);
+	//	break;
+	//case SDL_SCANCODE_3:
+	//	LoadScene(3);
+	//	break;
+
 		// Translation:
 	case SDL_SCANCODE_W:
 		rayTracer->scene->camera->Surge(MOVEMODIFIER);
@@ -105,7 +118,7 @@ void Game::KeyDown(int a_Key)
 
 		// Reset Camera Position:
 	case SDL_SCANCODE_R:
-		rayTracer->scene->camera->Init();
+		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt);
 		break;
 	}
 }

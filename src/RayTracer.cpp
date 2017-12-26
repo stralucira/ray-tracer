@@ -14,7 +14,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 {
-	if (depth > MAXDEPTH || this->scene->objectList.size() == 0)
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
 	{
 		return BACKGROUND_COLOR;
 	}
@@ -25,23 +25,14 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 	if (depthRendering)
 	{
 		int depthRender = 0;
-		for (size_t i = 0; i < scene->bvh.size(); i++)
-		{
-			//scene->topbvh->TraverseTop(ray, scene->topbvh->topRoot, 0, &depthRender);
-			scene->bvh[1]->Traverse(ray, scene->bvh[1]->root, 0, &depthRender);
-			return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
-		}
+		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
+		return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
 	}
 
 	// Trace function
 #if ENABLEBVH
-	//scene->topbvh->TraverseTop(ray, scene->topbvh->topRoot);
-	//nearest = ray->t;
-	for (size_t i = 0; i < scene->bvh.size(); i++)
-	{
-		scene->bvh[i]->Traverse(ray, scene->bvh[i]->root);
-		nearest = ray->t;
-	}
+	scene->bvh->Traverse(ray, scene->bvh->root);
+	nearest = ray->t;
 #else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
 	{
@@ -69,8 +60,8 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			vec3 color = BLACK;
 
 			vec3 shadowPointOrig = (dot(ray->dir, normal) < 0) ?
-				hitPoint + normal * 0.00001f :
-				hitPoint - normal * 0.00001f;
+				hitPoint + normal * 0.0001f :
+				hitPoint - normal * 0.0001f;
 
 			if (ray->hit->material.shader == Material::Shader::DIFFUSE)
 			{
@@ -164,7 +155,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 			
 			float kr = Fresnel(ray->dir, normal, 1.52f);
 			bool outside = dot(ray->dir, normal) < 0;
-			vec3 bias = 0.00001f * ray->hit->getNormal(hitPoint);
+			vec3 bias = 0.0001f * ray->hit->getNormal(hitPoint);
 
 			float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
 			float etai = 1, etat = 1.52f;
@@ -222,11 +213,8 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	//scene->topbvh->TraverseTop(&shadowRay, scene->topbvh->topRoot, true);
 	//if (shadowRay.t < tToLight) { return BLACK; }
 
-	for (size_t i = 0; i < scene->bvh.size(); i++)
-	{
-		scene->bvh[i]->Traverse(&shadowRay, scene->bvh[i]->root, true);
-		if (shadowRay.t < tToLight) { return BLACK; }
-	}
+	scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+	if (shadowRay.t < tToLight) { return BLACK; }
 #else
 		for (size_t i = 0; i < this->scene->primList.size(); i++)
 		{

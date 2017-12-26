@@ -10,7 +10,7 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 	//for (uint i = 0; i < primitives->size(); i++) indices[i] = i;
 
 	// allocate BVH root node
-	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 32));
+	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 64));
 	//pool = new BVHNode*[primList->size() * 2 - 1];
 	for (unsigned int i = 0; i < (primList->size() * 2 - 1); i++)
 	{
@@ -139,7 +139,7 @@ int BVH::ReturnLargest(vec3 point)
 }
 
 // Top BVH calculations
-void BVH::ConstructTopBVH(std::vector<AABB*>* objectBounds)
+/*void BVH::ConstructTopBVH(std::vector<AABB*>* objectBounds)
 {
 	//AABB* nodeA = objectBounds->front();
 	//AABB* nodeB->FindBestMatch(objectBounds, nodeA);
@@ -166,4 +166,4 @@ AABB BVH::CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int la
 		if ((*objectBounds)[i]->min.z < minZ) { minZ = (*objectBounds)[i]->min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
-}
+}*/

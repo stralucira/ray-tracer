@@ -9,15 +9,20 @@ int iCPU = omp_get_num_procs();
 
 Camera::Camera()
 {
-	this->Init();
+	this->Init(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, -1.0f));
+}
+
+Camera::Camera(vec3 pos, vec3 lookAt)
+{
+	this->Init(pos, lookAt);
 }
 
 // Initialize camera and the transformation matrix
-void Camera::Init()
+void Camera::Init(vec3 pos, vec3 lookAt)
 {
-	this->pos = vec3(0.0f, 0.0f, -1.0f);
+	this->pos = pos;
 	this->SetPosition(pos);
-	this->LookAt(vec3(0.0f, 0.0f, 1.0f));
+	this->LookAt(lookAt);
 
 	this->d = 1.0f;
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;

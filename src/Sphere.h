@@ -12,6 +12,7 @@ public:
 		this->centroid = position;
 		this->boundingBox = calculateAABB();
 	}
+	~Sphere();
 
 	bool intersect(Ray* ray);
 	vec3 getNormal(vec3 point);

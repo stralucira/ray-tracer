@@ -23,6 +23,8 @@ public:
 	void MouseMove( int _X, int _Y ) { /* implement if you want to detect mouse movement */ }
 	void KeyUp( int a_Key ) { /* implement if you want to handle keys */ }
 	void KeyDown(int a_Key);
+
+	void LoadScene( int scene_id );
 private:
 	Surface* screen;
 };
