@@ -90,14 +90,18 @@ void Camera::Yaw(float angle)
 	CalculateScreen();
 }
 // Zooming:
-void Camera::Zoom(float distance)
+void Camera::Zoom(float increment)
 {
-	d += distance;
-	CalculateScreen();
+	if (d + increment > 0)
+	{
+		d += increment;
+		CalculateScreen();
+	}
 }
 
 // Generate ray
 Ray Camera::GenerateRay(int x, int y)
 {
 	return Ray(this->pos, normalize((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos));
+	//return Ray(this->pos, normalizeSSE((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos));
 }

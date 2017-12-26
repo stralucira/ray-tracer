@@ -354,4 +354,32 @@ public:
 
 mat4 operator * ( const mat4& a, const mat4& b );
 
+inline const vec3 normalizeSSE(vec3 vector)
+{
+	__m128 tmp;
+
+	// copy data into the 128bit register
+	tmp = _mm_set_ps(1.0f, vector.z, vector.y, vector.x);
+
+	// 0x7F = 0111 1111 ~ means we don't want the w-component multiplied
+	// and the result written to all 4 components
+	__m128 dp = _mm_dp_ps(tmp, tmp, 0x7F);
+
+	// compute rsqrt of the dot product
+	dp = _mm_rsqrt_ps(dp);
+
+	// vec * rsqrt(dot(vec, vec))
+	tmp = _mm_mul_ps(tmp, dp);
+
+	vec3 vec;
+	union { __m128 v; float f[4]; } uf; // to access the 4 floats
+	uf.v = tmp;
+
+	vec.x = uf.f[0];
+	vec.y = uf.f[1];
+	vec.z = uf.f[2];
+
+	return vec;
+}
+
 }; // namespace Tmpl8

@@ -31,11 +31,9 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 	float prevT = ray->t;
 	Primitive* prevHit = ray->hit;
 
-	if (depthRender != NULL) { depthRender[0]++; }
-
-	if (isShadowRay && prevT != INFINITY) { return; }
-
-	if (ray->Intersect(node->bounds) == INFINITY) { return; }
+	if (depthRender != NULL) depthRender[0]++;
+	if (isShadowRay && prevT != INFINITY) return;
+	if (ray->Intersect(node->bounds) == INFINITY) return;
 
 	if (node->isLeaf())
 	{
@@ -52,9 +50,9 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 		vec3 rightCentroid = pool[node->leftFirst + 1]->bounds.CalculateCentroid();
 
 		vec3 lengths = glm::abs(leftCentroid - rightCentroid);
-		int dimension = ReturnLargest(lengths);
+		int axis = ReturnLargest(lengths);
 
-		bool sign = ray->dir[dimension] > 0.0f;
+		bool sign = ray->dir[axis] > 0.0f;
 
 		this->Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
 		this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);

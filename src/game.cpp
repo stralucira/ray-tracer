@@ -4,7 +4,7 @@
 
 float MOVEMODIFIER = 10.00f;
 float ROTATEMODIFIER = 0.05f;
-float ZOOMMODIFIER = 0.50f;
+float ZOOMMODIFIER = 0.05f;
 
 Scene* testScene;
 RayTracer* rayTracer;

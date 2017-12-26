@@ -30,22 +30,22 @@ public:
 	
 	std::vector<Primitive*>* primList;
 	
-	// Top BVH calculations
-	// Constructors
-	BVH(std::vector<std::vector<Primitive*>>* objectList, std::vector<AABB*>* objectBounds)
-	{
-		this->objectList = objectList;
-		ConstructTopBVH(objectBounds);
-	}
+	//// Top BVH calculations
+	//// Constructors
+	//BVH(std::vector<std::vector<Primitive*>>* objectList, std::vector<AABB*>* objectBounds)
+	//{
+	//	this->objectList = objectList;
+	//	ConstructTopBVH(objectBounds);
+	//}
 
-	// Functions
-	void ConstructTopBVH(std::vector<AABB*>* objectBounds);
-	static AABB CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int last);
-	
-	// Variables
-	unsigned int topPoolPtr = 2;
-	BVHNode* topRoot;
-	BVHNode** topPool;
+	//// Functions
+	//void ConstructTopBVH(std::vector<AABB*>* objectBounds);
+	//static AABB CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int last);
+	//
+	//// Variables
+	//unsigned int topPoolPtr = 2;
+	//BVHNode* topRoot;
+	//BVHNode** topPool;
 
-	std::vector<std::vector<Primitive*>>* objectList;
+	//std::vector<std::vector<Primitive*>>* objectList;
 };

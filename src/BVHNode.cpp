@@ -7,8 +7,8 @@
 void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr)
 {
 	//printf("BVH Node %i: Subdividing\n", poolPtr);
-	//if (count - this->leftFirst < 5) return;
-
+	if (count - this->leftFirst < 5) return;
+	
 	unsigned int tempPoolPtr = poolPtr;
 
 	BVHNode* left = pool[poolPtr]; //this.left = pool[poolPtr++];
@@ -22,69 +22,94 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsig
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode ** pool, std::vector<Primitive*>* primList, unsigned int & poolPtr)
+bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr)
 {
 	//printf("BVH Node %i: Partitioning \n", poolPtr);
 	// A * N
 	float parentNodeCost = this->bounds.CalculateVolume() * (count - leftFirst);
 	float lowestNodeCost = INFINITY;
 	float bestCoordinate;
-	int bestDimension;
+	int bestAxis;
 
-#if !ENABLEBINNING
-	for (int i = leftFirst; i < count; i++)
+	if (ENABLEBINNING)
 	{
-		for (int dimension = 0; dimension < 3; dimension++)
+		vec3 lengths = vec3(this->bounds.max - this->bounds.min);
+		for (int i = 1; i < 7; i++)
 		{
-			float splitCoordinate = (*primList)[i]->centroid[dimension];
-#else
-	vec3 lengths = vec3(this->bounds.max - this->bounds.min);
-	for (int i = 1; i < 7; i++)
-	{
-		for (int dimension = 0; dimension < 3; dimension++)
-		{
-			float splitCoordinate = this->bounds.min[dimension] + lengths[dimension] * (i / 7.0f);
-#endif // ENABLEBINNING
-			int leftCounter = 0;
-			int rightCounter = 0;
-
-			vec3 maxLeft = vec3(-INFINITY);
-			vec3 maxRight = vec3(-INFINITY);
-			vec3 minLeft = vec3(INFINITY);
-			vec3 minRight = vec3(INFINITY);
-
-			for (int i = leftFirst; i < count; i++)
+			for (int axis = 0; axis < 3; axis++)
 			{
-				if ((*primList)[i]->centroid[dimension] < splitCoordinate)
+				float splitCoordinate = this->bounds.min[axis] + lengths[axis] * (i / 7.0f);
+
+				int leftCounter = 0, rightCounter = 0;
+				vec3 maxLeft = vec3(-INFINITY), maxRight = vec3(-INFINITY);
+				vec3 minLeft = vec3(INFINITY), minRight = vec3(INFINITY);
+
+				for (int i = leftFirst; i < count; i++)
 				{
-					AdjustBounds((*primList)[i]->boundingBox, minLeft, maxLeft);
-					leftCounter++;
+					if ((*primList)[i]->centroid[axis] < splitCoordinate)
+					{
+						AdjustBounds((*primList)[i]->boundingBox, minLeft, maxLeft); leftCounter++;
+					}
+					else
+					{
+						AdjustBounds((*primList)[i]->boundingBox, minRight, maxRight); rightCounter++;
+					}
 				}
-				else
+
+				// Aleft * Nleft + Aright * Nright
+				float splitNodeCost = AABB(minLeft, maxLeft).CalculateVolume() * leftCounter + AABB(minRight, maxRight).CalculateVolume() * rightCounter;
+				if (splitNodeCost < lowestNodeCost)
 				{
-					AdjustBounds((*primList)[i]->boundingBox, minRight, maxRight);
-					rightCounter++;
+					lowestNodeCost = splitNodeCost;
+					bestAxis = axis;
+					bestCoordinate = splitCoordinate;
 				}
 			}
-
-			// Aleft * Nleft + Aright * Nright
-			float splitNodeCost = AABB(minLeft, maxLeft).CalculateVolume() * leftCounter + AABB(minRight, maxRight).CalculateVolume() * rightCounter;
-			if (splitNodeCost < lowestNodeCost)
+		}
+	}
+	else
+	{
+		for (int i = leftFirst; i < count; i++)
+		{
+			for (int axis = 0; axis < 3; axis++)
 			{
-				lowestNodeCost = splitNodeCost;
-				bestDimension = dimension;
-				bestCoordinate = splitCoordinate;
+				float splitCoordinate = (*primList)[i]->centroid[axis];
+
+				int leftCounter = 0, rightCounter = 0;
+				vec3 maxLeft = vec3(-INFINITY), maxRight = vec3(-INFINITY);
+				vec3 minLeft = vec3(INFINITY), minRight = vec3(INFINITY);
+
+				for (int i = leftFirst; i < count; i++)
+				{
+					if ((*primList)[i]->centroid[axis] < splitCoordinate)
+					{
+						AdjustBounds((*primList)[i]->boundingBox, minLeft, maxLeft); leftCounter++;
+					}
+					else
+					{
+						AdjustBounds((*primList)[i]->boundingBox, minRight, maxRight); rightCounter++;
+					}
+				}
+
+				// Aleft * Nleft + Aright * Nright
+				float splitNodeCost = AABB(minLeft, maxLeft).CalculateVolume() * leftCounter + AABB(minRight, maxRight).CalculateVolume() * rightCounter;
+				if (splitNodeCost < lowestNodeCost)
+				{
+					lowestNodeCost = splitNodeCost;
+					bestAxis = axis;
+					bestCoordinate = splitCoordinate;
+				}
 			}
 		}
 	}
 
 	// Aleft * Nleft + Aright * Nright >= A * N
-	if (lowestNodeCost >= parentNodeCost) { return false; }
+	if (lowestNodeCost >= parentNodeCost) return false;
 
 	int mid = leftFirst;
 	for (int i = leftFirst; i < count; i++)
 	{
-		if ((*primList)[i]->centroid[bestDimension] < bestCoordinate)
+		if ((*primList)[i]->centroid[bestAxis] < bestCoordinate)
 		{
 			std::swap((*primList)[i], (*primList)[mid]);
 			mid++;
