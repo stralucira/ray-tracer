@@ -6,7 +6,7 @@
 #include "Cylinder.h"
 #include "Torus.h"
 
-#define STATICSCENE 0
+#define STATICSCENE 1
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -44,10 +44,10 @@ Scene::Scene()
 	primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 
 	primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
-	primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::DIFFUSE);
+	primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
 
 	primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
-	primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+	primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
 
 	primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
 	primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
@@ -60,7 +60,7 @@ Scene::Scene()
 	lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(500.0f, 500.0f, 500.0f)));
 
 	this->LoadObject("cube.obj");
-	this->LoadObject("x-wing.obj");
+	this->LoadObject("millenium-falcon.obj");
 #endif
 
 	// BVH helpers	
@@ -102,7 +102,7 @@ void Scene::LoadObject(std::string inputfile)
 
 			vec3 vertices[3];
 			vec3 normal;
-			//vec2 texcoord;
+			vec2 texcoord;
 
 			// Loop over vertices in the face.
 			for (int v = 0; v < fv; v++)
@@ -116,8 +116,8 @@ void Scene::LoadObject(std::string inputfile)
 				float nx = attrib.normals[3 * idx.normal_index + 0];
 				float ny = attrib.normals[3 * idx.normal_index + 1];
 				float nz = attrib.normals[3 * idx.normal_index + 2];
-				//float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
-				//float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+				float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+				float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
 				// Optional: vertex colors
 				//tinyobj::real_t red = attrib.colors[3 * idx.vertex_index + 0];
 				//tinyobj::real_t green = attrib.colors[3 * idx.vertex_index + 1];
@@ -125,7 +125,7 @@ void Scene::LoadObject(std::string inputfile)
 
 				vertices[v] = vec3(vx, vy, vz);
 				normal = vec3(nx, ny, nz);
-				//texcoord = vec2(tx, ty);
+				texcoord = vec2(tx, ty);
 			}
 			index_offset += fv;
 
@@ -145,8 +145,8 @@ void Scene::LoadObject(std::string inputfile)
 						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks red
 						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks green
 						materials[shapes[s].mesh.material_ids[f]].specular[0]),	// Kd blue
-					materials[shapes[s].mesh.material_ids[f]].shininess,	// Ns
-					materials[shapes[s].mesh.material_ids[f]].dissolve
+					materials[shapes[s].mesh.material_ids[f]].shininess,		// Ns
+					materials[shapes[s].mesh.material_ids[f]].dissolve			//d
 				);
 
 				if (materials[shapes[s].mesh.material_ids[f]].dissolve < 1.0f)

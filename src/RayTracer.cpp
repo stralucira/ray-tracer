@@ -29,7 +29,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		{
 			//scene->topbvh->TraverseTop(ray, scene->topbvh->topRoot, 0, &depthRender);
 			scene->bvh[1]->Traverse(ray, scene->bvh[1]->root, 0, &depthRender);
-			return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((1.0f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
+			return vec3(clamp((depthRender * 0.001f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.001f), 0.0f, 1.0f), 0.0f);
 		}
 	}
 
@@ -59,7 +59,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		return BACKGROUND_COLOR;
 	}
 
-#if ALTERNATERENDERMODE // Phong
+#if ALTERNATERENDERMODE // Diffuse + Shininess + Dissolve
 	else
 	{
 		if (renderShadow)
@@ -126,8 +126,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
 		}
 		else
 		{
-			vec3 color = ray->hit->material.Kd;
-			return color;
+			return ray->hit->material.Kd;
 		}
 	}
 #else

@@ -16,8 +16,8 @@ Camera::Camera()
 void Camera::Init()
 {
 	this->pos = vec3(0.0f, 0.0f, -1.0f);
-	this->LookAt(vec3(0.0f, 0.0f, 1.0f));
 	this->SetPosition(pos);
+	this->LookAt(vec3(0.0f, 0.0f, 1.0f));
 
 	this->d = 1.0f;
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
@@ -39,7 +39,7 @@ void Camera::CalculateScreen()
 void Camera::PrintPosition()
 {
 	printf("-----------------------\n Camera Position \n-----------------------\n");
-	printf("dir: %.2f %.2f %.2f\n", dir.x, dir.y, dir.z);
+	printf("dir: %.2f %.2f %.2f\n", GetForward().x, GetForward().y, GetForward().z);
 	printf("pos: %.2f %.2f %.2f\n", GetPosition().x, GetPosition().y, GetPosition().z);
 	printf("\n");
 	printf("right: %.2f %.2f %.2f \n", GetRight().x, GetRight().y, GetRight().z);
@@ -71,6 +71,7 @@ void Camera::Heave(float speed)
 // Rotations:
 void Camera::Roll(float angle)
 {
+	LookAt(GetPosition() + GetUp() - angle * GetRight());
 	CalculateScreen();
 }
 void Camera::Pitch(float angle)

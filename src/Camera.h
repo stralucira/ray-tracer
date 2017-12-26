@@ -25,7 +25,6 @@ public:
 	void Zoom(float distance);
 
 	vec3 pos;
-	vec3 dir;
 	vec3 p0, p1, p2;
 
 	float d;
@@ -47,7 +46,7 @@ public:
 	vec3 GetRight()
 	{
 		glm::mat4& M = transform;
-		return -vec3(M[0][0], M[0][1], M[0][2]);
+		return vec3(M[0][0], M[0][1], M[0][2]);
 	}
 
 	vec3 GetUp()

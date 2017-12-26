@@ -13,8 +13,7 @@ public:
 	vec3 dir;	
 
 	// BVH helpers
-	bool Intersect(AABB bounds);
-	float IntersectT(AABB bounds);
+	float Intersect(AABB bounds);
 
 	int sign[3];
 	vec3 invDir;

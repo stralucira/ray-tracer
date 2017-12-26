@@ -35,7 +35,7 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 
 	if (isShadowRay && prevT != INFINITY) { return; }
 
-	if (!ray->Intersect(node->bounds)) { return; }
+	if (ray->Intersect(node->bounds) == INFINITY) { return; }
 
 	if (node->isLeaf())
 	{
