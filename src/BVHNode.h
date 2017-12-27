@@ -18,8 +18,8 @@ public:
 	// Functions
 	void AdjustBounds(AABB* bounds, vec3& min, vec3& max);
 	int FindBestMatch(std::vector<AABB*>* objectBounds, AABB* bounds);
-	void Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr);
-	bool Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr);
+	void Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, int& poolPtr);
+	bool Partition(BVHNode** pool, std::vector<Primitive*>* primList, int& poolPtr);
 	bool isLeaf();
 
 	// Variables

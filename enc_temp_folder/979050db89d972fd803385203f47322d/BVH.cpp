@@ -211,8 +211,12 @@ int BVH::ReturnLargest(vec3 point)
 }
 
 // Top BVH calculations (Broken)
-void BVH::ConstructTopBVH(std::vector<BVHNode**>* BVHNodes)
+void BVH::ConstructTopBVH(std::vector<Primitive*>* primList)
 {
+	for (int i = 0; i < primList->back()->index; i++)
+	{
+		printf("%i", i);
+	}
 	//AABB* nodeA = objectBounds->front();
 	//AABB* nodeB->FindBestMatch(objectBounds, nodeA);
 }

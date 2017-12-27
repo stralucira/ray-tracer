@@ -15,10 +15,8 @@ public:
 	std::vector<Light*> lightList;
 	std::vector<Primitive*> primList;
 	std::vector<AABB*> objectBounds;
-	std::vector<BVH*> bvhList;
 	//std::vector<std::vector<Primitive*>> objectList;
 	BVH* bvh;
-	BVH* topbvh;
 
 	vec3 pos, lookAt;
 	int index = 0;
@@ -27,5 +25,5 @@ public:
 	AABB* CalculateObjectBounds(std::vector<Primitive*> primList);
 
 	AABB* sceneBounds;
-
+	BVH* topbvh;
 };

@@ -17,4 +17,5 @@ public:
 
 	vec3 centroid;
 	AABB* boundingBox;
+	int index;
 };

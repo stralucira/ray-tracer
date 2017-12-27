@@ -48,10 +48,10 @@ Scene::Scene(int scene_id)
 		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 
 		primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
-		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::DIFFUSE);
 
 		primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
-		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 
 		primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
 		primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
@@ -68,7 +68,8 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(1000.0f, 1000.0f, 1000.0f)));
 
-		this->LoadObject("millenium-falcon.obj");
+		this->LoadObject("cube.obj");
+		this->LoadObject("f-16.obj");
 
 		//objectList.push_back(primList);
 		break;
@@ -90,7 +91,7 @@ Scene::Scene(int scene_id)
 	//	bvh.push_back(new BVH(&objectList[i]));
 	//}
 	//printf("Constructing Top BVH for %i objects...\n", objectList.size());
-	//topbvh = new BVH(&objectList, &objectBounds);
+	topbvh = new BVH(&primList, 1);
 
 	printf("-----------------------\n Done constructing BVH in %.2f seconds\n-----------------------\n", lastftime);
 }
@@ -152,6 +153,7 @@ void Scene::LoadObject(std::string inputfile)
 			// shapes[s].mesh.material_ids[f];
 
 			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
+			primList.back()->index = index;
 
 			if (materials.size() > 0)
 			{ 
@@ -181,7 +183,8 @@ void Scene::LoadObject(std::string inputfile)
 			//printf("Loading polygon %i \n", primList.size());
 		}
 	}
-	//objectBounds.push_back(CalculateObjectBounds(primList));
+	index++;
+	objectBounds.push_back(CalculateObjectBounds(primList));
 	//objectList.push_back(primList);
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
 }

@@ -15,7 +15,7 @@ public:
 	
 	RayTracer(Scene* scene, Surface* screen);
 
-	vec3 GetColor(int x, int y, Ray* ray, unsigned int depth);
+	vec3 GetColor(int x, int y, Ray* ray, int depth);
 	vec3 DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Material mat);
 
 	vec3 Reflect(vec3 dir, vec3 normal);

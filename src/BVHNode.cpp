@@ -4,12 +4,12 @@
 
 #define ENABLEBINNING 1
 
-void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr)
+void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, int& poolPtr)
 {
 	//printf("BVH Node %i: Subdividing\n", poolPtr);
 	if (count - this->leftFirst < 5) return;
 	
-	unsigned int tempPoolPtr = poolPtr;
+	int tempPoolPtr = poolPtr;
 
 	BVHNode* left = pool[poolPtr]; //this.left = pool[poolPtr++];
 	BVHNode* right = pool[poolPtr + 1]; //this.right = pool[poolPtr++];
@@ -22,7 +22,7 @@ void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, unsig
 	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
 }
 
-bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsigned int& poolPtr)
+bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, int& poolPtr)
 {
 	//printf("BVH Node %i: Partitioning \n", poolPtr);
 	// A * N

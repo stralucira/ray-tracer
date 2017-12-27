@@ -12,7 +12,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 	this->screen = screen;
 }
 
-vec3 RayTracer::GetColor(int x, int y, Ray* ray, unsigned int depth)
+vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 {
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
 	{

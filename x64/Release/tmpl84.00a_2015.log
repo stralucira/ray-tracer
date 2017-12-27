@@ -1,14 +1,38 @@
 ﻿cl : Command line warning D9002: ignoring unknown option '/arch:SSE2'
+  AABB.cpp
   BVH.cpp
+src\BVH.cpp(27): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+src\BVH.cpp(28): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   BVHNode.cpp
+  Camera.cpp
+  Cylinder.cpp
+  game.cpp
+src\game.cpp(26): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
+  Light.cpp
+  lodepng.cpp
+src\lodepng.cpp(798): warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+src\lodepng.cpp(1458): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+src\lodepng.cpp(1462): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+src\lodepng.cpp(1534): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+src\lodepng.cpp(3479): warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+src\lodepng.cpp(3493): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+src\lodepng.cpp(4334): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+src\lodepng.cpp(4382): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+src\lodepng.cpp(4462): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+src\lodepng.cpp(5405): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Material.cpp
+  Plane.cpp
+  Primitive.cpp
+  Ray.cpp
   RayTracer.cpp
   Scene.cpp
-src\Scene.cpp(204): warning C4477: 'printf' : format string '%i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-  src\Scene.cpp(204): note: consider using '%zi' in the format string
-src\Scene.cpp(212): warning C4477: 'printf' : format string '%i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
-  src\Scene.cpp(212): note: consider using '%zi' in the format string
-  game.cpp
-src\game.cpp(117): warning C4477: 'sprintf' : format string '%i' requires an argument of type 'int', but variadic argument 2 has type 'unsigned __int64'
-  src\game.cpp(117): note: consider using '%zi' in the format string
+src\Scene.cpp(79): warning C4477: 'printf' : format string '%i' requires an argument of type 'int', but variadic argument 1 has type 'unsigned __int64'
+  src\Scene.cpp(79): note: consider using '%zi' in the format string
+src\Scene.cpp(125): warning C4101: 'texcoord': unreferenced local variable
+  Sphere.cpp
+  surface.cpp
+  template.cpp
+  Torus.cpp
+  Triangle.cpp
   Generating Code...
   tmpl84.00a_2015.vcxproj -> C:\Users\satwikowirawan\source\repos\ray-tracer\x64\Release\Template.exe

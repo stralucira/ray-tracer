@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "RayTracer.h"
 
-float MOVEMODIFIER = 10.00f;
+float MOVEMODIFIER = 0.50f;
 float ROTATEMODIFIER = 0.05f;
 float ZOOMMODIFIER = 0.05f;
 

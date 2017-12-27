@@ -39,7 +39,6 @@ public:
 	//vec4* distancesAxis;
 
 	int index;
-	int* objectIndex;
 	std::vector<Primitive*>* primList;
 	
 	void ConstructTopBVH(std::vector<Primitive*>* primList);
