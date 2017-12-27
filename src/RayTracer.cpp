@@ -31,7 +31,8 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 
 	// Trace function
 #if ENABLEBVH
-	scene->bvh->Traverse(ray, scene->bvh->root);
+	scene->bvhTop->TraverseTop(ray, scene->bvhTop->topRoot);
+	//scene->bvh->Traverse(ray, scene->bvh->root);
 	nearest = ray->t;
 #else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
@@ -213,8 +214,9 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	//scene->topbvh->TraverseTop(&shadowRay, scene->topbvh->topRoot, true);
 	//if (shadowRay.t < tToLight) { return BLACK; }
 
-	scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
-	if (shadowRay.t < tToLight) { return BLACK; }
+		//scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+		scene->bvh->Traverse(&shadowRay, scene->bvhTop->topRoot, true);
+		if (shadowRay.t < tToLight) { return BLACK; }
 #else
 		for (size_t i = 0; i < this->scene->primList.size(); i++)
 		{

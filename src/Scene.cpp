@@ -92,7 +92,7 @@ Scene::Scene(int scene_id)
 	lastftime = timer.elapsed();
 
 	// Dynamic scene BVH builder
-	bvhTop = new BVHTop(&bvhList);
+	bvhTop = new BVHTop(&primList, &bvhList);
 
 	printf("-----------------------\n Done constructing BVH in %.2f seconds\n-----------------------\n", lastftime);
 }

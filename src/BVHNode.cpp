@@ -149,6 +149,7 @@ bool BVHNode::isLeaf()
 	return count != 0;
 }
 
+// Top level BVH functions
 void BVHNode::SubdivideTop(BVHNode** pool, std::vector<BVH*>* bvhList, int& poolPtr)
 {
 	//printf("BVH Node %i: Subdividing\n", poolPtr);
@@ -203,6 +204,5 @@ bool BVHNode::PartitionTop(BVHNode** pool, std::vector<BVH*>* bvhList, int & poo
 	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
-
 	return true;
 }
