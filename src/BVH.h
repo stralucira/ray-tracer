@@ -17,9 +17,10 @@ public:
 	void ConstructBVH(std::vector<Primitive*>* primList);
 	void Traverse(Ray* ray, BVHNode* node, bool isShadowRay = false, int* depthRender = NULL);
 	float Trace(Ray* ray, BVHNode* node);
+	
 	static AABB CalculateBounds(std::vector<Primitive*>* primList, int first, int last);
-
 	float CalculateDistance2(AABB bounds, vec3 point);
+	float IntersectRay(Ray* ray, AABB bounds);
 	int ReturnLargest(vec3 point);
 
 	// Variables
@@ -27,7 +28,7 @@ public:
 	unsigned int poolPtr;
 	BVHNode** pool;
 	BVHNode* root;
-	vec4* lengthsAxis;
+	//vec4* distancesAxis;
 
 	std::vector<Primitive*>* primList;
 	

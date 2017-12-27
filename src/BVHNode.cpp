@@ -31,7 +31,7 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsig
 	float bestCoordinate;
 	int bestAxis;
 
-	if (ENABLEBINNING)
+	if (ENABLEBINNING) // SAH with binning
 	{
 		vec3 lengths = vec3(this->bounds.max - this->bounds.min);
 		for (int i = 1; i < 7; i++)
@@ -67,7 +67,7 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, unsig
 			}
 		}
 	}
-	else
+	else // SAH without binning
 	{
 		for (int i = leftFirst; i < count; i++)
 		{

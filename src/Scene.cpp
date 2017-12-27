@@ -68,7 +68,7 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(1000.0f, 1000.0f, 1000.0f)));
 
-		this->LoadObject("x-wing.obj");
+		this->LoadObject("millenium-falcon.obj");
 
 		//objectList.push_back(primList);
 		break;

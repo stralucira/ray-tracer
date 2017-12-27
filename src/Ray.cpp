@@ -10,30 +10,3 @@ Ray::Ray(vec3 origin, vec3 direction)
 	// BVH helpers
 	this->invDir = 1.0f / this->dir;
 }
-
-float Ray::Intersect(AABB bounds)
-{
-	float tmin, tmax, txmin, txmax, tymin, tymax, tzmin, tzmax;
-
-	txmin = (bounds.min.x - this->orig.x) * this->invDir.x;
-	txmax = (bounds.max.x - this->orig.x) * this->invDir.x;
-	tymin = (bounds.min.y - this->orig.y) * this->invDir.y;
-	tymax = (bounds.max.y - this->orig.y) * this->invDir.y;
-
-	tmin = glm::min(txmin, txmax);
-	tmax = glm::max(txmin, txmax);
-
-	tmin = glm::max(tmin, glm::min(tymin, tymax));
-	tmax = glm::min(tmax, glm::max(tymin, tymax));
-
-	tzmin = (bounds.min.z - this->orig.z) * this->invDir.z;
-	tzmax = (bounds.max.z - this->orig.z) * this->invDir.z;
-
-	tmin = glm::max(tmin, glm::min(tzmin, tzmax));
-	tmax = glm::min(tmax, glm::max(tzmin, tzmax));
-
-	if (tmax < 0.0f) { return INFINITY; }
-	if (tmin > tmax) { return INFINITY; }
-	
-	return tmin;
-}
