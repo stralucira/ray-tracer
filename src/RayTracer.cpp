@@ -2,7 +2,7 @@
 #include "RayTracer.h"
 
 #define ENABLEBVH 1
-#define ALTERNATERENDERMODE 1
+#define ALTERNATERENDERMODE 0
 
 int iCPU2 = omp_get_num_procs();
 

@@ -3,6 +3,7 @@
 #include "Light.h"
 #include "Camera.h"
 #include "BVH.h"
+#include "BVHTop.h"
 
 class Scene
 {
@@ -14,18 +15,17 @@ public:
 
 	std::vector<Light*> lightList;
 	std::vector<Primitive*> primList;
-	std::vector<AABB*> objectBounds;
 	std::vector<BVH*> bvhList;
+
 	//std::vector<std::vector<Primitive*>> objectList;
+	BVHTop* bvhTop;
 	BVH* bvh;
-	BVH* topbvh;
 
 	vec3 pos, lookAt;
 	int index = 0;
 
 	// bvh helpers
 	AABB* CalculateObjectBounds(std::vector<Primitive*> primList);
-
+	vec3 CalculateObjectCentroid(AABB * bounds);
 	AABB* sceneBounds;
-
 };

@@ -1,5 +1,6 @@
 #include "template.h"
 #include "BVH.h"
+#include "BVHNode.h"
 
 void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 {
@@ -160,40 +161,6 @@ float BVH::IntersectRay(Ray* ray, AABB bounds)
 	return tmin;
 }
 
-AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int last)
-{
-	//printf("BVH Node %i: Calculating\n", first);
-	
-	float maxX = -INFINITY;
-	float maxY = -INFINITY;
-	float maxZ = -INFINITY;
-
-	float minX = INFINITY;
-	float minY = INFINITY;
-	float minZ = INFINITY;
-
-	for (int i = first; i < last; i++)
-	{
-		if ((*primitives)[i]->boundingBox->max.x > maxX) { maxX = (*primitives)[i]->boundingBox->max.x; }
-		if ((*primitives)[i]->boundingBox->max.y > maxY) { maxY = (*primitives)[i]->boundingBox->max.y; }
-		if ((*primitives)[i]->boundingBox->max.z > maxZ) { maxZ = (*primitives)[i]->boundingBox->max.z; }
-		
-		if ((*primitives)[i]->boundingBox->min.x < minX) { minX = (*primitives)[i]->boundingBox->min.x; }
-		if ((*primitives)[i]->boundingBox->min.y < minY) { minY = (*primitives)[i]->boundingBox->min.y; }
-		if ((*primitives)[i]->boundingBox->min.z < minZ) { minZ = (*primitives)[i]->boundingBox->min.z; }
-	}
-	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
-}
-
-float BVH::CalculateDistance(AABB bounds, vec3 point)
-{
-	float distanceX = glm::max(glm::max(bounds.min.x - point.x, 0.0f), glm::max(0.0f, point.x - bounds.max.x));
-	float distanceY = glm::max(glm::max(bounds.min.y - point.y, 0.0f), glm::max(0.0f, point.y - bounds.max.y));
-	float distanceZ = glm::max(glm::max(bounds.min.z - point.z, 0.0f), glm::max(0.0f, point.z - bounds.max.z));
-
-	return sqrtf(distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ);
-}
-
 float BVH::CalculateDistance2(AABB bounds, vec3 point)
 {
 	float distanceX = glm::max(glm::max(bounds.min.x - point.x, 0.0f), glm::max(0.0f, point.x - bounds.max.x));
@@ -203,39 +170,51 @@ float BVH::CalculateDistance2(AABB bounds, vec3 point)
 	return distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ;
 }
 
+AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int last)
+{
+	//printf("BVH Node %i: Calculating\n", first);
+
+	float maxX = -INFINITY; float minX = INFINITY;
+	float maxY = -INFINITY; float minY = INFINITY;
+	float maxZ = -INFINITY; float minZ = INFINITY;
+
+	for (int i = first; i < last; i++)
+	{
+		if ((*primitives)[i]->boundingBox->max.x > maxX) { maxX = (*primitives)[i]->boundingBox->max.x; }
+		if ((*primitives)[i]->boundingBox->max.y > maxY) { maxY = (*primitives)[i]->boundingBox->max.y; }
+		if ((*primitives)[i]->boundingBox->max.z > maxZ) { maxZ = (*primitives)[i]->boundingBox->max.z; }
+
+		if ((*primitives)[i]->boundingBox->min.x < minX) { minX = (*primitives)[i]->boundingBox->min.x; }
+		if ((*primitives)[i]->boundingBox->min.y < minY) { minY = (*primitives)[i]->boundingBox->min.y; }
+		if ((*primitives)[i]->boundingBox->min.z < minZ) { minZ = (*primitives)[i]->boundingBox->min.z; }
+	}
+	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
+}
+
+AABB BVH::CalculateBoundsTop(std::vector<BVH*>* bvhList, int first, int last)
+{
+	//printf("BVH Node %i: Calculating\n", first);
+
+	float maxX = -INFINITY; float minX = INFINITY;
+	float maxY = -INFINITY; float minY = INFINITY;
+	float maxZ = -INFINITY; float minZ = INFINITY;
+
+	for (int i = first; i < last; i++)
+	{
+		if ((*bvhList)[i]->boundingBox->max.x > maxX) { maxX = (*bvhList)[i]->boundingBox->max.x; }
+		if ((*bvhList)[i]->boundingBox->max.y > maxY) { maxY = (*bvhList)[i]->boundingBox->max.y; }
+		if ((*bvhList)[i]->boundingBox->max.z > maxZ) { maxZ = (*bvhList)[i]->boundingBox->max.z; }
+
+		if ((*bvhList)[i]->boundingBox->min.x < minX) { minX = (*bvhList)[i]->boundingBox->min.x; }
+		if ((*bvhList)[i]->boundingBox->min.y < minY) { minY = (*bvhList)[i]->boundingBox->min.y; }
+		if ((*bvhList)[i]->boundingBox->min.z < minZ) { minZ = (*bvhList)[i]->boundingBox->min.z; }
+	}
+	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
+}
+
 int BVH::ReturnLargest(vec3 point)
 {
 	return point.x > point.y ?
 		(point.x > point.z ? 0 : 2) :
 		(point.y > point.z ? 1 : 2);
 }
-
-// Top BVH calculations (Broken)
-void BVH::ConstructTopBVH(std::vector<BVHNode**>* BVHNodes)
-{
-	//AABB* nodeA = objectBounds->front();
-	//AABB* nodeB->FindBestMatch(objectBounds, nodeA);
-}
-
-/*AABB BVH::CalculateTopBounds(std::vector<AABB*>* objectBounds, int first, int last)
-{
-	float maxX = -INFINITY;
-	float maxY = -INFINITY;
-	float maxZ = -INFINITY;
-
-	float minX = INFINITY;
-	float minY = INFINITY;
-	float minZ = INFINITY;
-
-	for (int i = first; i < last; i++)
-	{
-		if ((*objectBounds)[i]->max.x > maxX) { maxX = (*objectBounds)[i]->max.x; }
-		if ((*objectBounds)[i]->max.y > maxY) { maxY = (*objectBounds)[i]->max.y; }
-		if ((*objectBounds)[i]->max.z > maxZ) { maxZ = (*objectBounds)[i]->max.z; }
-
-		if ((*objectBounds)[i]->min.x < minX) { minX = (*objectBounds)[i]->min.x; }
-		if ((*objectBounds)[i]->min.y < minY) { minY = (*objectBounds)[i]->min.y; }
-		if ((*objectBounds)[i]->min.z < minZ) { minZ = (*objectBounds)[i]->min.z; }
-	}
-	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
-}*/

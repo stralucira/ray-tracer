@@ -21,44 +21,52 @@ Scene::Scene(int scene_id)
 		pos = vec3(0.0f, 0.0f, -1.0f);
 		lookAt = vec3(0.0f, 0.0f, 1.0f);
 		camera = new Camera(pos, lookAt);
-		//std::vector<Primitive*> primList;
 
 		lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
 		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
 		primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
 		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::GLASS);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
 		primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
 		primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
 		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Plane(vec3(0, -5, 5), vec3(0, 1, 0))); // bottom plane
 		primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Plane(vec3(0, 5, 5), vec3(0, -1, 0))); // top plane
 		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
 		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
 		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
 		primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
 
 		this->LoadObject("cube.obj");
 
-		//objectList.push_back(primList);
 		break;
 	case 2:
 		pos = vec3(0.0f, 0.0f, 1.0f);
@@ -71,27 +79,20 @@ Scene::Scene(int scene_id)
 		this->LoadObject("cube.obj");
 		this->LoadObject("f-16.obj");
 
-		//objectList.push_back(primList);
 		break;
 	}
 
 	// BVH helpers	
 	printf("Constructing BVH for %i polygons...\n", primList.size());
-	
-	float lastftime = 0;
-	auto timer = Timer();
-	
-	bvh = new BVH(&primList);
 
+	// Static scene BVH builder
+	float lastftime = 0;
+	auto timer = Timer();	
+	bvh = new BVH(&primList);
 	lastftime = timer.elapsed();
 
-	//for (size_t i = 0; i < objectList.size(); i++)
-	//{
-	//	printf("Constructing BVH %i for %i polygons...\n", i + 1, objectList[i].size());
-	//	bvh.push_back(new BVH(&objectList[i]));
-	//}
-	//printf("Constructing Top BVH for %i objects...\n", objectList.size());
-	topbvh = new BVH(&primList, 1);
+	// Dynamic scene BVH builder
+	bvhTop = new BVHTop(&bvhList);
 
 	printf("-----------------------\n Done constructing BVH in %.2f seconds\n-----------------------\n", lastftime);
 }
@@ -102,6 +103,7 @@ void Scene::LoadObject(std::string inputfile)
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
+	std::vector<Primitive*> primLoadList;
 
 	std::string err;
 	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
@@ -155,6 +157,9 @@ void Scene::LoadObject(std::string inputfile)
 			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 			primList.back()->index = index;
 
+			primLoadList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
+			primLoadList.back()->index = index;
+
 			if (materials.size() > 0)
 			{ 
 				primList.back()->material = Material(
@@ -183,9 +188,14 @@ void Scene::LoadObject(std::string inputfile)
 			//printf("Loading polygon %i \n", primList.size());
 		}
 	}
+
+	// Top level BVH loader
+	bvhList.push_back(new BVH(&primLoadList));
+	bvhList.back()->boundingBox = CalculateObjectBounds(primLoadList);
+	bvhList.back()->centroid = CalculateObjectCentroid(bvhList.back()->boundingBox);
+	bvhList.back()->index = index;
 	index++;
-	objectBounds.push_back(CalculateObjectBounds(primList));
-	//objectList.push_back(primList);
+
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
 }
 
@@ -210,4 +220,9 @@ AABB* Scene::CalculateObjectBounds(std::vector<Primitive*> primList)
 		if (primList[i]->boundingBox->min.z < minZ) { minZ = primList[i]->boundingBox->min.z; }
 	}
 	return new AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
+}
+
+vec3 Scene::CalculateObjectCentroid(AABB* bounds)
+{
+	return ((bounds->max - bounds->min) * 0.5f);
 }

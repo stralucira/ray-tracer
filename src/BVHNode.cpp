@@ -149,15 +149,60 @@ bool BVHNode::isLeaf()
 	return count != 0;
 }
 
-/*int BVHNode::FindBestMatch(std::vector<AABB*>* objectBounds, AABB* bounds)
+void BVHNode::SubdivideTop(BVHNode** pool, std::vector<BVH*>* bvhList, int& poolPtr)
 {
-	float bestArea = INFINITY;
-	for (size_t i = 0; i < objectBounds->size(); i++)
+	//printf("BVH Node %i: Subdividing\n", poolPtr);
+	if (count - this->leftFirst < 5) return;
+
+	int tempPoolPtr = poolPtr;
+
+	BVHNode* left = pool[poolPtr]; //this.left = pool[poolPtr++];
+	BVHNode* right = pool[poolPtr + 1]; //this.right = pool[poolPtr++];
+
+	if (!PartitionTop(pool, bvhList, poolPtr)) return; //Partition();
+
+	left->SubdivideTop(pool, bvhList, poolPtr); //this.left->Subdivide();
+	right->SubdivideTop(pool, bvhList, poolPtr); //this.right->Subdivide();
+
+	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
+}
+
+bool BVHNode::PartitionTop(BVHNode** pool, std::vector<BVH*>* bvhList, int & poolPtr)
+{
+	vec3 lengths = bounds.max - bounds.min;
+
+	int axis;
+
+	float longestAxis = max(lengths.x, max(lengths.y, lengths.z));
+	if (longestAxis == lengths.x) axis = 0;
+	else if (longestAxis == lengths.y) axis = 1;
+	else axis = 2;
+
+	float splitCoordinate = (bounds.max[axis] + bounds.min[axis]) * 0.5f;
+
+	int mid = leftFirst;
+	for (int i = leftFirst; i < count; i++)
 	{
-		if ((*objectBounds)[i] != bounds)
+		if ((*bvhList)[i]->centroid[axis] < splitCoordinate)
 		{
-			AABB unionBox = AABB((*objectBounds)[i]->min + bounds->min,(*objectBounds)[i]->max + bounds->max);
-			//float boxArea = &unionBox.CalculateArea;
+			std::swap(bvhList[i], bvhList[mid]);
+			mid++;
 		}
 	}
-}*/
+
+	//Left node.
+	pool[poolPtr]->leftFirst = leftFirst;
+	pool[poolPtr]->count = mid;
+	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	//Right node.
+	pool[poolPtr]->leftFirst = mid;
+	pool[poolPtr]->count = count;
+	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	return true;
+}
