@@ -27,8 +27,8 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 
 	// Trace function
 #if ENABLEBVH
-	//scene->bvhTop->TraverseTop(ray, scene->bvhTop->topRoot);
-	scene->bvh->Traverse(ray, scene->bvh->root);
+	scene->bvhTop->TraverseTop(ray, scene->bvhTop->topRoot);
+	//scene->bvh->Traverse(ray, scene->bvh->root);
 	nearest = ray->t;
 #else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)

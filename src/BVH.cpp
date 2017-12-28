@@ -211,13 +211,70 @@ AABB BVH::CalculateBoundsTop(std::vector<BVH*>* bvhList, int first, int last)
 
 	for (int i = first; i < last; i++)
 	{
-		if ((*bvhList)[i]->boundingBox->max.x > maxX) { maxX = (*bvhList)[i]->boundingBox->max.x; }
-		if ((*bvhList)[i]->boundingBox->max.y > maxY) { maxY = (*bvhList)[i]->boundingBox->max.y; }
-		if ((*bvhList)[i]->boundingBox->max.z > maxZ) { maxZ = (*bvhList)[i]->boundingBox->max.z; }
+		if ((*bvhList)[i]->boundingBox.max.x > maxX) { maxX = (*bvhList)[i]->boundingBox.max.x; }
+		if ((*bvhList)[i]->boundingBox.max.y > maxY) { maxY = (*bvhList)[i]->boundingBox.max.y; }
+		if ((*bvhList)[i]->boundingBox.max.z > maxZ) { maxZ = (*bvhList)[i]->boundingBox.max.z; }
 
-		if ((*bvhList)[i]->boundingBox->min.x < minX) { minX = (*bvhList)[i]->boundingBox->min.x; }
-		if ((*bvhList)[i]->boundingBox->min.y < minY) { minY = (*bvhList)[i]->boundingBox->min.y; }
-		if ((*bvhList)[i]->boundingBox->min.z < minZ) { minZ = (*bvhList)[i]->boundingBox->min.z; }
+		if ((*bvhList)[i]->boundingBox.min.x < minX) { minX = (*bvhList)[i]->boundingBox.min.x; }
+		if ((*bvhList)[i]->boundingBox.min.y < minY) { minY = (*bvhList)[i]->boundingBox.min.y; }
+		if ((*bvhList)[i]->boundingBox.min.z < minZ) { minZ = (*bvhList)[i]->boundingBox.min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }
+
+bool BVH::isLeaf()
+{
+	return count != 0;
+}
+
+void BVH::Subdivide(BVH** pool, std::vector<BVH*>* bvhList, int& poolPtr)
+{
+	if (count - this->leftFirst < 5) return;
+
+	int tempPoolPtr = poolPtr;
+
+	BVH* left = pool[poolPtr]; //this.left = pool[poolPtr++];
+	BVH* right = pool[poolPtr + 1]; //this.right = pool[poolPtr++];
+
+	if (!Partition(pool, bvhList, poolPtr)) return; //Partition();
+
+	left->Subdivide(pool, bvhList, poolPtr); //this.left->Subdivide();
+	right->Subdivide(pool, bvhList, poolPtr); //this.right->Subdivide();
+
+	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
+}
+
+bool BVH::Partition(BVH** pool, std::vector<BVH*>* bvhList, int & poolPtr)
+{
+	vec3 lengths = boundingBox.max - boundingBox.min;
+	int axis = returnLargest(lengths);
+	
+	float splitCoordinate = (boundingBox.max[axis] + boundingBox.min[axis]) * 0.5f;
+
+	int mid = leftFirst;
+	for (int i = leftFirst; i < count; i++)
+	{
+		if ((*bvhList)[i]->centroid[axis] < splitCoordinate)
+		{
+			std::swap(bvhList[i], bvhList[mid]);
+			mid++;
+		}
+	}
+
+	// Left node
+	pool[poolPtr]->leftFirst = leftFirst;
+	pool[poolPtr]->count = mid;
+	pool[poolPtr]->boundingBox = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+
+	// Right node
+	pool[poolPtr]->leftFirst = mid;
+	pool[poolPtr]->count = count;
+	pool[poolPtr]->boundingBox = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+
+	poolPtr++;
+	
+	return true;
+}
+

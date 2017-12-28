@@ -26,7 +26,7 @@ public:
 	int index = 0;
 
 	// bvh helpers
-	AABB* CalculateObjectBounds(std::vector<Primitive*> primList);
-	vec3 CalculateObjectCentroid(AABB * bounds);
+	AABB CalculateObjectBounds(std::vector<Primitive*> primList);
+	vec3 CalculateObjectCentroid(AABB bounds);
 	AABB* sceneBounds;
 };

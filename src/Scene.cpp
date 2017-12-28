@@ -180,7 +180,7 @@ Scene::Scene(int scene_id)
 	lastftime = timer.elapsed();
 
 	// Dynamic scene BVH builder
-	//bvhTop = new BVHTop(&primList, &bvhList);
+	bvhTop = new BVHTop(&primList, &bvhList);
 
 	printf("-----------------------\n BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
 }
@@ -277,16 +277,16 @@ void Scene::LoadObject(std::string inputfile)
 	}
 
 	// Top level BVH loader
-	/*bvhList.push_back(new BVH(&primLoadList));
+	bvhList.push_back(new BVH(&primLoadList));
 	bvhList.back()->boundingBox = CalculateObjectBounds(primLoadList);
 	bvhList.back()->centroid = CalculateObjectCentroid(bvhList.back()->boundingBox);
-	bvhList.back()->index = index;*/
+	bvhList.back()->index = index;
 	index++;
 
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
 }
 
-AABB* Scene::CalculateObjectBounds(std::vector<Primitive*> primList)
+AABB Scene::CalculateObjectBounds(std::vector<Primitive*> primList)
 {
 	float maxX = -INFINITY; float minX = INFINITY;
 	float maxY = -INFINITY; float minY = INFINITY;
@@ -302,10 +302,10 @@ AABB* Scene::CalculateObjectBounds(std::vector<Primitive*> primList)
 		if (primList[i]->boundingBox->min.y < minY) { minY = primList[i]->boundingBox->min.y; }
 		if (primList[i]->boundingBox->min.z < minZ) { minZ = primList[i]->boundingBox->min.z; }
 	}
-	return new AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
+	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }
 
-vec3 Scene::CalculateObjectCentroid(AABB* bounds)
+vec3 Scene::CalculateObjectCentroid(AABB bounds)
 {
-	return ((bounds->max - bounds->min) * 0.5f);
+	return ((bounds.max - bounds.min) * 0.5f);
 }

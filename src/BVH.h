@@ -9,6 +9,7 @@ class BVH
 {
 public:
 	// Contructors
+	BVH() {};
 	BVH(std::vector<Primitive*>* primList)
 	{
 		this->primList = primList;
@@ -25,13 +26,20 @@ public:
 	
 	float CalculateDistance2(AABB bounds, vec3 point);
 	float IntersectRay(Ray* ray, AABB bounds);
+	bool isLeaf();
+
+	void Subdivide(BVH** pool, std::vector<BVH*>* bvhList, int& poolPtr);
+	bool Partition(BVH** pool, std::vector<BVH*>* bvhList, int& poolPtr);
 
 	// Variables
 	//uint* indices;
 	int poolPtr;
 	BVHNode** pool;
 	BVHNode* root;
-	AABB* boundingBox;
+	AABB boundingBox;
+
+	int leftFirst;	// 4 bytes
+	int count; //4 bytes
 
 	std::vector<Primitive*>* primList;
 

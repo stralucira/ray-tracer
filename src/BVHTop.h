@@ -16,12 +16,12 @@ public:
 	//int* primIndices;
 	//int* bvhIndices;
 	int topPoolPtr;
-	BVHNode** topPool;
-	BVHNode* topRoot;
+	BVH** topPool;
+	BVH* topRoot;
 
 	void ConstructBVHTop(std::vector<BVH*>* bvhList);
-	void TraverseTop(Ray * ray, BVHNode * node, bool isShadowRay = false, int * depthRender = FALSE);
-	float TraceTop(Ray * ray, BVHNode * node);
+	void TraverseTop(Ray * ray, BVH* node, bool isShadowRay = false, int * depthRender = FALSE);
+	//float TraceTop(Ray * ray, BVHNode * node);
 	float IntersectRay(Ray * ray, AABB bounds);
 	void SubdivideTop(BVHNode** pool, std::vector<BVH*>* bvhList, int& poolPtr);
 	AABB CalculateBoundsTop(std::vector<BVH*>* bvhList, int first, int last);

@@ -10,12 +10,12 @@ void BVHTop::ConstructBVHTop(std::vector<BVH*>* bvhList)
 		this->primIndices[i] = (*primList)[i]->index;
 	}*/
 
-	topPool = reinterpret_cast<BVHNode**>(_mm_malloc((bvhList->size() * 2 - 1) * sizeof(BVHNode), 64));
+	topPool = reinterpret_cast<BVH**>(_mm_malloc((bvhList->size() * 2 - 1) * sizeof(BVH), 64));
 	//topPool = new BVHNode*[bvhList->size() * 2 - 1];
 	//this->bvhIndices = new int[bvhList->size()];
 	for (size_t i = 0; i < bvhList->size(); i++)
 	{
-		topPool[i] = new BVHNode();
+		topPool[i] = new BVH();
 		//this->bvhIndices[i] = (*bvhList)[i]->index;
 	}
 	topRoot = topPool[0];
@@ -23,22 +23,24 @@ void BVHTop::ConstructBVHTop(std::vector<BVH*>* bvhList)
 
 	topRoot->leftFirst = 0;
 	topRoot->count = bvhList->size();
-	topRoot->bounds = CalculateBoundsTop(bvhList, 0, bvhList->size());
-	topRoot->SubdivideTop(topPool, bvhList, topPoolPtr);
+	topRoot->boundingBox = CalculateBoundsTop(bvhList, 0, bvhList->size());
+	topRoot->Subdivide(topPool, bvhList, topPoolPtr);
 }
 
-void BVHTop::TraverseTop(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
+void BVHTop::TraverseTop(Ray* ray, BVH* node, bool isShadowRay, int* depthRender)
 {
 	float prevT = ray->t;
 	Primitive* prevHit = ray->hit;
 
 	if (depthRender != NULL) depthRender[0]++;
 	if (isShadowRay && prevT != INFINITY) return;
-	if (IntersectRay(ray, node->bounds) == INFINITY) return;
+	if (IntersectRay(ray, node->boundingBox) == INFINITY) return;
 
 	if (node->isLeaf())
 	{
-		if (TraceTop(ray, node) > prevT)
+		node->Traverse(ray, node->root, 0, depthRender);
+
+		if (ray->t > prevT)
 		{
 			ray->t = prevT;
 			ray->hit = prevHit;
@@ -112,7 +114,9 @@ void BVHTop::TraverseTop(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRe
 	}
 }
 
-float BVHTop::TraceTop(Ray* ray, BVHNode* node)
+// We might not need the TraceTop function at all
+
+/* float BVHTop::TraceTop(Ray* ray, BVHNode* node)
 {
 	float nearest = INFINITY;
 
@@ -129,7 +133,7 @@ float BVHTop::TraceTop(Ray* ray, BVHNode* node)
 	if (ray->t > nearest) { ray->t = nearest; }
 
 	return ray->t;
-}
+}*/
 
 float BVHTop::IntersectRay(Ray* ray, AABB bounds)
 {
@@ -166,13 +170,13 @@ AABB BVHTop::CalculateBoundsTop(std::vector<BVH*>* bvhList, int first, int last)
 
 	for (int i = first; i < last; i++)
 	{
-		if ((*bvhList)[i]->boundingBox->max.x > maxX) { maxX = (*bvhList)[i]->boundingBox->max.x; }
-		if ((*bvhList)[i]->boundingBox->max.y > maxY) { maxY = (*bvhList)[i]->boundingBox->max.y; }
-		if ((*bvhList)[i]->boundingBox->max.z > maxZ) { maxZ = (*bvhList)[i]->boundingBox->max.z; }
+		if ((*bvhList)[i]->boundingBox.max.x > maxX) { maxX = (*bvhList)[i]->boundingBox.max.x; }
+		if ((*bvhList)[i]->boundingBox.max.y > maxY) { maxY = (*bvhList)[i]->boundingBox.max.y; }
+		if ((*bvhList)[i]->boundingBox.max.z > maxZ) { maxZ = (*bvhList)[i]->boundingBox.max.z; }
 
-		if ((*bvhList)[i]->boundingBox->min.x < minX) { minX = (*bvhList)[i]->boundingBox->min.x; }
-		if ((*bvhList)[i]->boundingBox->min.y < minY) { minY = (*bvhList)[i]->boundingBox->min.y; }
-		if ((*bvhList)[i]->boundingBox->min.z < minZ) { minZ = (*bvhList)[i]->boundingBox->min.z; }
+		if ((*bvhList)[i]->boundingBox.min.x < minX) { minX = (*bvhList)[i]->boundingBox.min.x; }
+		if ((*bvhList)[i]->boundingBox.min.y < minY) { minY = (*bvhList)[i]->boundingBox.min.y; }
+		if ((*bvhList)[i]->boundingBox.min.z < minZ) { minZ = (*bvhList)[i]->boundingBox.min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }
