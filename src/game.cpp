@@ -15,14 +15,15 @@ int polyCount = 0;
 
 void Game::Init()
 {
-	// --------------------------------------------------------------
-	// 1 the original scene DO NOT USE WITH TOP BVH
-	// 2 lego han solo, 8k triangles
-	// 3 x-wing, 34k triangles
-	// 4 tie fighter, 54k triangles
-	// 5 millennium falcon, 178k triangles (better not get near)
-	// Fear is the path to the dark side
-	// --------------------------------------------------------------
+// -----------------------------------------------------------
+// 1 The original scene
+// 2 LEGO Han Solo, 8k triangles
+// 3 X-wing, 34k triangles
+// 4 TIE Fighter, 54k triangles
+// 5 Millennium Falcon, 178k triangles (better not get near)
+// -----------------------------------------------------------
+// Fear is the path to the dark side
+// -----------------------------------------------------------
 	
 	LoadScene(3); // <-- Change scene here
 }

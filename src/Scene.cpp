@@ -177,7 +177,6 @@ Scene::Scene(int scene_id)
 
 		lightList.push_back(new Light(vec3(0.0f, 0.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
 
-		//this->LoadObject("han.obj");
 		this->LoadObject("f-16.obj");
 		this->LoadObject("cube.obj");
 
@@ -185,19 +184,29 @@ Scene::Scene(int scene_id)
 	}
 
 	// BVH helpers	
-	printf("Constructing BVH for %i polygons...\n", primList.size());
+	printf("----------------------------------------------\nConstructing static BVH for %i polygons...\n", primList.size());
 
 	// Static scene BVH builder
 	float lastftime = 0; auto timer = Timer();
 	bvh = new BVH(&primList);
 	lastftime = timer.elapsed(); timer.reset();
-	printf("-----------------------\n BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
+	printf("BVH constructed in %.3f seconds\n----------------------------------------------\n", lastftime);
 #if ENABLETOPBVH
 	// Dynamic scene BVH builder
+	for (size_t i = 0; i < objectList.size(); i++)
+	{
+		printf("Constructing object %i BVH for %i polygons...\n", i + 1, objectList[i].size());
+		lastftime = 0;
+		bvhList.push_back(new BVH(&objectList[i]));
+		lastftime = timer.elapsed(); timer.reset();
+		bvhList[i]->bounds = CalculateObjectBounds(objectList[i]);
+		bvhList[i]->centroid = CalculateObjectCentroid(bvhList[i]->bounds);
+		printf("BVH for object %i constructed in %.3f seconds\n----------------------------------------------\n", i + 1, lastftime);
+	}
 	lastftime = 0;
 	bvhTop = new BVHTop(&bvhList);
 	lastftime = timer.elapsed();
-	printf("-----------------------\n Top level BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
+	printf("Top level BVH constructed in %.3f seconds\n----------------------------------------------\n", lastftime);
 #endif
 }
 
@@ -260,7 +269,7 @@ void Scene::LoadObject(std::string inputfile)
 			// per-face material
 			// shapes[s].mesh.material_ids[f];
 
-			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
+			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2]));
 			primList.back()->index = index;
 
 			if (materials.size() > 0)
@@ -319,19 +328,10 @@ void Scene::LoadObject(std::string inputfile)
 	}
 	// Top level BVH loader
 	objectList.push_back(primLoadList);
-
-	float lastftime = 0; auto timer = Timer();
-	bvhList.push_back(new BVH(&objectList.back()));
-	lastftime = timer.elapsed();
-
-	printf("-----------------------\n BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
-	bvhList.back()->bounds = CalculateObjectBounds(primLoadList);
-	bvhList.back()->centroid = CalculateObjectCentroid(bvhList.back()->bounds);
 #else
 		}
 	}
 #endif // ENABLETOPBVH
-	printf("-----------------------\n Done loading polygons \n-----------------------\n");
 }
 
 AABB Scene::CalculateObjectBounds(std::vector<Primitive*> primList)

@@ -3,8 +3,6 @@
 #include "Ray.h"
 #include <random>
 
-#define CAMERADEBUG 0
-
 int iCPU = omp_get_num_procs();
 
 Camera::Camera()
@@ -43,17 +41,17 @@ void Camera::CalculateScreen()
 
 void Camera::PrintPosition()
 {
-	printf("-----------------------\n Camera Position \n-----------------------\n");
-	printf("dir: %.2f %.2f %.2f\n", GetForward().x, GetForward().y, GetForward().z);
-	printf("pos: %.2f %.2f %.2f\n", GetPosition().x, GetPosition().y, GetPosition().z);
+	printf("----------------------------------------------\n Camera Position \n----------------------------------------------\n");
+	printf("Position:  %.2ff, %.2ff, %.2ff\n", GetPosition().x, GetPosition().y, GetPosition().z);
+	printf("Direction: %.2ff, %.2ff, %.2ff\n", GetForward().x, GetForward().y, GetForward().z);
 	printf("\n");
-	printf("right: %.2f %.2f %.2f \n", GetRight().x, GetRight().y, GetRight().z);
-	printf("up: %.2f %.2f %.2f \n", GetUp().x, GetUp().y, GetUp().z);
+	printf("Right: %.2f %.2f %.2f \n", GetRight().x, GetRight().y, GetRight().z);
+	printf("Up: %.2f %.2f %.2f \n", GetUp().x, GetUp().y, GetUp().z);
 	printf("\n");
-	printf("p0: %.2f %.2f %.2f \n", p0.x, p0.y, p0.z);
-	printf("p1: %.2f %.2f %.2f \n", p1.x, p1.y, p1.z);
-	printf("p2: %.2f %.2f %.2f \n", p2.x, p2.y, p2.z);
-	printf("-----------------------\n");
+	printf("Top left corner: %.2f %.2f %.2f \n", p0.x, p0.y, p0.z);
+	printf("Top right corner: %.2f %.2f %.2f \n", p1.x, p1.y, p1.z);
+	printf("Bottom left corner: %.2f %.2f %.2f \n", p2.x, p2.y, p2.z);
+	printf("----------------------------------------------\n");
 }
 
 // Camera Movement
