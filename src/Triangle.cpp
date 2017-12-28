@@ -11,7 +11,7 @@ bool Triangle::intersect(Ray* ray)
 	vec3 pvec = cross(ray->dir, ac);
 	float det = dot(ab, pvec);
 
-	if (fabs(det) < 0.0001f) return false;
+	if (det > -0.0001f && det < 0.0001f) return false;
 	
 	float invDet = 1.0f / det;
 	

@@ -123,6 +123,7 @@ float BVHTop::TraceTop(Ray* ray, BVHNode* node)
 		{
 			nearest = ray->t;
 			ray->hit = (*this->primList)[i];
+			printf("%i is hit\n", i);
 		}
 	}
 

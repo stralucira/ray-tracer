@@ -16,7 +16,7 @@ int polyCount;
 
 void Game::Init()
 {    
-	LoadScene(2);
+	LoadScene(1);
 }
 
 void Game::LoadScene(int scene_id)

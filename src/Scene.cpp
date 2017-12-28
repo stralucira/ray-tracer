@@ -26,11 +26,11 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
 		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
-		primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::GLASS);
 		primList.back()->index = index; index++;
 
 		primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
-		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::GLASS);
+		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
 		primList.back()->index = index; index++;
 
 		primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
@@ -45,24 +45,64 @@ Scene::Scene(int scene_id)
 		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
 		primList.back()->index = index; index++;
 
-		primList.push_back(new Plane(vec3(0, -5, 5), vec3(0, 1, 0))); // bottom plane
+		//primList.push_back(new Plane(vec3(0, -5, 0), vec3(0, 1, 0))); // bottom plane
+		//primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
+		//primList.back()->index = index; index++;
+
+		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f)));
 		primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
 		primList.back()->index = index; index++;
 
-		primList.push_back(new Plane(vec3(0, 5, 5), vec3(0, -1, 0))); // top plane
+		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f), 1));
+		primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
+
+		//primList.push_back(new Plane(vec3(0, 5, 0), vec3(0, -1, 0))); // top plane
+		//primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+		//primList.back()->index = index; index++;
+
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1));
 		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		primList.back()->index = index; index++;
 
-		primList.push_back(new Plane(vec3(-5, 0, 5), vec3(1, 0, 0))); // left plane
-		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f)));
+		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		primList.back()->index = index; index++;
 
-		primList.push_back(new Plane(vec3(5, 0, 5), vec3(-1, 0, 0))); // right plane
-		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+		//primList.push_back(new Plane(vec3(-5, 0, 0), vec3(1, 0, 0))); // left plane
+		//primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::DIFFUSE);
+		//primList.back()->index = index; index++;
+
+		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), 1));
+		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
 		primList.back()->index = index; index++;
 
-		primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
-		primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), 1));
+		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+		primList.back()->index = index; index++;
+
+		//primList.push_back(new Plane(vec3(5, 0, 0), vec3(-1, 0, 0))); // right plane
+		//primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
+		//primList.back()->index = index; index++;
+
+		primList.push_back(new Triangle(vec3(5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f)));
+		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->index = index; index++;
+
+		primList.push_back(new Triangle(vec3(5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f)));
+		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->index = index; index++;
+
+		//primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
+		//primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
+		//primList.back()->index = index; index++;
+
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f), 1));
+		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.back()->index = index; index++;
+
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f)));
+		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
 		primList.back()->index = index; index++;
 
 		this->LoadObject("cube.obj");
@@ -76,8 +116,9 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(1000.0f, 1000.0f, 1000.0f)));
 
-		this->LoadObject("cube.obj");
-		this->LoadObject("f-16.obj");
+		//this->LoadObject("cube.obj");
+		this->LoadObject("millenium-falcon.obj");
+		//this->LoadObject("x-wing.obj");
 
 		break;
 	}
@@ -92,7 +133,7 @@ Scene::Scene(int scene_id)
 	lastftime = timer.elapsed();
 
 	// Dynamic scene BVH builder
-	bvhTop = new BVHTop(&primList, &bvhList);
+	//bvhTop = new BVHTop(&primList, &bvhList);
 
 	printf("-----------------------\n Done constructing BVH in %.2f seconds\n-----------------------\n", lastftime);
 }
@@ -201,13 +242,9 @@ void Scene::LoadObject(std::string inputfile)
 
 AABB* Scene::CalculateObjectBounds(std::vector<Primitive*> primList)
 {
-	float maxX = -INFINITY;
-	float maxY = -INFINITY;
-	float maxZ = -INFINITY;
-
-	float minX = INFINITY;
-	float minY = INFINITY;
-	float minZ = INFINITY;
+	float maxX = -INFINITY; float minX = INFINITY;
+	float maxY = -INFINITY; float minY = INFINITY;
+	float maxZ = -INFINITY; float minZ = INFINITY;
 
 	for (size_t i = 0; i < primList.size(); i++)
 	{
