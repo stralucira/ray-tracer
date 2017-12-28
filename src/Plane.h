@@ -9,7 +9,7 @@ public:
 		this->normal = normal;
 		
 		this->centroid = position;
-		this->boundingBox = calculateAABB();
+		this->bounds = calculateAABB();
 	}
 	~Plane();
 

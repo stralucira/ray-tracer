@@ -177,8 +177,9 @@ Scene::Scene(int scene_id)
 
 		lightList.push_back(new Light(vec3(0.0f, 0.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
 
-		this->LoadObject("cube.obj");
+		//this->LoadObject("han.obj");
 		this->LoadObject("f-16.obj");
+		//this->LoadObject("cube.obj");
 
 		break;
 	}
@@ -187,15 +188,17 @@ Scene::Scene(int scene_id)
 	printf("Constructing BVH for %i polygons...\n", primList.size());
 
 	// Static scene BVH builder
-	float lastftime = 0;
-	auto timer = Timer();	
+	float lastftime = 0; auto timer = Timer();
 	bvh = new BVH(&primList);
-	lastftime = timer.elapsed();
-
-	// Dynamic scene BVH builder
-	bvhTop = new BVHTop(&primList, &bvhList);
-
+	lastftime = timer.elapsed(); timer.reset();
 	printf("-----------------------\n BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
+#if ENABLETOPBVH
+	// Dynamic scene BVH builder
+	lastftime = 0;
+	bvhTop = new BVHTop(&bvhList);
+	lastftime = timer.elapsed();
+	printf("-----------------------\n Top level BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
+#endif
 }
 
 // wavefront .obj file loader
@@ -204,7 +207,10 @@ void Scene::LoadObject(std::string inputfile)
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
+
+#if ENABLETOPBVH
 	std::vector<Primitive*> primLoadList;
+#endif //ENABLETOPBVH
 
 	std::string err;
 	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, inputfile.c_str());
@@ -257,11 +263,8 @@ void Scene::LoadObject(std::string inputfile)
 			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 			primList.back()->index = index;
 
-			primLoadList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
-			primLoadList.back()->index = index;
-
 			if (materials.size() > 0)
-			{ 
+			{
 				primList.back()->material = Material(
 					vec3(
 						materials[shapes[s].mesh.material_ids[f]].diffuse[0],	// Kd red
@@ -284,18 +287,50 @@ void Scene::LoadObject(std::string inputfile)
 					primList.back()->material.shader = Material::Shader::DIFFUSE;
 				}
 			}
-			//primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
-			//printf("Loading polygon %i \n", primList.size());
+#if ENABLETOPBVH // Experimental top BVH construction helper
+			primLoadList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
+			primLoadList.back()->index = index;
+
+			if (materials.size() > 0)
+			{
+				primLoadList.back()->material = Material(
+					vec3(
+						materials[shapes[s].mesh.material_ids[f]].diffuse[0],	// Kd red
+						materials[shapes[s].mesh.material_ids[f]].diffuse[1],	// Kd green
+						materials[shapes[s].mesh.material_ids[f]].diffuse[2]),	// Kd blue
+					vec3(
+						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks red
+						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks green
+						materials[shapes[s].mesh.material_ids[f]].specular[0]),	// Kd blue
+					materials[shapes[s].mesh.material_ids[f]].shininess,		// Ns
+					materials[shapes[s].mesh.material_ids[f]].dissolve			//d
+				);
+
+				if (materials[shapes[s].mesh.material_ids[f]].dissolve < 1.0f)
+				{
+					primLoadList.back()->material.shader = Material::Shader::GLASS;
+				}
+				else
+				{
+					primLoadList.back()->material.shader = Material::Shader::DIFFUSE;
+				}
+			}
 		}
 	}
-
 	// Top level BVH loader
-	bvhList.push_back(new BVH(&primLoadList));
-	bvhList.back()->boundingBox = CalculateObjectBounds(primLoadList);
-	bvhList.back()->centroid = CalculateObjectCentroid(bvhList.back()->boundingBox);
-	bvhList.back()->index = index;
-	index++;
+	objectList.push_back(primLoadList);
 
+	float lastftime = 0; auto timer = Timer();
+	bvhList.push_back(new BVH(&objectList.back()));
+	lastftime = timer.elapsed();
+
+	printf("-----------------------\n BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
+	bvhList.back()->bounds = CalculateObjectBounds(primLoadList);
+	bvhList.back()->centroid = CalculateObjectCentroid(bvhList.back()->bounds);
+#else
+		}
+	}
+#endif // ENABLETOPBVH
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
 }
 
@@ -307,13 +342,13 @@ AABB Scene::CalculateObjectBounds(std::vector<Primitive*> primList)
 
 	for (size_t i = 0; i < primList.size(); i++)
 	{
-		if (primList[i]->boundingBox->max.x > maxX) { maxX = primList[i]->boundingBox->max.x; }
-		if (primList[i]->boundingBox->max.y > maxY) { maxY = primList[i]->boundingBox->max.y; }
-		if (primList[i]->boundingBox->max.z > maxZ) { maxZ = primList[i]->boundingBox->max.z; }
+		if (primList[i]->bounds->max.x > maxX) { maxX = primList[i]->bounds->max.x; }
+		if (primList[i]->bounds->max.y > maxY) { maxY = primList[i]->bounds->max.y; }
+		if (primList[i]->bounds->max.z > maxZ) { maxZ = primList[i]->bounds->max.z; }
 
-		if (primList[i]->boundingBox->min.x < minX) { minX = primList[i]->boundingBox->min.x; }
-		if (primList[i]->boundingBox->min.y < minY) { minY = primList[i]->boundingBox->min.y; }
-		if (primList[i]->boundingBox->min.z < minZ) { minZ = primList[i]->boundingBox->min.z; }
+		if (primList[i]->bounds->min.x < minX) { minX = primList[i]->bounds->min.x; }
+		if (primList[i]->bounds->min.y < minY) { minY = primList[i]->bounds->min.y; }
+		if (primList[i]->bounds->min.z < minZ) { minZ = primList[i]->bounds->min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }

@@ -4,21 +4,12 @@
 
 void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 {
-	//printf("Constructing BVH for %i polygons...\n", primList->size());
-
-	// create index array
-	//indices = new uint[primitives->size()];
-	//for (uint i = 0; i < primitives->size(); i++) indices[i] = i;
-
 	// allocate BVH root node
 	//pool = new BVHNode*[primList->size() * 2 - 1];
 	pool = reinterpret_cast<BVHNode**>(_mm_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 64));
-	//distancesAxis = new vec4[primList->size() * 2 - 1];
-	//distancesAxis = reinterpret_cast<vec4*>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(vec4), 64));
 	for (size_t i = 0; i < (primList->size() * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
-		//distancesAxis[i] = vec4(0.0f);
 	}
 	root = pool[0];
 	poolPtr = 2;
@@ -173,32 +164,21 @@ float BVH::IntersectRay(Ray* ray, AABB bounds)
 	return tmin;
 }
 
-float BVH::CalculateDistance2(AABB bounds, vec3 point)
-{
-	float distanceX = glm::max(glm::max(bounds.min.x - point.x, 0.0f), glm::max(0.0f, point.x - bounds.max.x));
-	float distanceY = glm::max(glm::max(bounds.min.y - point.y, 0.0f), glm::max(0.0f, point.y - bounds.max.y));
-	float distanceZ = glm::max(glm::max(bounds.min.z - point.z, 0.0f), glm::max(0.0f, point.z - bounds.max.z));
-
-	return distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ;
-}
-
 AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int last)
 {
-	//printf("BVH Node %i: Calculating\n", first);
-
 	float maxX = -INFINITY; float minX = INFINITY;
 	float maxY = -INFINITY; float minY = INFINITY;
 	float maxZ = -INFINITY; float minZ = INFINITY;
 
 	for (int i = first; i < last; i++)
 	{
-		if ((*primitives)[i]->boundingBox->max.x > maxX) { maxX = (*primitives)[i]->boundingBox->max.x; }
-		if ((*primitives)[i]->boundingBox->max.y > maxY) { maxY = (*primitives)[i]->boundingBox->max.y; }
-		if ((*primitives)[i]->boundingBox->max.z > maxZ) { maxZ = (*primitives)[i]->boundingBox->max.z; }
+		if ((*primitives)[i]->bounds->max.x > maxX) { maxX = (*primitives)[i]->bounds->max.x; }
+		if ((*primitives)[i]->bounds->max.y > maxY) { maxY = (*primitives)[i]->bounds->max.y; }
+		if ((*primitives)[i]->bounds->max.z > maxZ) { maxZ = (*primitives)[i]->bounds->max.z; }
 
-		if ((*primitives)[i]->boundingBox->min.x < minX) { minX = (*primitives)[i]->boundingBox->min.x; }
-		if ((*primitives)[i]->boundingBox->min.y < minY) { minY = (*primitives)[i]->boundingBox->min.y; }
-		if ((*primitives)[i]->boundingBox->min.z < minZ) { minZ = (*primitives)[i]->boundingBox->min.z; }
+		if ((*primitives)[i]->bounds->min.x < minX) { minX = (*primitives)[i]->bounds->min.x; }
+		if ((*primitives)[i]->bounds->min.y < minY) { minY = (*primitives)[i]->bounds->min.y; }
+		if ((*primitives)[i]->bounds->min.z < minZ) { minZ = (*primitives)[i]->bounds->min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }
@@ -211,13 +191,13 @@ AABB BVH::CalculateBoundsTop(std::vector<BVH*>* bvhList, int first, int last)
 
 	for (int i = first; i < last; i++)
 	{
-		if ((*bvhList)[i]->boundingBox.max.x > maxX) { maxX = (*bvhList)[i]->boundingBox.max.x; }
-		if ((*bvhList)[i]->boundingBox.max.y > maxY) { maxY = (*bvhList)[i]->boundingBox.max.y; }
-		if ((*bvhList)[i]->boundingBox.max.z > maxZ) { maxZ = (*bvhList)[i]->boundingBox.max.z; }
+		if ((*bvhList)[i]->bounds.max.x > maxX) { maxX = (*bvhList)[i]->bounds.max.x; }
+		if ((*bvhList)[i]->bounds.max.y > maxY) { maxY = (*bvhList)[i]->bounds.max.y; }
+		if ((*bvhList)[i]->bounds.max.z > maxZ) { maxZ = (*bvhList)[i]->bounds.max.z; }
 
-		if ((*bvhList)[i]->boundingBox.min.x < minX) { minX = (*bvhList)[i]->boundingBox.min.x; }
-		if ((*bvhList)[i]->boundingBox.min.y < minY) { minY = (*bvhList)[i]->boundingBox.min.y; }
-		if ((*bvhList)[i]->boundingBox.min.z < minZ) { minZ = (*bvhList)[i]->boundingBox.min.z; }
+		if ((*bvhList)[i]->bounds.min.x < minX) { minX = (*bvhList)[i]->bounds.min.x; }
+		if ((*bvhList)[i]->bounds.min.y < minY) { minY = (*bvhList)[i]->bounds.min.y; }
+		if ((*bvhList)[i]->bounds.min.z < minZ) { minZ = (*bvhList)[i]->bounds.min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
 }
@@ -246,10 +226,10 @@ void BVH::Subdivide(BVH** pool, std::vector<BVH*>* bvhList, int& poolPtr)
 
 bool BVH::Partition(BVH** pool, std::vector<BVH*>* bvhList, int & poolPtr)
 {
-	vec3 lengths = boundingBox.max - boundingBox.min;
+	vec3 lengths = bounds.max - bounds.min;
 	int axis = returnLargest(lengths);
 	
-	float splitCoordinate = (boundingBox.max[axis] + boundingBox.min[axis]) * 0.5f;
+	float splitCoordinate = (bounds.max[axis] + bounds.min[axis]) * 0.5f;
 
 	int mid = leftFirst;
 	for (int i = leftFirst; i < count; i++)
@@ -264,17 +244,16 @@ bool BVH::Partition(BVH** pool, std::vector<BVH*>* bvhList, int & poolPtr)
 	// Left node
 	pool[poolPtr]->leftFirst = leftFirst;
 	pool[poolPtr]->count = mid;
-	pool[poolPtr]->boundingBox = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
 
 	// Right node
 	pool[poolPtr]->leftFirst = mid;
 	pool[poolPtr]->count = count;
-	pool[poolPtr]->boundingBox = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
+	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
 	
 	return true;
 }
-

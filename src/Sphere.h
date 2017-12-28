@@ -10,7 +10,7 @@ public:
 		this->radius2 = radius * radius;
 		
 		this->centroid = position;
-		this->boundingBox = calculateAABB();
+		this->bounds = calculateAABB();
 	}
 	~Sphere();
 

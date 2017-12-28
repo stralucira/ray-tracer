@@ -7,7 +7,7 @@ float ZOOMMODIFIER = 0.05f;
 
 Scene* scene;
 RayTracer* rayTracer;
-int polyCount;
+int polyCount = 0;
 
 // -----------------------------------------------------------
 // Initialize the game
@@ -126,6 +126,11 @@ void Game::KeyDown(int a_Key)
 
 		// Toggle Traversal Mode
 	case SDL_SCANCODE_T:
+		if (rayTracer->scene->bvhTop->traversalMode != 2)
+			rayTracer->scene->bvhTop->traversalMode++;
+		else
+			rayTracer->scene->bvhTop->traversalMode = 0;
+
 		if (rayTracer->scene->bvh->traversalMode != 2)
 			rayTracer->scene->bvh->traversalMode++;
 		else

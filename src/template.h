@@ -382,11 +382,22 @@ inline const vec3 normalizeSSE(vec3 vector)
 	return vec;
 }
 
+// User added methods
 inline const int returnLargest(vec3 point)
 {
 	return point.x > point.y ?
 		(point.x > point.z ? 0 : 2) :
 		(point.y > point.z ? 1 : 2);
+}
+
+#include "AABB.h"
+inline float CalculateDistance2(AABB bounds, vec3 point)
+{
+	float distanceX = glm::max(glm::max(bounds.min.x - point.x, 0.0f), glm::max(0.0f, point.x - bounds.max.x));
+	float distanceY = glm::max(glm::max(bounds.min.y - point.y, 0.0f), glm::max(0.0f, point.y - bounds.max.y));
+	float distanceZ = glm::max(glm::max(bounds.min.z - point.z, 0.0f), glm::max(0.0f, point.z - bounds.max.z));
+
+	return distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ;
 }
 
 }; // namespace Tmpl8

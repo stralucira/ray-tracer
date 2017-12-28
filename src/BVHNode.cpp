@@ -2,8 +2,6 @@
 #include "BVH.h"
 #include "BVHNode.h"
 
-#define ENABLEBINNING 1
-
 void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, int& poolPtr)
 {
 	if (count - this->leftFirst < 5) return;
@@ -47,11 +45,11 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, int& 
 				{
 					if ((*primList)[i]->centroid[axis] < splitCoordinate)
 					{
-						AdjustBounds((*primList)[i]->boundingBox, minLeft, maxLeft); leftCounter++;
+						AdjustBounds((*primList)[i]->bounds, minLeft, maxLeft); leftCounter++;
 					}
 					else
 					{
-						AdjustBounds((*primList)[i]->boundingBox, minRight, maxRight); rightCounter++;
+						AdjustBounds((*primList)[i]->bounds, minRight, maxRight); rightCounter++;
 					}
 				}
 
@@ -82,11 +80,11 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, int& 
 				{
 					if ((*primList)[i]->centroid[axis] < splitCoordinate)
 					{
-						AdjustBounds((*primList)[i]->boundingBox, minLeft, maxLeft); leftCounter++;
+						AdjustBounds((*primList)[i]->bounds, minLeft, maxLeft); leftCounter++;
 					}
 					else
 					{
-						AdjustBounds((*primList)[i]->boundingBox, minRight, maxRight); rightCounter++;
+						AdjustBounds((*primList)[i]->bounds, minRight, maxRight); rightCounter++;
 					}
 				}
 
@@ -146,56 +144,4 @@ void BVHNode::AdjustBounds(AABB * bounds, vec3& min, vec3& max)
 bool BVHNode::isLeaf()
 {
 	return count != 0;
-}
-
-// Top level BVH functions
-void BVHNode::SubdivideTop(BVHNode** pool, std::vector<BVH*>* bvhList, int& poolPtr)
-{
-	if (count - this->leftFirst < 5) return;
-
-	int tempPoolPtr = poolPtr;
-
-	BVHNode* left = pool[poolPtr]; //this.left = pool[poolPtr++];
-	BVHNode* right = pool[poolPtr + 1]; //this.right = pool[poolPtr++];
-
-	if (!PartitionTop(pool, bvhList, poolPtr)) return; //Partition();
-
-	left->SubdivideTop(pool, bvhList, poolPtr); //this.left->Subdivide();
-	right->SubdivideTop(pool, bvhList, poolPtr); //this.right->Subdivide();
-
-	this->leftFirst = tempPoolPtr; count = 0; //this.isLeaf = false;
-}
-
-bool BVHNode::PartitionTop(BVHNode** pool, std::vector<BVH*>* bvhList, int & poolPtr)
-{
-	vec3 lengths = bounds.max - bounds.min;
-	int axis = returnLargest(lengths);
-	
-	float splitCoordinate = (bounds.max[axis] + bounds.min[axis]) * 0.5f;
-
-	int mid = leftFirst;
-	for (int i = leftFirst; i < count; i++)
-	{
-		if ((*bvhList)[i]->centroid[axis] < splitCoordinate)
-		{
-			std::swap(bvhList[i], bvhList[mid]);
-			mid++;
-		}
-	}
-
-	// Left node
-	pool[poolPtr]->leftFirst = leftFirst;
-	pool[poolPtr]->count = mid;
-	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
-
-	poolPtr++;
-
-	// Right node
-	pool[poolPtr]->leftFirst = mid;
-	pool[poolPtr]->count = count;
-	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
-
-	poolPtr++;
-	
-	return true;
 }

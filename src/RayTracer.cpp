@@ -1,9 +1,6 @@
 #include "template.h"
 #include "RayTracer.h"
 
-#define ENABLEBVH 1
-#define ALTERNATERENDERMODE 1
-
 int iCPU2 = omp_get_num_procs();
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
@@ -21,14 +18,21 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 	if (depthRendering)
 	{
 		int depthRender = 0;
+#if ENABLETOPBVH
+		scene->bvhTop->TraverseTop(ray, scene->bvhTop->topRoot, 0, &depthRender);
+#else
 		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
+#endif
 		return vec3(clamp((depthRender * 0.005f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.005f), 0.0f, 1.0f), 0.0f);
 	}
 
 	// Trace function
 #if ENABLEBVH
+#if ENABLETOPBVH
 	scene->bvhTop->TraverseTop(ray, scene->bvhTop->topRoot);
-	//scene->bvh->Traverse(ray, scene->bvh->root);
+#else
+	scene->bvh->Traverse(ray, scene->bvh->root);
+#endif // ENABLETOPBVH
 	nearest = ray->t;
 #else
 	for (size_t i = 0; i < this->scene->primList.size(); i++)
@@ -197,9 +201,11 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	if (renderShadow)
 	{
 #if ENABLEBVH
+#if ENABLETOPBVH
 		scene->bvhTop->TraverseTop(&shadowRay, scene->bvhTop->topRoot, true);
-		//scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
-		//scene->bvh->Traverse(&shadowRay, scene->bvhTop->topRoot, true);
+#else
+		scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+#endif
 		if (shadowRay.t < tToLight) { return BLACK; }
 #else
 		for (size_t i = 0; i < this->scene->primList.size(); i++)
@@ -207,7 +213,7 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 			this->scene->primList[i]->intersect(&shadowRay);
 			if (shadowRay.t < tToLight) { return BLACK; }
 		}
-#endif
+#endif // ENABLEBVH
 	}
 
 	float euclidianDistanceToLight = distance(hitPoint, light->pos);

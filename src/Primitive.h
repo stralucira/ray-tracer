@@ -16,6 +16,6 @@ public:
 	virtual AABB* calculateAABB() = 0;
 
 	vec3 centroid;
-	AABB* boundingBox;
+	AABB* bounds;
 	int index;
 };

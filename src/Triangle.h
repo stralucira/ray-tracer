@@ -12,7 +12,7 @@ public:
 		this->normal = normal;
 	
 		this->centroid = calculateCentroid();
-		this->boundingBox = calculateAABB();
+		this->bounds = calculateAABB();
 	}
 	Triangle(vec3 a, vec3 b, vec3 c) : Primitive(a)
 	{
@@ -22,7 +22,7 @@ public:
 		this->normal = normalize(cross(b - a, c - a));
 
 		this->centroid = calculateCentroid();
-		this->boundingBox = calculateAABB();
+		this->bounds = calculateAABB();
 	}
 	Triangle(vec3 a, vec3 b, vec3 c, int sign) : Primitive(a)
 	{
@@ -32,7 +32,7 @@ public:
 		this->normal = -normalize(cross(b - a, c - a));
 
 		this->centroid = calculateCentroid();
-		this->boundingBox = calculateAABB();
+		this->bounds = calculateAABB();
 	}
 	~Triangle();
 

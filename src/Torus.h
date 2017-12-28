@@ -12,7 +12,7 @@ public:
 		this->axis = normalize(axis);
 
 		this->centroid = position;
-		this->boundingBox = calculateAABB();
+		this->bounds = calculateAABB();
 	}
 	~Torus();
 
