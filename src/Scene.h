@@ -22,6 +22,7 @@ public:
 	BVH* bvh;
 
 	vec3 pos, lookAt;
+	float MOVEMODIFIER;
 	int index = 0;
 
 	// bvh helpers

@@ -11,10 +11,10 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 	//for (uint i = 0; i < primitives->size(); i++) indices[i] = i;
 
 	// allocate BVH root node
-	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 64));
-	//lengthsAxis = new vec4[primList->size() * 2 - 1];
-	//distancesAxis = reinterpret_cast<vec4*>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(vec4), 64));
 	//pool = new BVHNode*[primList->size() * 2 - 1];
+	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 64));
+	//distancesAxis = new vec4[primList->size() * 2 - 1];
+	//distancesAxis = reinterpret_cast<vec4*>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(vec4), 64));
 	for (size_t i = 0; i < (primList->size() * 2 - 1); i++)
 	{
 		pool[i] = new BVHNode();
@@ -50,69 +50,81 @@ void BVH::Traverse(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRender)
 
 	else
 	{
+		switch (traversalMode)
+		{
 		// ------------------------------------------------------------------------------
 		// Basic Traversal (It gets the job done)
 		// ------------------------------------------------------------------------------
-		//this->Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
-		//this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
-
+		case 0:
+		{
+			this->Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
+			this->Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
+		}
+		break;
 		// ------------------------------------------------------------------------------
-		// Ordered Traversal (It is actually a bit faster using this)
+		// Ordered Traversal (Preferred method, it is actually faster using this)
 		// Calculate distance to both child nodes, Traverse the nearest child node first
 		// ------------------------------------------------------------------------------
-		float leftDistance2 = CalculateDistance2(pool[node->leftFirst]->bounds, ray->orig);
-		float rightDistance2 = CalculateDistance2(pool[node->leftFirst + 1]->bounds, ray->orig);
-		
-		if (leftDistance2 < rightDistance2)
+		case 1:
 		{
-			Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
-			if (ray->t * ray->t < rightDistance2) return;
-			Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
-		}
-		else
-		{
-			Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
-			if (ray->t * ray->t < leftDistance2) return;
-			Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
-		}
+			float leftDistance2 = CalculateDistance2(pool[node->leftFirst]->bounds, ray->orig);
+			float rightDistance2 = CalculateDistance2(pool[node->leftFirst + 1]->bounds, ray->orig);
 
+			if (leftDistance2 < rightDistance2)
+			{
+				Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
+				if (ray->t * ray->t < rightDistance2) return;
+				Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
+			}
+			else
+			{
+				Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
+				if (ray->t * ray->t < leftDistance2) return;
+				Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
+			}
+		}
+		break;
 		// ------------------------------------------------------------------------------
-		// Ordered Traversal (A bit slower then distance calculations?)
+		// Ordered Traversal (Least depth but a bit slower than distance calculation)
 		// Determine the axis for which the child node centroids are furthest apart
 		// Use ray direction sign for that axis to determine near and far.
 		// ------------------------------------------------------------------------------
-		/*vec3 leftCentroid = pool[node->leftFirst]->bounds.CalculateCentroid();
-		vec3 rightCentroid = pool[node->leftFirst + 1]->bounds.CalculateCentroid();
-
-		vec3 distances = glm::abs(leftCentroid - rightCentroid);
-		int axis = ReturnLargest(distances);
-
-		bool index = ray->dir[axis] > 0.0f;
-		//distancesAxis[node->leftFirst] = vec4(distances, axis);
-
-		int closeIndex = index ? node->leftFirst : node->leftFirst + 1;
-		int farIndex = index ? node->leftFirst + 1 : node->leftFirst;
-
-		float closeT = ray->t;
-		float farT = ray->t;
-
-		float closeAABBdistance = IntersectRay(ray, pool[closeIndex]->bounds);
-		float farAABBdistance = IntersectRay(ray, pool[farIndex]->bounds);
-
-		if (closeAABBdistance < INFINITY)
+		case 2:
 		{
-			this->Traverse(ray, pool[closeIndex], isShadowRay, depthRender);
-			closeT = ray->t;
-			if (closeT < farAABBdistance) return;
+			vec3 leftCentroid = pool[node->leftFirst]->bounds.CalculateCentroid();
+			vec3 rightCentroid = pool[node->leftFirst + 1]->bounds.CalculateCentroid();
+
+			vec3 distances = glm::abs(leftCentroid - rightCentroid);
+			int axis = returnLargest(distances);
+
+			bool index = ray->dir[axis] > 0.0f;
+
+			int closeIndex = index ? node->leftFirst : node->leftFirst + 1;
+			int farIndex = index ? node->leftFirst + 1 : node->leftFirst;
+
+			float closeT = ray->t;
+			float farT = ray->t;
+
+			float closeAABBdistance = IntersectRay(ray, pool[closeIndex]->bounds);
+			float farAABBdistance = IntersectRay(ray, pool[farIndex]->bounds);
+
+			if (closeAABBdistance < INFINITY)
+			{
+				this->Traverse(ray, pool[closeIndex], isShadowRay, depthRender);
+				closeT = ray->t;
+				if (closeT < farAABBdistance) return;
+			}
+
+			if (farAABBdistance < INFINITY)
+			{
+				this->Traverse(ray, pool[farIndex], isShadowRay, depthRender);
+				farT = ray->t;
+				if (closeT < farT) ray->t = closeT;
+				else ray->t = farT;
+			}
 		}
-
-		if (farAABBdistance < INFINITY)
-		{
-			this->Traverse(ray, pool[farIndex], isShadowRay, depthRender);
-			farT = ray->t;
-			if (closeT < farT) ray->t = closeT;
-			else ray->t = farT;
-		}*/
+		break;
+		}
 	}
 }
 
@@ -193,8 +205,6 @@ AABB BVH::CalculateBounds(std::vector<Primitive*>* primitives, int first, int la
 
 AABB BVH::CalculateBoundsTop(std::vector<BVH*>* bvhList, int first, int last)
 {
-	//printf("BVH Node %i: Calculating\n", first);
-
 	float maxX = -INFINITY; float minX = INFINITY;
 	float maxY = -INFINITY; float minY = INFINITY;
 	float maxZ = -INFINITY; float minZ = INFINITY;
@@ -210,11 +220,4 @@ AABB BVH::CalculateBoundsTop(std::vector<BVH*>* bvhList, int first, int last)
 		if ((*bvhList)[i]->boundingBox->min.z < minZ) { minZ = (*bvhList)[i]->boundingBox->min.z; }
 	}
 	return AABB(vec3(minX, minY, minZ), vec3(maxX, maxY, maxZ));
-}
-
-int BVH::ReturnLargest(vec3 point)
-{
-	return point.x > point.y ?
-		(point.x > point.z ? 0 : 2) :
-		(point.y > point.z ? 1 : 2);
 }

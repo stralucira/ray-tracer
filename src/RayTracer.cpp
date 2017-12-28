@@ -2,7 +2,7 @@
 #include "RayTracer.h"
 
 #define ENABLEBVH 1
-#define ALTERNATERENDERMODE 0
+#define ALTERNATERENDERMODE 1
 
 int iCPU2 = omp_get_num_procs();
 
@@ -14,11 +14,7 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 {
-	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
-	{
-		return BACKGROUND_COLOR;
-	}
-
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
 	float nearest = INFINITY;
 
 	// BVH depth rendering
@@ -26,7 +22,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 	{
 		int depthRender = 0;
 		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
-		return vec3(clamp((depthRender * 0.01f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.01f), 0.0f, 1.0f), 0.0f);
+		return vec3(clamp((depthRender * 0.005f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.005f), 0.0f, 1.0f), 0.0f);
 	}
 
 	// Trace function
@@ -45,82 +41,72 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 	}
 #endif // ENABLEBVH
 
-	// If ray does not intersect
-	if (nearest == INFINITY)
-	{
-		return BACKGROUND_COLOR;
-	}
+	if (nearest == INFINITY) return BACKGROUND_COLOR; 	// If ray does not intersect
+	if (!renderShadow) return ray->hit->material.Kd; 	// Toggle shadows on / off
 
-#if ALTERNATERENDERMODE // Diffuse + Shininess + Dissolve
+#if ALTERNATERENDERMODE // pseudo diffuse + shininess + dissolve rendering method (used for loaded obj files)
 	else
 	{
-		if (renderShadow)
+		vec3 hitPoint = ray->orig + ray->dir * nearest;
+		vec3 normal = ray->hit->getNormal(hitPoint);
+		vec3 color = BLACK;
+
+		vec3 shadowPointOrig = (dot(ray->dir, normal) < 0) ?
+			hitPoint + normal * 0.0001f :
+			hitPoint - normal * 0.0001f;
+
+		if (ray->hit->material.shader == Material::Shader::DIFFUSE)
 		{
-			vec3 hitPoint = ray->orig + ray->dir * nearest;
-			vec3 normal = ray->hit->getNormal(hitPoint);
-			vec3 color = BLACK;
-
-			vec3 shadowPointOrig = (dot(ray->dir, normal) < 0) ?
-				hitPoint + normal * 0.0001f :
-				hitPoint - normal * 0.0001f;
-
-			if (ray->hit->material.shader == Material::Shader::DIFFUSE)
+			for (size_t i = 0; i < this->scene->lightList.size(); i++)
 			{
-				for (size_t i = 0; i < this->scene->lightList.size(); i++)
-				{
-					vec3 diffuseColor = BLACK;
-					vec3 specularColor = BLACK;
+				vec3 diffuseColor = BLACK;
+				vec3 specularColor = BLACK;
 
-					vec3 lightDir = this->scene->lightList[i]->pos - hitPoint;
-					//float lightDistance2 = dot(lightDir, lightDir);
-					lightDir = normalize(lightDir);
+				vec3 lightDir = this->scene->lightList[i]->pos - hitPoint;
+				//float lightDistance2 = dot(lightDir, lightDir);
+				lightDir = normalize(lightDir);
 
-					if (dot(lightDir, normal) < 0) { continue; }
+				if (dot(lightDir, normal) < 0) { continue; }
 
-					diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], ray->hit->material);
+				diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], ray->hit->material);
 
-					vec3 reflectionDirection = reflect(-lightDir, normal);
-					specularColor += powf(glm::max(0.0f, -dot(reflectionDirection, ray->dir)), ray->hit->material.Ns);// * this->scene->lightList[i]->color;
+				vec3 reflectionDirection = reflect(-lightDir, normal);
+				specularColor += powf(glm::max(0.0f, -dot(reflectionDirection, ray->dir)), ray->hit->material.Ns);// * this->scene->lightList[i]->color;
 
-					color += diffuseColor + specularColor * ray->hit->material.Ks;
-				}
-				//ray->t = INFINITY;
+				color += diffuseColor + specularColor * ray->hit->material.Ks;
 			}
-
-			if (ray->hit->material.shader == Material::Shader::MIRROR)
-			{
-				Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
-				color += ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
-				//ray->t = INFINITY;
-			}
-			
-			if (ray->hit->material.shader == Material::Shader::GLASS)
-			{
-				vec3 reflectionDirection = normalize(reflect(ray->dir, normal));
-				vec3 refractionDirection = normalize(refract(ray->dir, normal, 1.0f));
-				vec3 reflectionRayOrig = (dot(reflectionDirection, normal) < 0) ?
-					hitPoint - normal * 0.0001f :
-					hitPoint + normal * 0.0001f;
-				vec3 refractionRayOrig = (dot(refractionDirection, normal) < 0) ?
-					hitPoint - normal * 0.0001f :
-					hitPoint + normal * 0.0001f;
-				
-				Ray reflectRay = Ray(reflectionRayOrig, reflectionDirection);
-				vec3 reflectionColor = GetColor(x, y, &reflectRay, depth += 1);
-				
-				Ray refractRay = Ray(refractionRayOrig, refractionDirection);
-				vec3 refractionColor = GetColor(x, y, &refractRay, depth += 1);
-
-				color += reflectionColor * (ray->hit->material.dissolve) + refractionColor * (1 - ray->hit->material.dissolve);
-			}
-			return color;
-
+			//ray->t = INFINITY;
 		}
-		else
+
+		if (ray->hit->material.shader == Material::Shader::MIRROR)
 		{
-			return ray->hit->material.Kd;
+			Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
+			color += ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
+			//ray->t = INFINITY;
 		}
+
+		if (ray->hit->material.shader == Material::Shader::GLASS)
+		{
+			vec3 reflectionDirection = normalize(reflect(ray->dir, normal));
+			vec3 refractionDirection = normalize(refract(ray->dir, normal, 1.0f));
+			vec3 reflectionRayOrig = (dot(reflectionDirection, normal) < 0) ?
+				hitPoint - normal * 0.0001f :
+				hitPoint + normal * 0.0001f;
+			vec3 refractionRayOrig = (dot(refractionDirection, normal) < 0) ?
+				hitPoint - normal * 0.0001f :
+				hitPoint + normal * 0.0001f;
+
+			Ray reflectRay = Ray(reflectionRayOrig, reflectionDirection);
+			vec3 reflectionColor = GetColor(x, y, &reflectRay, depth += 1);
+
+			Ray refractRay = Ray(refractionRayOrig, refractionDirection);
+			vec3 refractionColor = GetColor(x, y, &refractRay, depth += 1);
+
+			color += reflectionColor * (ray->hit->material.dissolve) + refractionColor * (1 - ray->hit->material.dissolve);
+		}
+		return color;
 	}
+
 #else
 	// If ray intersects
 	else
@@ -128,7 +114,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 		vec3 hitPoint = ray->orig + ray->dir * nearest;
 		vec3 normal = ray->hit->getNormal(hitPoint);
 		vec3 color = BLACK;
-		
+
 		// DIFFUSE material shader hit
 		if (ray->hit->material.shader == Material::Shader::DIFFUSE)
 		{
@@ -153,7 +139,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 		if (ray->hit->material.shader == Material::Shader::GLASS)
 		{
 			vec3 refractColor = BLACK;
-			
+
 			float kr = Fresnel(ray->dir, normal, 1.52f);
 			bool outside = dot(ray->dir, normal) < 0;
 			vec3 bias = 0.0001f * ray->hit->getNormal(hitPoint);
@@ -161,7 +147,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 			float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
 			float etai = 1, etat = 1.52f;
 			vec3 n = normal;
-			
+
 			if (cosi < 0)
 			{
 				cosi = -cosi;
@@ -173,7 +159,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 			}
 			float eta = etai / etat;
 			float k = 1 - eta * eta * (1 - cosi * cosi);
-			
+
 			if (k < 0)
 			{
 				return color;
@@ -181,13 +167,13 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 			else
 			{
 				Ray refractRay = Ray(hitPoint, eta * ray->dir + (eta * cosi - sqrtf(k)) * n);
-				
+
 				vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
 				refractRay.orig = hitEpsilon;
 
 				refractColor = this->GetColor(x, y, &refractRay, depth += 1);
 			}
-		
+
 			Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
 			vec3 reflectColor = ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
@@ -211,8 +197,8 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	if (renderShadow)
 	{
 #if ENABLEBVH
-	//scene->topbvh->TraverseTop(&shadowRay, scene->topbvh->topRoot, true);
-	//if (shadowRay.t < tToLight) { return BLACK; }
+		//scene->topbvh->TraverseTop(&shadowRay, scene->topbvh->topRoot, true);
+		//if (shadowRay.t < tToLight) { return BLACK; }
 
 		scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
 		//scene->bvh->Traverse(&shadowRay, scene->bvhTop->topRoot, true);

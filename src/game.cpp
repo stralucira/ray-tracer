@@ -2,11 +2,10 @@
 #include "Scene.h"
 #include "RayTracer.h"
 
-float MOVEMODIFIER = 0.50f;
 float ROTATEMODIFIER = 0.05f;
 float ZOOMMODIFIER = 0.05f;
 
-Scene* testScene;
+Scene* scene;
 RayTracer* rayTracer;
 int polyCount;
 
@@ -15,14 +14,23 @@ int polyCount;
 // -----------------------------------------------------------
 
 void Game::Init()
-{    
-	LoadScene(1);
+{
+	// --------------------------------------------------------------
+	// 1 the original scene, better to disable alternate render mode
+	// 2 lego han solo, 8k triangles
+	// 3 x-wing, 34k triangles
+	// 4 tie fighter, 54k triangles
+	// 5 millennium falcon, 178k triangles (better not get near)
+	// Fear is the path to the dark side
+	// --------------------------------------------------------------
+	
+	LoadScene(5); // <-- Change scene here
 }
 
 void Game::LoadScene(int scene_id)
 {
-	testScene = new Scene(scene_id);
-	rayTracer = new RayTracer(testScene, screen);
+	scene = new Scene(scene_id);
+	rayTracer = new RayTracer(scene, screen);
 	polyCount += rayTracer->scene->bvh->primList->size();
 }
 
@@ -50,22 +58,22 @@ void Game::KeyDown(int a_Key)
 
 		// Translation:
 	case SDL_SCANCODE_W:
-		rayTracer->scene->camera->Surge(MOVEMODIFIER);
+		rayTracer->scene->camera->Surge(scene->MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_A:
-		rayTracer->scene->camera->Sway(-MOVEMODIFIER);
+		rayTracer->scene->camera->Sway(-scene->MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_S:
-		rayTracer->scene->camera->Surge(-MOVEMODIFIER);
+		rayTracer->scene->camera->Surge(-scene->MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_D:
-		rayTracer->scene->camera->Sway(MOVEMODIFIER);
+		rayTracer->scene->camera->Sway(scene->MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_Q:
-		rayTracer->scene->camera->Heave(-MOVEMODIFIER);
+		rayTracer->scene->camera->Heave(-scene->MOVEMODIFIER);
 		break;
 	case SDL_SCANCODE_E:
-		rayTracer->scene->camera->Heave(MOVEMODIFIER);
+		rayTracer->scene->camera->Heave(scene->MOVEMODIFIER);
 		break;
 
 		// Rotation:
@@ -116,6 +124,14 @@ void Game::KeyDown(int a_Key)
 		rayTracer->renderShadow = !rayTracer->renderShadow;
 		break;
 
+		// Toggle Traversal Mode
+	case SDL_SCANCODE_T:
+		if (rayTracer->scene->bvh->traversalMode != 2)
+			rayTracer->scene->bvh->traversalMode++;
+		else
+			rayTracer->scene->bvh->traversalMode = 0;
+		break;
+
 		// Reset Camera Position:
 	case SDL_SCANCODE_R:
 		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt);
@@ -131,10 +147,30 @@ void Game::Tick( float dt )
 	rayTracer->Render();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f Polygons: %i \n", 1 / dt, polyCount);
+	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt,
+		polyCount,
+		rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z,
+		rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z);
 	screen->Print(buffer, 2, 2, 0xffffff);
-	sprintf(buffer, "Position: %.2f %.2f %.2f \n", rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z);
+	
+	sprintf(buffer, "Press B to toggle depth rendering.");
 	screen->Print(buffer, 2, 12, 0xffffff);
-	sprintf(buffer, "Direction: %.2f %.2f %.2f \n", rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z);
-	screen->Print(buffer, 2, 22, 0xffffff);	
+
+	switch (rayTracer->scene->bvh->traversalMode)
+	{
+	case 0:
+		sprintf(buffer, "Press T to toggle traversal modes. Traversal mode: Standard.");
+		break;
+	case 1:
+		sprintf(buffer, "Press T to toggle traversal modes. Traversal mode: Distance calculation.");
+		break;
+	case 2:
+		sprintf(buffer, "Press T to toggle traversal modes. Traversal mode: Ray direction sign.");
+		break;
+	}
+	screen->Print(buffer, 2, 22, 0xffffff);
+
+	sprintf(buffer, "Press V to toggle shadows.");
+	screen->Print(buffer, 2, 32, 0xffffff);
+	
 }

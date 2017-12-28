@@ -6,7 +6,6 @@
 
 void BVHNode::Subdivide(BVHNode** pool, std::vector<Primitive*>* primList, int& poolPtr)
 {
-	//printf("BVH Node %i: Subdividing\n", poolPtr);
 	if (count - this->leftFirst < 5) return;
 	
 	int tempPoolPtr = poolPtr;
@@ -116,14 +115,14 @@ bool BVHNode::Partition(BVHNode** pool, std::vector<Primitive*>* primList, int& 
 		}
 	}
 
-	//Left node.
+	// Left node
 	pool[poolPtr]->leftFirst = leftFirst;
 	pool[poolPtr]->count = mid;
 	pool[poolPtr]->bounds = BVH::CalculateBounds(primList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
 
-	//Right node.
+	// Right node
 	pool[poolPtr]->leftFirst = mid;
 	pool[poolPtr]->count = count;
 	pool[poolPtr]->bounds = BVH::CalculateBounds(primList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
@@ -152,7 +151,6 @@ bool BVHNode::isLeaf()
 // Top level BVH functions
 void BVHNode::SubdivideTop(BVHNode** pool, std::vector<BVH*>* bvhList, int& poolPtr)
 {
-	//printf("BVH Node %i: Subdividing\n", poolPtr);
 	if (count - this->leftFirst < 5) return;
 
 	int tempPoolPtr = poolPtr;
@@ -171,14 +169,8 @@ void BVHNode::SubdivideTop(BVHNode** pool, std::vector<BVH*>* bvhList, int& pool
 bool BVHNode::PartitionTop(BVHNode** pool, std::vector<BVH*>* bvhList, int & poolPtr)
 {
 	vec3 lengths = bounds.max - bounds.min;
-
-	int axis;
-
-	float longestAxis = max(lengths.x, max(lengths.y, lengths.z));
-	if (longestAxis == lengths.x) axis = 0;
-	else if (longestAxis == lengths.y) axis = 1;
-	else axis = 2;
-
+	int axis = returnLargest(lengths);
+	
 	float splitCoordinate = (bounds.max[axis] + bounds.min[axis]) * 0.5f;
 
 	int mid = leftFirst;
@@ -191,18 +183,19 @@ bool BVHNode::PartitionTop(BVHNode** pool, std::vector<BVH*>* bvhList, int & poo
 		}
 	}
 
-	//Left node.
+	// Left node
 	pool[poolPtr]->leftFirst = leftFirst;
 	pool[poolPtr]->count = mid;
 	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
 
-	//Right node.
+	// Right node
 	pool[poolPtr]->leftFirst = mid;
 	pool[poolPtr]->count = count;
 	pool[poolPtr]->bounds = BVH::CalculateBoundsTop(bvhList, pool[poolPtr]->leftFirst, pool[poolPtr]->count);
 
 	poolPtr++;
+	
 	return true;
 }

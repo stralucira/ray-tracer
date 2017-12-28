@@ -57,35 +57,34 @@ void BVHTop::TraverseTop(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRe
 		// Ordered Traversal (It is actually a bit faster using this)
 		// Calculate distance to both child nodes, Traverse the nearest child node first
 		// ------------------------------------------------------------------------------
-		//float leftDistance2 = CalculateDistance2(pool[node->leftFirst]->bounds, ray->orig);
-		//float rightDistance2 = CalculateDistance2(pool[node->leftFirst + 1]->bounds, ray->orig);
-		//
-		//if (leftDistance2 < rightDistance2)
-		//{
-		//	TraverseTop(ray, pool[node->leftFirst], isShadowRay, depthRender);
-		//	if (ray->t * ray->t < rightDistance2) return;
-		//	Traverse(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
-		//}
-		//else
-		//{
-		//	TraverseTop(ray, pool[node->leftFirst + 1], isShadowRay, depthRender);
-		//	if (ray->t * ray->t < leftDistance2) return;
-		//	Traverse(ray, pool[node->leftFirst], isShadowRay, depthRender);
-		//}
+		/*float leftdistance2 = calculatedistance2(pool[node->leftfirst]->bounds, ray->orig);
+		float rightdistance2 = calculatedistance2(pool[node->leftfirst + 1]->bounds, ray->orig);
+		
+		if (leftdistance2 < rightdistance2)
+		{
+			traversetop(ray, pool[node->leftfirst], isshadowray, depthrender);
+			if (ray->t * ray->t < rightdistance2) return;
+			traverse(ray, pool[node->leftfirst + 1], isshadowray, depthrender);
+		}
+		else
+		{
+			traversetop(ray, pool[node->leftfirst + 1], isshadowray, depthrender);
+			if (ray->t * ray->t < leftdistance2) return;
+			traverse(ray, pool[node->leftfirst], isshadowray, depthrender);
+		}*/
 
 		// ------------------------------------------------------------------------------
 		// Ordered Traversal (A bit slower then distance calculations?)
 		// Determine the axis for which the child node centroids are furthest apart
 		// Use ray direction sign for that axis to determine near and far.
 		// ------------------------------------------------------------------------------
-		/*vec3 leftCentroid = pool[node->leftFirst]->bounds.CalculateCentroid();
-		vec3 rightCentroid = pool[node->leftFirst + 1]->bounds.CalculateCentroid();
+		/*vec3 leftCentroid = topPool[node->leftFirst]->bounds.CalculateCentroid();
+		vec3 rightCentroid = topPool[node->leftFirst + 1]->bounds.CalculateCentroid();
 
 		vec3 distances = glm::abs(leftCentroid - rightCentroid);
-		int axis = ReturnLargest(distances);
+		int axis = returnLargest(distances);
 
 		bool index = ray->dir[axis] > 0.0f;
-		//distancesAxis[node->leftFirst] = vec4(distances, axis);
 
 		int closeIndex = index ? node->leftFirst : node->leftFirst + 1;
 		int farIndex = index ? node->leftFirst + 1 : node->leftFirst;
@@ -93,19 +92,19 @@ void BVHTop::TraverseTop(Ray* ray, BVHNode* node, bool isShadowRay, int* depthRe
 		float closeT = ray->t;
 		float farT = ray->t;
 
-		float closeAABBdistance = IntersectRay(ray, pool[closeIndex]->bounds);
-		float farAABBdistance = IntersectRay(ray, pool[farIndex]->bounds);
+		float closeAABBdistance = IntersectRay(ray, topPool[closeIndex]->bounds);
+		float farAABBdistance = IntersectRay(ray, topPool[farIndex]->bounds);
 
 		if (closeAABBdistance < INFINITY)
 		{
-			this->Traverse(ray, pool[closeIndex], isShadowRay, depthRender);
+			this->TraverseTop(ray, topPool[closeIndex], isShadowRay, depthRender);
 			closeT = ray->t;
 			if (closeT < farAABBdistance) return;
 		}
 
 		if (farAABBdistance < INFINITY)
 		{
-			this->Traverse(ray, pool[farIndex], isShadowRay, depthRender);
+			this->TraverseTop(ray, topPool[farIndex], isShadowRay, depthRender);
 			farT = ray->t;
 			if (closeT < farT) ray->t = closeT;
 			else ray->t = farT;

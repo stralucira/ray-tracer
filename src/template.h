@@ -11,7 +11,7 @@
 #define RED					vec3(1.0f, 0.0f, 0.0f)
 #define GREEN				vec3(0.0f, 1.0f, 0.0f)
 #define BLUE				vec3(0.0f, 0.0f, 1.0f)
-#define BACKGROUND_COLOR	vec3(0.0f, 0.3f, 0.8f)
+#define BACKGROUND_COLOR	vec3(0.0f, 0.3f, 0.6f)
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?
@@ -380,6 +380,13 @@ inline const vec3 normalizeSSE(vec3 vector)
 	vec.z = uf.f[2];
 
 	return vec;
+}
+
+inline const int returnLargest(vec3 point)
+{
+	return point.x > point.y ?
+		(point.x > point.z ? 0 : 2) :
+		(point.y > point.z ? 1 : 2);
 }
 
 }; // namespace Tmpl8

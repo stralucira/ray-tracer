@@ -25,7 +25,6 @@ public:
 	
 	float CalculateDistance2(AABB bounds, vec3 point);
 	float IntersectRay(Ray* ray, AABB bounds);
-	int ReturnLargest(vec3 point);
 
 	// Variables
 	//uint* indices;
@@ -36,6 +35,7 @@ public:
 
 	std::vector<Primitive*>* primList;
 
-	int index;
 	vec3 centroid;
+	int index;
+	int traversalMode = 1;
 };

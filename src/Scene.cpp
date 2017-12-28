@@ -17,10 +17,12 @@ Scene::Scene(int scene_id)
 
 	switch (scene_id)
 	{
-	case 1:
+	case 1: // orignal scene
 		pos = vec3(0.0f, 0.0f, -1.0f);
 		lookAt = vec3(0.0f, 0.0f, 1.0f);
 		camera = new Camera(pos, lookAt);
+
+		MOVEMODIFIER = 0.50f;
 
 		lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
@@ -38,7 +40,7 @@ Scene::Scene(int scene_id)
 		primList.back()->index = index; index++;
 
 		primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
-		primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
 		primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
@@ -108,17 +110,62 @@ Scene::Scene(int scene_id)
 		this->LoadObject("cube.obj");
 
 		break;
-	case 2:
-		pos = vec3(0.0f, 0.0f, 1.0f);
-		lookAt = vec3(0.0f, 0.0f, -1.0f);
+	case 2: // lego han solo scene
+		pos = vec3(6.43f, 12.65f, 15.52f);
+		lookAt = pos + vec3(-0.51f, -0.14f, -0.85f);
 		camera = new Camera(pos, lookAt);
 
-		lightList.push_back(new Light(vec3(3.0f, -3.0f, -5.0f), vec3(100.0f, 100.0f, 100.0f)));
-		lightList.push_back(new Light(vec3(150.0f, 0.0f, -270.0f), vec3(1000.0f, 1000.0f, 1000.0f)));
+		MOVEMODIFIER = 1.00f;
 
-		//this->LoadObject("cube.obj");
+		lightList.push_back(new Light(vec3(0.50f, 16.77f, 10.85f), vec3(200.0f, 200.0f, 200.0f)));
+		lightList.push_back(new Light(vec3(12.37f, 19.72f, 11.91f), vec3(200.0f, 200.0f, 200.0f)));
+
+		this->LoadObject("han.obj");
+
+		break;
+	case 3: // x-wing scene
+		pos = vec3(1697.0f, 231.0f, -967.0f);
+		lookAt = pos + vec3(-0.41f, -0.24f, -0.88f);
+		camera = new Camera(pos, lookAt);
+
+		MOVEMODIFIER = 10.00f;
+
+		lightList.push_back(new Light(vec3(1409.98f, 107.04f, -1637.97f), vec3(200.0f, 200.0f, 200.0f)));
+		lightList.push_back(new Light(vec3(1467.80f, 111.66f, -1881.94f), vec3(1000.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(1468.24f, 42.31f, -1891.45f), vec3(1000.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(1351.85f, 42.45f, -1887.67f), vec3(1000.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(1351.50f, 112.44f, -1888.60f), vec3(1000.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(1411.23f, 134.46f, -1694.33f), vec3(1000.0f, 1000.0f, 1000.0f)));
+
+		this->LoadObject("x-wing.obj");
+
+		break;
+	case 4: // tie fighter scene
+		pos = vec3(88.94f, 47.57f, -175.54f);
+		lookAt = pos + vec3(0.55f, -0.38f, -0.74f);
+		camera = new Camera(pos, lookAt);
+
+		MOVEMODIFIER = 10.00f;
+
+		lightList.push_back(new Light(vec3(143.12f, 11.31f, -271.44f), vec3(200.0f, 200.0f, 200.0f)));
+		lightList.push_back(new Light(vec3(149.62f, -12.83f, -274.64f), vec3(0.0f, 200.0f, 0.0f)));
+		lightList.push_back(new Light(vec3(132.69f, 0.15f, -313.19f), vec3(100.0f, 0.0f, 0.0f)));
+		lightList.push_back(new Light(vec3(157.25f, -0.39f, -312.82f), vec3(100.0f, 0.0f, 0.0f)));
+
+
+		this->LoadObject("TIE-fighter.obj");
+
+		break;
+	case 5: // millennium falcon scene
+		pos = vec3(0, 1600, -6000);
+		lookAt = pos + vec3(0.0f, -0.48f, 0.88f);
+		camera = new Camera(pos, lookAt);
+
+		MOVEMODIFIER = 10.00f;
+
+		lightList.push_back(new Light(vec3(180.0f, 0.0f, -2850.0f), vec3(200.0f, 200.0f, 200.0f)));
+
 		this->LoadObject("millenium-falcon.obj");
-		//this->LoadObject("x-wing.obj");
 
 		break;
 	}
@@ -135,7 +182,7 @@ Scene::Scene(int scene_id)
 	// Dynamic scene BVH builder
 	//bvhTop = new BVHTop(&primList, &bvhList);
 
-	printf("-----------------------\n Done constructing BVH in %.2f seconds\n-----------------------\n", lastftime);
+	printf("-----------------------\n BVH constructed in %.3f seconds\n-----------------------\n", lastftime);
 }
 
 // wavefront .obj file loader
@@ -165,12 +212,11 @@ void Scene::LoadObject(std::string inputfile)
 
 			vec3 vertices[3];
 			vec3 normal;
-			vec2 texcoord;
+			//vec2 texcoord;
 
 			// Loop over vertices in the face.
 			for (int v = 0; v < fv; v++)
 			{
-
 				// access to vertex
 				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
 				float vx = attrib.vertices[3 * idx.vertex_index + 0];
@@ -231,10 +277,10 @@ void Scene::LoadObject(std::string inputfile)
 	}
 
 	// Top level BVH loader
-	bvhList.push_back(new BVH(&primLoadList));
+	/*bvhList.push_back(new BVH(&primLoadList));
 	bvhList.back()->boundingBox = CalculateObjectBounds(primLoadList);
 	bvhList.back()->centroid = CalculateObjectCentroid(bvhList.back()->boundingBox);
-	bvhList.back()->index = index;
+	bvhList.back()->index = index;*/
 	index++;
 
 	printf("-----------------------\n Done loading polygons \n-----------------------\n");
