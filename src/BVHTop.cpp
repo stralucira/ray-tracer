@@ -10,7 +10,7 @@ void BVHTop::ConstructBVHTop(std::vector<BVH*>* bvhList)
 		this->primIndices[i] = (*primList)[i]->index;
 	}*/
 
-	topPool = reinterpret_cast<BVHNode**>(_aligned_malloc((bvhList->size() * 2 - 1) * sizeof(BVHNode), 64));
+	topPool = reinterpret_cast<BVHNode**>(_mm_malloc((bvhList->size() * 2 - 1) * sizeof(BVHNode), 64));
 	//topPool = new BVHNode*[bvhList->size() * 2 - 1];
 	//this->bvhIndices = new int[bvhList->size()];
 	for (size_t i = 0; i < bvhList->size(); i++)

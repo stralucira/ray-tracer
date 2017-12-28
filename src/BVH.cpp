@@ -12,7 +12,7 @@ void BVH::ConstructBVH(std::vector<Primitive*>* primList)
 
 	// allocate BVH root node
 	//pool = new BVHNode*[primList->size() * 2 - 1];
-	pool = reinterpret_cast<BVHNode**>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 64));
+	pool = reinterpret_cast<BVHNode**>(_mm_malloc((primList->size() * 2 - 1) * sizeof(BVHNode), 64));
 	//distancesAxis = new vec4[primList->size() * 2 - 1];
 	//distancesAxis = reinterpret_cast<vec4*>(_aligned_malloc((primList->size() * 2 - 1) * sizeof(vec4), 64));
 	for (size_t i = 0; i < (primList->size() * 2 - 1); i++)

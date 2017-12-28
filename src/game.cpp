@@ -24,7 +24,7 @@ void Game::Init()
 	// Fear is the path to the dark side
 	// --------------------------------------------------------------
 	
-	LoadScene(5); // <-- Change scene here
+	LoadScene(1); // <-- Change scene here
 }
 
 void Game::LoadScene(int scene_id)
@@ -135,6 +135,22 @@ void Game::KeyDown(int a_Key)
 		// Reset Camera Position:
 	case SDL_SCANCODE_R:
 		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt);
+		break;
+
+	case SDL_SCANCODE_1:
+		LoadScene(1);
+		break;
+	case SDL_SCANCODE_2:
+		LoadScene(2);
+		break;
+	case SDL_SCANCODE_3:
+		LoadScene(3);
+		break;
+	case SDL_SCANCODE_4:
+		LoadScene(4);
+		break;
+	case SDL_SCANCODE_5:
+		LoadScene(5);
 		break;
 	}
 }
