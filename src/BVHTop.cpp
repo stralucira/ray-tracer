@@ -11,11 +11,12 @@ void BVHTop::ConstructBVHTop(std::vector<BVH*>* bvhList)
 	}*/
 
 	topPool = reinterpret_cast<BVH**>(_mm_malloc((bvhList->size() * 2 - 1) * sizeof(BVH), 64));
-	//topPool = new BVHNode*[bvhList->size() * 2 - 1];
+	//topPool = new BVH*[bvhList->size() * 2 - 1];
 	//this->bvhIndices = new int[bvhList->size()];
 	for (size_t i = 0; i < bvhList->size(); i++)
 	{
 		topPool[i] = new BVH();
+		topPool[i] = (*bvhList)[i];
 		//this->bvhIndices[i] = (*bvhList)[i]->index;
 	}
 	topRoot = topPool[0];

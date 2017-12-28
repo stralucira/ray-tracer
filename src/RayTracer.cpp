@@ -197,10 +197,8 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	if (renderShadow)
 	{
 #if ENABLEBVH
-		//scene->topbvh->TraverseTop(&shadowRay, scene->topbvh->topRoot, true);
-		//if (shadowRay.t < tToLight) { return BLACK; }
-
-		scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+		scene->bvhTop->TraverseTop(&shadowRay, scene->bvhTop->topRoot, true);
+		//scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
 		//scene->bvh->Traverse(&shadowRay, scene->bvhTop->topRoot, true);
 		if (shadowRay.t < tToLight) { return BLACK; }
 #else

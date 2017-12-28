@@ -19,7 +19,7 @@ Scene::Scene(int scene_id)
 	{
 	case 1: // orignal scene
 		pos = vec3(0.0f, 0.0f, -1.0f);
-		lookAt = vec3(0.0f, 0.0f, 1.0f);
+		lookAt = pos + vec3(0.0f, 0.0f, 1.0f);
 		camera = new Camera(pos, lookAt);
 
 		MOVEMODIFIER = 0.50f;
@@ -166,6 +166,19 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(180.0f, 0.0f, -2850.0f), vec3(200.0f, 200.0f, 200.0f)));
 
 		this->LoadObject("millenium-falcon.obj");
+
+		break;
+	case 0:
+		pos = vec3(0.0f, 0.0f, -1.0f);
+		lookAt = pos + vec3(0.0f, 0.0f, 1.0f);
+		camera = new Camera(pos, lookAt);
+
+		MOVEMODIFIER = 0.10f;
+
+		lightList.push_back(new Light(vec3(0.0f, 0.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
+
+		this->LoadObject("cube.obj");
+		this->LoadObject("f-16.obj");
 
 		break;
 	}
