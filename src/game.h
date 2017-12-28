@@ -7,7 +7,7 @@
 #define ALTERNATERENDERMODE 1
 #define ENABLEBINNING 1
 #define ENABLEBVH 1
-#define ENABLETOPBVH 1
+#define ENABLETOPBVH 0
 
 #include "template.h"
 

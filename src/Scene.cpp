@@ -179,7 +179,7 @@ Scene::Scene(int scene_id)
 
 		//this->LoadObject("han.obj");
 		this->LoadObject("f-16.obj");
-		//this->LoadObject("cube.obj");
+		this->LoadObject("cube.obj");
 
 		break;
 	}

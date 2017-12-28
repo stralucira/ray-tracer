@@ -16,7 +16,7 @@ int polyCount = 0;
 void Game::Init()
 {
 	// --------------------------------------------------------------
-	// 1 the original scene, better to disable alternate render mode
+	// 1 the original scene DO NOT USE WITH TOP BVH
 	// 2 lego han solo, 8k triangles
 	// 3 x-wing, 34k triangles
 	// 4 tie fighter, 54k triangles
@@ -24,7 +24,7 @@ void Game::Init()
 	// Fear is the path to the dark side
 	// --------------------------------------------------------------
 	
-	LoadScene(0); // <-- Change scene here
+	LoadScene(3); // <-- Change scene here
 }
 
 void Game::LoadScene(int scene_id)
@@ -126,15 +126,17 @@ void Game::KeyDown(int a_Key)
 
 		// Toggle Traversal Mode
 	case SDL_SCANCODE_T:
+#if ENABLETOPBVH
 		if (rayTracer->scene->bvhTop->traversalMode != 2)
 			rayTracer->scene->bvhTop->traversalMode++;
 		else
 			rayTracer->scene->bvhTop->traversalMode = 0;
-
+#else
 		if (rayTracer->scene->bvh->traversalMode != 2)
 			rayTracer->scene->bvh->traversalMode++;
 		else
 			rayTracer->scene->bvh->traversalMode = 0;
+#endif
 		break;
 
 		// Reset Camera Position:
