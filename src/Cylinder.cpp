@@ -77,6 +77,11 @@ bool Cylinder::intersect(Ray* ray)
 	}
 }
 
+bool Cylinder::getIsLight()
+{
+	return false;
+}
+
 vec3 Cylinder::getNormal(vec3 point)
 {
 	vec3 co = point - this->centroid;

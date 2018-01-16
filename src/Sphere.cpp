@@ -27,6 +27,11 @@ bool Sphere::intersect(Ray* ray)
 	return true;
 }
 
+bool Sphere::getIsLight()
+{
+	return false;
+}
+
 vec3 Sphere::getNormal(vec3 point)
 {
 	return normalize(point - this->centroid);

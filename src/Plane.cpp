@@ -18,6 +18,11 @@ bool Plane::intersect(Ray* ray)
 	return false;
 }
 
+bool Plane::getIsLight()
+{
+	return false;
+}
+
 vec3 Plane::getNormal(vec3 point)
 {
 	return this->normal;

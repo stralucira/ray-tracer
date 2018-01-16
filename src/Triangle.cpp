@@ -34,6 +34,11 @@ bool Triangle::intersect(Ray* ray)
 	return false;
 }
 
+bool Triangle::getIsLight()
+{
+	return this->isLight;
+}
+
 vec3 Triangle::getNormal(vec3 point)
 {
 	return this->normal;

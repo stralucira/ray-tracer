@@ -52,6 +52,11 @@ bool Torus::intersect(Ray* ray)
 	return true;
 }
 
+bool Torus::getIsLight()
+{
+	return false;
+}
+
 vec3 Torus::getNormal(vec3 point)
 {
 	vec3 centerToPoint = point - this->centroid;

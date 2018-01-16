@@ -12,10 +12,10 @@ public:
 	Material material = Material(Material::Shader::DIFFUSE);
 
 	virtual bool intersect(Ray* ray) = 0;
+	virtual bool getIsLight() = 0;
 	virtual vec3 getNormal(vec3 point) = 0;
 	virtual AABB* calculateAABB() = 0;
 
 	vec3 centroid;
 	AABB* bounds;
-	int index;
 };

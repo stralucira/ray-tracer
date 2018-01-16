@@ -25,4 +25,8 @@ public:
 	bool depthRendering = false;
 	bool renderShadow = true;
 	bool inShadow;
+
+	vec3 Sample(Ray* ray, int depth);
+	vec3 CosineWeightedDiffuseReflection(vec3 normal);
+	vec3 Trace(Ray* ray);
 };

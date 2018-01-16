@@ -259,7 +259,8 @@ void RayTracer::Render()
 		for (x = 0; x < SCRWIDTH; x++)
 		{
 			Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
-			vec3 color = GetColor(x, y, &ray, 0);
+			//vec3 color = GetColor(x, y, &ray, 0);
+			vec3 color = Sample(&ray, 0);
 
 			color *= 255.0f;
             int r = glm::min((int)color.x, 255);
@@ -279,4 +280,80 @@ void RayTracer::Render()
 			this->screen->Plot(x, y, this->buffer[y][x]);
 		}
 	}
+}
+
+// -----------------------------------------------------------
+// Pathtracing stuff
+// -----------------------------------------------------------
+
+vec3 RayTracer::Trace(Ray* ray)
+{
+	float nearest = INFINITY;
+
+	scene->bvh->Traverse(ray, scene->bvh->root);
+	nearest = ray->t;
+
+	if (nearest == INFINITY)
+	{
+		return BACKGROUND_COLOR;
+	}
+	else
+	{
+		return ray->orig + ray->dir * nearest;
+	}
+}
+
+vec3 RayTracer::Sample(Ray* ray, int depth)
+{
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
+	{
+		return BACKGROUND_COLOR;
+	}
+	
+	vec3 hitPoint = Trace(ray);
+
+	if (ray->t == INFINITY)
+	{
+		return BACKGROUND_COLOR;
+	}
+
+	if (ray->hit->getIsLight())
+	{
+		return ray->hit->material.Kd;
+	}
+
+	vec3 normal = ray->hit->getNormal(hitPoint);
+
+	// continue in random direction
+	vec3 R = CosineWeightedDiffuseReflection(normal);
+	Ray newRay = Ray(hitPoint, R);
+
+	// update throughput
+	vec3 BRDF = ray->hit->material.Kd * INVPI;
+	
+	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
+
+	return PI * 2.0f * BRDF * Ei;
+}
+
+vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
+{
+	float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float r = sqrt(r0);
+	float theta = 2 * PI * r1;
+	float x = r * cosf(theta);
+	float y = r * sinf(theta);
+
+	vec3 dir = vec3(x, y, sqrt(1 - r0));
+
+	vec3 randomDir = normalize(vec3(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX)));
+
+	vec3 t = cross(randomDir, normal);
+	vec3 b = cross(normal, t);
+
+	mat3 tangentSpace = mat3(b, t, normal);
+
+	vec3 transformedDir = tangentSpace * dir;
+
+	return transformedDir;
 }

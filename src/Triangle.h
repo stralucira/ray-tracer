@@ -14,29 +14,24 @@ public:
 		this->centroid = calculateCentroid();
 		this->bounds = calculateAABB();
 	}
-	Triangle(vec3 a, vec3 b, vec3 c) : Primitive(a)
+	Triangle(vec3 a, vec3 b, vec3 c, bool sign = false, bool isLight = false) : Primitive(a)
 	{
 		this->a = a;
 		this->b = b;
 		this->c = c;
-		this->normal = normalize(cross(b - a, c - a));
+		
+		if (sign) this->normal = -normalize(cross(b - a, c - a));
+		else this->normal = normalize(cross(b - a, c - a));
 
 		this->centroid = calculateCentroid();
 		this->bounds = calculateAABB();
-	}
-	Triangle(vec3 a, vec3 b, vec3 c, int sign) : Primitive(a)
-	{
-		this->a = a;
-		this->b = b;
-		this->c = c;
-		this->normal = -normalize(cross(b - a, c - a));
 
-		this->centroid = calculateCentroid();
-		this->bounds = calculateAABB();
+		this->isLight = isLight;
 	}
 	~Triangle();
 
 	bool intersect(Ray* ray);
+	bool getIsLight();
 	vec3 getNormal(vec3 point);
 
 	AABB* calculateAABB();
@@ -44,4 +39,6 @@ public:
 
 	vec3 a, b, c;
 	vec3 normal;
+	float area;
+	bool isLight;
 };

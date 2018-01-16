@@ -16,6 +16,7 @@ public:
 	~Cylinder();
 
 	bool intersect(Ray* ray);
+	bool getIsLight();
 	vec3 getNormal(vec3 point);
 
 	AABB* calculateAABB();
