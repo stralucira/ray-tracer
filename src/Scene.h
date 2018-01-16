@@ -1,6 +1,7 @@
 #pragma once
 #include "Primitive.h"
 #include "Light.h"
+#include "SphericalLight.h"
 #include "Camera.h"
 #include "BVH.h"
 #include "BVHTop.h"
