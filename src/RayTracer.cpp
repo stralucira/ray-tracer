@@ -9,6 +9,44 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 	this->screen = screen;
 }
 
+void RayTracer::Render()
+{
+	omp_set_num_threads(iCPU2);
+	int x = 0;
+
+#pragma omp parallel for private(x)
+	for (int y = 0; y < SCRHEIGHT; y++)
+	{
+		for (x = 0; x < SCRWIDTH; x++)
+		{
+			Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
+			//vec3 color = GetColor(x, y, &ray, 0); // Whitted-style ray tracing
+			vec3 color = Sample(&ray, 0); // Pathtracing
+
+			color *= 255.0f;
+			int r = glm::min((int)color.x, 255);
+			int g = glm::min((int)color.y, 255);
+			int b = glm::min((int)color.z, 255);
+
+			buffer[y][x] = ((r << 16) + (g << 8) + (b));
+			this->screen->Plot(x, y, ((r << 16) + (g << 8) + (b)));
+		}
+	}
+
+#pragma omp parallel for private(x)
+	for (int y = 0; y < SCRHEIGHT; y++)
+	{
+		for (x = 0; x < SCRWIDTH; x++)
+		{
+			this->screen->Plot(x, y, this->buffer[y][x]);
+		}
+	}
+}
+
+// -----------------------------------------------------------
+// Whitted-style ray tracing stuff
+// -----------------------------------------------------------
+
 vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 {
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
@@ -248,40 +286,6 @@ float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)
 	}
 }
 
-void RayTracer::Render()
-{
-	omp_set_num_threads(iCPU2);
-	int x = 0;
-	
-	#pragma omp parallel for private(x)
-	for (int y = 0; y < SCRHEIGHT; y++)
-	{
-		for (x = 0; x < SCRWIDTH; x++)
-		{
-			Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
-			//vec3 color = GetColor(x, y, &ray, 0);
-			vec3 color = Sample(&ray, 0);
-
-			color *= 255.0f;
-            int r = glm::min((int)color.x, 255);
-            int g = glm::min((int)color.y, 255);
-            int b = glm::min((int)color.z, 255);
-			
-			buffer[y][x] = ((r << 16) + (g << 8) + (b));
-			this->screen->Plot(x, y, ((r << 16) + (g << 8) + (b)));
-		}
-	}
-	
-	#pragma omp parallel for private(x)
-	for (int y = 0; y < SCRHEIGHT; y++)
-	{
-		for (x = 0; x < SCRWIDTH; x++)
-		{
-			this->screen->Plot(x, y, this->buffer[y][x]);
-		}
-	}
-}
-
 // -----------------------------------------------------------
 // Pathtracing stuff
 // -----------------------------------------------------------
@@ -330,7 +334,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 
 	// update throughput
 	vec3 BRDF = ray->hit->material.Kd * INVPI;
-	
+
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
 
 	return PI * 2.0f * BRDF * Ei;
