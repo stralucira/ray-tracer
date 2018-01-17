@@ -29,4 +29,6 @@ public:
 	vec3 Sample(Ray* ray, int depth);
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 	vec3 Trace(Ray* ray);
+
+	vec3 SampleSkydome(HDRBitmap* skydome, Ray* ray);
 };

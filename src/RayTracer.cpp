@@ -312,13 +312,15 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
 	{
 		return BACKGROUND_COLOR;
+		//return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 	
 	vec3 hitPoint = Trace(ray);
 
 	if (ray->t == INFINITY)
 	{
-		return BACKGROUND_COLOR;
+		//return BACKGROUND_COLOR;
+		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 
 	if (ray->hit->getIsLight())
@@ -360,4 +362,12 @@ vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 	vec3 transformedDir = tangentSpace * dir;
 
 	return transformedDir;
+}
+
+vec3 RayTracer::SampleSkydome(HDRBitmap* skydome, Ray* ray)
+{
+	float u = fmodf(0.5f * (1.0f + atan2(ray->dir.x, -ray->dir.z) * INVPI), 1.0f);
+	float v = acosf(ray->dir.y) * INVPI;
+	int pixel = (int)(u * (float)(skydome->width - 1)) + ((int)(v * (float)(skydome->height - 1)) * skydome->width);
+	return *reinterpret_cast<vec3*>(&skydome->buffer[pixel]);
 }

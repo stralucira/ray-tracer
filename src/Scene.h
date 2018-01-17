@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "BVH.h"
 #include "BVHTop.h"
+#include "HDRBitmap.h"
 
 class Scene
 {
@@ -14,12 +15,12 @@ public:
 	void LoadObject(std::string filename);
 
 	std::vector<Light*> lightList;
-	std::vector<Primitive*> lightList2;
 	std::vector<Primitive*> primList;
 	std::vector<std::vector<Primitive*>> objectList;
 	std::vector<BVH*> bvhList;
 
-	//std::vector<std::vector<Primitive*>> objectList;
+	HDRBitmap* skydome;
+
 	BVHTop* bvhTop;
 	BVH* bvh;
 
