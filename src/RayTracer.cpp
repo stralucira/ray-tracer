@@ -9,11 +9,12 @@ RayTracer::RayTracer(Scene* scene, Surface* screen)
 	this->screen = screen;	
 }
 
-void RayTracer::Render(int samples)
+int RayTracer::Render(int samples)
 {
 	omp_set_num_threads(iCPU2);
 	int x = 0;
 
+	int pixelCount = 0;
 	float invSample = 1 / (float)samples;
 
 #pragma omp parallel for private(x)
@@ -33,6 +34,8 @@ void RayTracer::Render(int samples)
 			int g = glm::min((int)accumulator[y][x].g, 255);
 			int b = glm::min((int)accumulator[y][x].b, 255);
 
+			pixelCount += r + g + b;
+
 			buffer[y][x] = ((r << 16) + (g << 8) + b);
 		}
 	}
@@ -45,6 +48,8 @@ void RayTracer::Render(int samples)
 			this->screen->Plot(x, y, this->buffer[y][x]);
 		}
 	}
+
+	return pixelCount;
 }
 
 // -----------------------------------------------------------

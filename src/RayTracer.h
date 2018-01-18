@@ -16,13 +16,13 @@ public:
 	vec3 accumulator[SCRHEIGHT][SCRWIDTH];
 	
 	RayTracer(Scene* scene, Surface* screen);
+	int Render(int samples);
 
 	vec3 GetColor(int x, int y, Ray* ray, int depth);
 	vec3 DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Material mat);
 
 	vec3 Reflect(vec3 dir, vec3 normal);
 	float Fresnel(vec3 dir, vec3 normal, float index);
-	void Render(int samples);
 
 	bool depthRendering = false;
 	bool renderShadow = true;

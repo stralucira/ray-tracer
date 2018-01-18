@@ -173,7 +173,7 @@ void Game::Tick( float dt )
 {
 	++frameCount;
 
-	rayTracer->Render(frameCount);
+	int pixelCount = rayTracer->Render(frameCount);
 
 	char buffer[500];
 	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt,
@@ -202,7 +202,7 @@ void Game::Tick( float dt )
 	sprintf(buffer, "Press V to toggle shadows.");
 	screen->Print(buffer, 2, 32, 0xffffff);
 
-	sprintf(buffer, "Static tick_count: %d", frameCount);
+	sprintf(buffer, "Pixel summed: %i frame count: %i", pixelCount, frameCount);
 	screen->Print(buffer, 2, 42, 0xffffff);
 	
 }
