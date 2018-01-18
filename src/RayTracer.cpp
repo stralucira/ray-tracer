@@ -312,17 +312,19 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
 	{
 		return BACKGROUND_COLOR;
-		//return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 	
+	// trace ray
 	vec3 hitPoint = Trace(ray);
 
+	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
 		//return BACKGROUND_COLOR;
 		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 
+	// terminate if we hit a light source
 	if (ray->hit->getIsLight())
 	{
 		return ray->hit->material.Kd;
@@ -336,15 +338,13 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 
 	// update throughput
 	vec3 BRDF = ray->hit->material.Kd * INVPI;
-
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
-
 	return PI * 2.0f * BRDF * Ei;
 }
 
 vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 {
-	float r0 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX), r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float r0 = (float)rand() / RAND_MAX, r1 = (float)rand() / RAND_MAX;
 	float r = sqrt(r0);
 	float theta = 2 * PI * r1;
 	float x = r * cosf(theta);
@@ -352,16 +352,12 @@ vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 
 	vec3 dir = vec3(x, y, sqrt(1 - r0));
 
-	vec3 randomDir = normalize(vec3(static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX)));
-
+	vec3 randomDir = normalize(vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
 	vec3 t = cross(randomDir, normal);
 	vec3 b = cross(normal, t);
-
 	mat3 tangentSpace = mat3(b, t, normal);
 
-	vec3 transformedDir = tangentSpace * dir;
-
-	return transformedDir;
+	return tangentSpace * dir;
 }
 
 vec3 RayTracer::SampleSkydome(HDRBitmap* skydome, Ray* ray)
