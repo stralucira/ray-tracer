@@ -4,15 +4,19 @@
 int iCPU2 = omp_get_num_procs();
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
-{
+: accumulator(SCRWIDTH, vector<vec3>(SCRHEIGHT)){
 	this->scene = scene;
-	this->screen = screen;
+	this->screen = screen;	
 }
 
-void RayTracer::Render()
+void RayTracer::Render(int samples)
 {
 	omp_set_num_threads(iCPU2);
 	int x = 0;
+
+	double sample_inv = (double) 1 / (double) samples;
+
+	printf("%0.5f", sample_inv);
 
 #pragma omp parallel for private(x)
 	for (int y = 0; y < SCRHEIGHT; y++)
@@ -23,13 +27,19 @@ void RayTracer::Render()
 			//vec3 color = GetColor(x, y, &ray, 0); // Whitted-style ray tracing
 			vec3 color = Sample(&ray, 0); // Pathtracing
 
-			color *= 255.0f;
-			int r = glm::min((int)color.x, 255);
-			int g = glm::min((int)color.y, 255);
-			int b = glm::min((int)color.z, 255);
+			accumulator[y][x].x = (accumulator[y][x].x * (1 - sample_inv) + color.x * sample_inv);
+			accumulator[y][x].y = (accumulator[y][x].y * (1 - sample_inv) + color.y * sample_inv);
+			accumulator[y][x].z = (accumulator[y][x].z * (1 - sample_inv) + color.z * sample_inv);
 
-			buffer[y][x] = ((r << 16) + (g << 8) + (b));
-			this->screen->Plot(x, y, ((r << 16) + (g << 8) + (b)));
+			vec3 output = accumulator[y][x];
+
+			output *= 255.0f;
+			int r = glm::min((int)output.x, 255);
+			int g = glm::min((int)output.y, 255);
+			int b = glm::min((int)output.z, 255);
+
+			buffer[y][x] = ((r << 16) + (g << 8) + b);
+			//this->screen->Plot(x, y, ((r << 16)/sample_size + (g << 8)/sample_size + (b)/sample_size));
 		}
 	}
 

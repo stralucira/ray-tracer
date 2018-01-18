@@ -25,11 +25,12 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(3); // <-- Change scene here
+	LoadScene(1); // <-- Change scene here
 }
 
 void Game::LoadScene(int scene_id)
 {
+	tick_count = 0;
 	scene = new Scene(scene_id);
 	rayTracer = new RayTracer(scene, screen);
 	polyCount += rayTracer->scene->bvh->primList->size();
@@ -44,6 +45,8 @@ void Game::HandleInput( float dt ) { }
 
 void Game::KeyDown(int a_Key)
 {
+	tick_count = 1;
+
 	switch (a_Key)
 	{
 		// Scene loader, needs destructor
@@ -168,7 +171,10 @@ void Game::KeyDown(int a_Key)
 // -----------------------------------------------------------
 void Game::Tick( float dt )
 {
-	rayTracer->Render();
+
+	++tick_count;
+
+	rayTracer->Render(tick_count);
 
 	char buffer[500];
 	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt,
@@ -196,5 +202,8 @@ void Game::Tick( float dt )
 
 	sprintf(buffer, "Press V to toggle shadows.");
 	screen->Print(buffer, 2, 32, 0xffffff);
+
+	sprintf(buffer, "Static tick_count: %d", tick_count);
+	screen->Print(buffer, 2, 42, 0xffffff);
 	
 }

@@ -32,6 +32,7 @@ public:
 	void LoadScene( int scene_id );
 private:
 	Surface* screen;
+	int tick_count;
 };
 
 }; // namespace Tmpl8

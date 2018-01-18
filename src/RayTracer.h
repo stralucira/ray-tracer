@@ -12,6 +12,8 @@ public:
 	Surface* screen;
 	Scene* scene;
 	Pixel buffer[SCRHEIGHT][SCRWIDTH];
+
+	vector<vector<vec3>> accumulator;
 	
 	RayTracer(Scene* scene, Surface* screen);
 
@@ -20,7 +22,7 @@ public:
 
 	vec3 Reflect(vec3 dir, vec3 normal);
 	float Fresnel(vec3 dir, vec3 normal, float index);
-	void Render();
+	void Render(int samples);
 
 	bool depthRendering = false;
 	bool renderShadow = true;
