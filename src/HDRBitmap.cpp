@@ -12,7 +12,7 @@ HDRBitmap::HDRBitmap(const char* inputfile)
 	width = FreeImage_GetWidth(dib);
 	height = FreeImage_GetHeight(dib);
 	
-	buffer = (vec4*)_aligned_malloc(sizeof(vec4)* width * height, 16);
+	buffer = (vec4*)_mm_malloc(sizeof(vec4)* width * height, 16);
 	for (int y = 0; y < height; y++)
 	{
 		vec3* line = (vec3*)FreeImage_GetScanLine(dib, height - 1 - y);
