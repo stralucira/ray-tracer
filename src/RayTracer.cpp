@@ -4,7 +4,7 @@
 int iCPU2 = omp_get_num_procs();
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
-: accumulator(SCRWIDTH, vector<vec3>(SCRHEIGHT)){
+{
 	this->scene = scene;
 	this->screen = screen;	
 }
@@ -14,9 +14,7 @@ void RayTracer::Render(int samples)
 	omp_set_num_threads(iCPU2);
 	int x = 0;
 
-	double sample_inv = (double) 1 / (double) samples;
-
-	printf("%0.5f", sample_inv);
+	float invSample = 1 / (float)samples;
 
 #pragma omp parallel for private(x)
 	for (int y = 0; y < SCRHEIGHT; y++)
@@ -27,19 +25,15 @@ void RayTracer::Render(int samples)
 			//vec3 color = GetColor(x, y, &ray, 0); // Whitted-style ray tracing
 			vec3 color = Sample(&ray, 0); // Pathtracing
 
-			accumulator[y][x].x = (accumulator[y][x].x * (1 - sample_inv) + color.x * sample_inv);
-			accumulator[y][x].y = (accumulator[y][x].y * (1 - sample_inv) + color.y * sample_inv);
-			accumulator[y][x].z = (accumulator[y][x].z * (1 - sample_inv) + color.z * sample_inv);
+			accumulator[y][x].r = (accumulator[y][x].r * (1 - invSample) + color.r * invSample * 255.0f);
+			accumulator[y][x].g = (accumulator[y][x].g * (1 - invSample) + color.y * invSample * 255.0f);
+			accumulator[y][x].b = (accumulator[y][x].b * (1 - invSample) + color.z * invSample * 255.0f);
 
-			vec3 output = accumulator[y][x];
-
-			output *= 255.0f;
-			int r = glm::min((int)output.x, 255);
-			int g = glm::min((int)output.y, 255);
-			int b = glm::min((int)output.z, 255);
+			int r = glm::min((int)accumulator[y][x].r, 255);
+			int g = glm::min((int)accumulator[y][x].g, 255);
+			int b = glm::min((int)accumulator[y][x].b, 255);
 
 			buffer[y][x] = ((r << 16) + (g << 8) + b);
-			//this->screen->Plot(x, y, ((r << 16)/sample_size + (g << 8)/sample_size + (b)/sample_size));
 		}
 	}
 
@@ -375,5 +369,5 @@ vec3 RayTracer::SampleSkydome(HDRBitmap* skydome, Ray* ray)
 	float u = fmodf(0.5f * (1.0f + atan2(ray->dir.x, -ray->dir.z) * INVPI), 1.0f);
 	float v = acosf(ray->dir.y) * INVPI;
 	int pixel = (int)(u * (float)(skydome->width - 1)) + ((int)(v * (float)(skydome->height - 1)) * skydome->width);
-	return *reinterpret_cast<vec3*>(&skydome->buffer[pixel]);
+	return skydome->buffer[pixel];
 }

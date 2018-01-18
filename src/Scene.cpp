@@ -26,6 +26,8 @@ Scene::Scene(int scene_id)
 
 		MOVEMODIFIER = 0.50f;
 
+		skydome = new HDRBitmap("space.hdr");
+
 		lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 

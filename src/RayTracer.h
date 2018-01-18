@@ -13,7 +13,7 @@ public:
 	Scene* scene;
 	Pixel buffer[SCRHEIGHT][SCRWIDTH];
 
-	vector<vector<vec3>> accumulator;
+	vec3 accumulator[SCRHEIGHT][SCRWIDTH];
 	
 	RayTracer(Scene* scene, Surface* screen);
 

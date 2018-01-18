@@ -30,7 +30,7 @@ void Game::Init()
 
 void Game::LoadScene(int scene_id)
 {
-	tick_count = 0;
+	frameCount = 0;
 	scene = new Scene(scene_id);
 	rayTracer = new RayTracer(scene, screen);
 	polyCount += rayTracer->scene->bvh->primList->size();
@@ -45,7 +45,7 @@ void Game::HandleInput( float dt ) { }
 
 void Game::KeyDown(int a_Key)
 {
-	tick_count = 1;
+	frameCount = 1;
 
 	switch (a_Key)
 	{
@@ -171,10 +171,9 @@ void Game::KeyDown(int a_Key)
 // -----------------------------------------------------------
 void Game::Tick( float dt )
 {
+	++frameCount;
 
-	++tick_count;
-
-	rayTracer->Render(tick_count);
+	rayTracer->Render(frameCount);
 
 	char buffer[500];
 	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt,
@@ -203,7 +202,7 @@ void Game::Tick( float dt )
 	sprintf(buffer, "Press V to toggle shadows.");
 	screen->Print(buffer, 2, 32, 0xffffff);
 
-	sprintf(buffer, "Static tick_count: %d", tick_count);
+	sprintf(buffer, "Static tick_count: %d", frameCount);
 	screen->Print(buffer, 2, 42, 0xffffff);
 	
 }
