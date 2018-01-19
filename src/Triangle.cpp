@@ -28,10 +28,17 @@ bool Triangle::intersect(Ray* ray)
 	if (t > 0.0001f)
 	{
 		ray->t = t;
+		ray->u = u;
+		ray->v = v;
 		return true;
 	}
 
 	return false;
+}
+
+vec2 Triangle::getTexCoord(Ray* ray)
+{
+	return uv0 + ray->u * (uv1 - uv0) + ray->v * (uv2 - uv0);
 }
 
 bool Triangle::getIsLight()

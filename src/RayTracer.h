@@ -33,4 +33,5 @@ public:
 	vec3 Trace(Ray* ray);
 
 	vec3 SampleSkydome(HDRBitmap* skydome, Ray* ray);
+	vec3 sampleTexturePoint(Surface* tex, const vec2 uv);
 };

@@ -14,6 +14,7 @@ public:
 	~Plane();
 
 	bool intersect(Ray* ray);
+	vec2 getTexCoord(Ray * ray);
 	bool getIsLight();
 	vec3 getNormal(vec3 point);
 

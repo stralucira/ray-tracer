@@ -6,6 +6,8 @@ Ray::Ray(vec3 origin, vec3 direction)
 	this->orig = origin;
 	this->dir = direction;
 	this->t = INFINITY;
+	this->u = INFINITY;
+	this->v = INFINITY;
 
 	// BVH helpers
 	this->invDir = 1.0f / this->dir;

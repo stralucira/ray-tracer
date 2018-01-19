@@ -7,7 +7,7 @@ class Ray
 public:
 	Ray(vec3 origin, vec3 direction);
 	
-	float t;
+	float t, u, v;
 	float tHit;
 	vec3 orig;
 	vec3 dir;	

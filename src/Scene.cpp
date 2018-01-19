@@ -32,23 +32,23 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
 		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
-		primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::GLASS);
+		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::GLASS);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
-		primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::MIRROR);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
-		primList.back()->material = Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
-		primList.back()->material = Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
+		primList.back()->material = new Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
-		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(0, -5, 0), vec3(0, 1, 0))); // bottom plane
@@ -56,11 +56,11 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f)));
-		primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f), 1));
-		primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(0, 5, 0), vec3(0, -1, 0))); // top plane
@@ -68,11 +68,11 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1, true));
-		primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 0, true));
-		primList.back()->material = Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(-5, 0, 0), vec3(1, 0, 0))); // left plane
@@ -80,11 +80,11 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), 1));
-		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), 1));
-		primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(5, 0, 0), vec3(-1, 0, 0))); // right plane
@@ -92,11 +92,11 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f)));
-		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f)));
-		primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
@@ -104,14 +104,14 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f), 1));
-		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f)));
-		primList.back()->material = Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
-		this->LoadObject("cube.obj");
+		//this->LoadObject("cube.obj");
 
 		break;
 	case 2: // lego han solo scene
@@ -120,6 +120,8 @@ Scene::Scene(int scene_id)
 		camera = new Camera(pos, lookAt);
 
 		MOVEMODIFIER = 1.00f;
+
+		skydome = new HDRBitmap("space.hdr");
 
 		lightList.push_back(new Light(vec3(0.50f, 16.77f, 10.85f), vec3(200.0f, 200.0f, 200.0f)));
 		lightList.push_back(new Light(vec3(12.37f, 19.72f, 11.91f), vec3(200.0f, 200.0f, 200.0f)));
@@ -153,11 +155,12 @@ Scene::Scene(int scene_id)
 
 		MOVEMODIFIER = 10.00f;
 
+		skydome = new HDRBitmap("space.hdr");
+
 		lightList.push_back(new Light(vec3(143.12f, 11.31f, -271.44f), vec3(200.0f, 200.0f, 200.0f)));
 		lightList.push_back(new Light(vec3(149.62f, -12.83f, -274.64f), vec3(0.0f, 200.0f, 0.0f)));
 		lightList.push_back(new Light(vec3(132.69f, 0.15f, -313.19f), vec3(100.0f, 0.0f, 0.0f)));
 		lightList.push_back(new Light(vec3(157.25f, -0.39f, -312.82f), vec3(100.0f, 0.0f, 0.0f)));
-
 
 		this->LoadObject("TIE-fighter.obj");
 
@@ -168,6 +171,8 @@ Scene::Scene(int scene_id)
 		camera = new Camera(pos, lookAt);
 
 		MOVEMODIFIER = 10.00f;
+
+		skydome = new HDRBitmap("space.hdr");
 
 		lightList.push_back(new Light(vec3(180.0f, 0.0f, -2850.0f), vec3(200.0f, 200.0f, 200.0f)));
 
@@ -180,6 +185,8 @@ Scene::Scene(int scene_id)
 		camera = new Camera(pos, lookAt);
 
 		MOVEMODIFIER = 0.10f;
+
+		skydome = new HDRBitmap("space.hdr");
 
 		lightList.push_back(new Light(vec3(0.0f, 0.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
 
@@ -235,6 +242,37 @@ void Scene::LoadObject(std::string inputfile)
 		std::cerr << err << std::endl;
 	}
 
+	for (size_t i = 0; i < materials.size(); i++)
+	{
+		matList.push_back(new Material());
+		//Material mat = Material();
+		matList.back()->diffuse = vec3(materials[i].diffuse[0], materials[i].diffuse[1], materials[i].diffuse[2]);
+		matList.back()->specular = vec3(materials[i].specular[0], materials[i].specular[1], materials[i].specular[2]);
+		matList.back()->shininess = materials[i].shininess;
+		matList.back()->dissolve = materials[i].dissolve;
+		
+		if (materials[i].dissolve < 1.0f)
+		{
+			matList.back()->shader = Material::Shader::GLASS;
+		}
+		else
+		{
+			matList.back()->shader = Material::Shader::DIFFUSE;
+		}
+		if (!materials[i].diffuse_texname.empty())
+		{
+			auto lastSlash = materials[i].diffuse_texname.find_last_of('/');
+			std::string texturePath;
+			if (lastSlash != std::string::npos) {
+				texturePath = materials[i].diffuse_texname.substr(0, lastSlash + 1);
+			}
+			else {
+				texturePath = materials[i].diffuse_texname;
+			}
+			matList.back()->texture = new Surface(const_cast<char*>(materials[i].diffuse_texname.c_str()));
+		}
+	}
+
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++)
 	{
@@ -245,8 +283,8 @@ void Scene::LoadObject(std::string inputfile)
 			int fv = shapes[s].mesh.num_face_vertices[f];
 
 			vec3 vertices[3];
-			vec3 normal;
-			//vec2 texcoord;
+			vec3 normals[3];
+			vec2 texcoord[3];
 
 			// Loop over vertices in the face.
 			for (int v = 0; v < fv; v++)
@@ -259,49 +297,57 @@ void Scene::LoadObject(std::string inputfile)
 				float nx = attrib.normals[3 * idx.normal_index + 0];
 				float ny = attrib.normals[3 * idx.normal_index + 1];
 				float nz = attrib.normals[3 * idx.normal_index + 2];
-				//float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
-				//float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+				float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+				float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
 				// Optional: vertex colors
 				//tinyobj::real_t red = attrib.colors[3 * idx.vertex_index + 0];
 				//tinyobj::real_t green = attrib.colors[3 * idx.vertex_index + 1];
 				//tinyobj::real_t blue = attrib.colors[3 * idx.vertex_index + 2];
 
 				vertices[v] = vec3(vx, vy, vz);
-				normal = vec3(nx, ny, nz);
-				//texcoord = vec2(tx, ty);
+				normals[v] = vec3(nx, ny, nz);
+				texcoord[v] = vec2(tx, ty);
 			}
 			index_offset += fv;
 
 			// per-face material
 			// shapes[s].mesh.material_ids[f];
 
-			primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2]));
+			primList.push_back(new Triangle(
+				vertices[0], vertices[1], vertices[2],
+				normals[0], normals[1], normals[2],
+				texcoord[0], texcoord[1], texcoord[2]
+			));
 			//primList.back()->index = index;
 
-			if (materials.size() > 0)
+			//size_t test = shapes[s].mesh.material_ids[f];
+
+			primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
+
+			/*if (materials.size() > 0)
 			{
-				primList.back()->material = Material(
+				primList.back()->material = new Material(
 					vec3(
 						materials[shapes[s].mesh.material_ids[f]].diffuse[0],	// Kd red
 						materials[shapes[s].mesh.material_ids[f]].diffuse[1],	// Kd green
 						materials[shapes[s].mesh.material_ids[f]].diffuse[2]),	// Kd blue
 					vec3(
 						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks red
-						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks green
-						materials[shapes[s].mesh.material_ids[f]].specular[0]),	// Kd blue
+						materials[shapes[s].mesh.material_ids[f]].specular[1],	// Ks green
+						materials[shapes[s].mesh.material_ids[f]].specular[2]),	// Ks blue
 					materials[shapes[s].mesh.material_ids[f]].shininess,		// Ns
 					materials[shapes[s].mesh.material_ids[f]].dissolve			//d
 				);
 
 				if (materials[shapes[s].mesh.material_ids[f]].dissolve < 1.0f)
 				{
-					primList.back()->material.shader = Material::Shader::GLASS;
+					primList.back()->material->shader = Material::Shader::GLASS;
 				}
 				else
 				{
-					primList.back()->material.shader = Material::Shader::DIFFUSE;
+					primList.back()->material->shader = Material::Shader::DIFFUSE;
 				}
-			}
+			}*/
 #if ENABLETOPBVH // Experimental top BVH construction helper
 			primLoadList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 			primLoadList.back()->index = index;

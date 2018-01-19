@@ -77,6 +77,11 @@ bool Cylinder::intersect(Ray* ray)
 	}
 }
 
+vec2 Cylinder::getTexCoord(Ray* ray)
+{
+	return vec2(0.0f);
+}
+
 bool Cylinder::getIsLight()
 {
 	return false;

@@ -18,6 +18,11 @@ bool Plane::intersect(Ray* ray)
 	return false;
 }
 
+vec2 Plane::getTexCoord(Ray* ray)
+{
+	return vec2(0.0f);
+}
+
 bool Plane::getIsLight()
 {
 	return false;

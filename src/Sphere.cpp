@@ -27,6 +27,11 @@ bool Sphere::intersect(Ray* ray)
 	return true;
 }
 
+vec2 Sphere::getTexCoord(Ray* ray)
+{
+	return vec2(0.0f);
+}
+
 bool Sphere::getIsLight()
 {
 	return false;

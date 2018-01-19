@@ -25,7 +25,7 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(1); // <-- Change scene here
+	LoadScene(3); // <-- Change scene here
 }
 
 void Game::LoadScene(int scene_id)
@@ -202,7 +202,7 @@ void Game::Tick( float dt )
 	sprintf(buffer, "Press V to toggle shadows.");
 	screen->Print(buffer, 2, 32, 0xffffff);
 
-	sprintf(buffer, "Pixel summed: %i frame count: %i", pixelCount, frameCount);
+	sprintf(buffer, "Pixel summed: %i. Frame count: %i", pixelCount, frameCount);
 	screen->Print(buffer, 2, 42, 0xffffff);
 	
 }

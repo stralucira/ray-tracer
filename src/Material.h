@@ -5,25 +5,27 @@ class Material
 public:
 	enum class Shader { DIFFUSE, MIRROR, GLASS };
 
+	Material() : texture(nullptr){}
+
 	Material(vec3 diffuseColor, Shader shader)
 	{
-		this->Kd = diffuseColor;
+		this->diffuse = diffuseColor;
 		this->shader = shader;
 	}
 
 	Material(vec3 diffuseColor, vec3 specularColor, float shininess, Shader shader)
 	{
-		this->Kd = diffuseColor;
-		this->Ks = specularColor;
-		this->Ns = shininess;
+		this->diffuse = diffuseColor;
+		this->specular = specularColor;
+		this->shininess = shininess;
 		this->shader = shader;
 	}
 
 	Material(vec3 diffuseColor, vec3 specularColor, float shininess, float dissolve)
 	{
-		this->Kd = diffuseColor;
-		this->Ks = specularColor;
-		this->Ns = shininess;
+		this->diffuse = diffuseColor;
+		this->specular = specularColor;
+		this->shininess = shininess;
 		this->dissolve = dissolve;
 	}
 
@@ -31,11 +33,18 @@ public:
 	{
 		this->shader = shader;
 	}
+	
+	vec3 ambient = BLACK;	// Ka
+	vec3 diffuse = BLACK;	// Kd
+	vec3 specular = BLACK;	// Ks
+	vec3 transmittance;		// Kt, Tf
+	vec3 emission;			// Ke
+	float shininess = 0;	// Ns
+	float ior;				// Ni (index of refraction)
+	float dissolve;			// d, Tr
+	int illum;				// illum model
 
-	vec3 Ka = BLACK; // Ambient color
-	vec3 Kd = BLACK; // Diffuse color
-	vec3 Ks = BLACK; // Specular color
-	float Ns = 0;
-	float dissolve = 1;
+	Surface* texture;
+
 	Shader shader;
 };

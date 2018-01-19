@@ -52,6 +52,11 @@ bool Torus::intersect(Ray* ray)
 	return true;
 }
 
+vec2 Torus::getTexCoord(Ray* ray)
+{
+	return vec2(0.0f);
+}
+
 bool Torus::getIsLight()
 {
 	return false;
