@@ -17,7 +17,6 @@ public:
 
 	std::vector<Light*> lightList;
 	std::vector<Primitive*> primList;
-
 	std::vector<Material*> matList;
 
 	std::vector<std::vector<Primitive*>> objectList;

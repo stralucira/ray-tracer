@@ -9,29 +9,32 @@
 class RayTracer
 {
 public:
+	RayTracer(Scene* scene, Surface* screen);
+
 	Surface* screen;
 	Scene* scene;
 	Pixel buffer[SCRHEIGHT][SCRWIDTH];
-
 	vec3 accumulator[SCRHEIGHT][SCRWIDTH];
 	
-	RayTracer(Scene* scene, Surface* screen);
 	int Render(int samples);
 
-	vec3 GetColor(int x, int y, Ray* ray, int depth);
-	vec3 DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Material mat);
-
+	// Whitted-style ray tracing stuff
+	vec3 SampleWhitted(int x, int y, Ray* ray, int depth);
+	vec3 DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Ray* ray);
 	vec3 Reflect(vec3 dir, vec3 normal);
 	float Fresnel(vec3 dir, vec3 normal, float index);
+
+	// Pathtracing stuff
+	vec3 Trace(Ray* ray);
+	vec3 Sample(Ray* ray, int depth);
+	vec3 CosineWeightedDiffuseReflection(vec3 normal);
+
+	// Global stuff
+	vec3 GetColor(Ray* ray);
+	vec3 SampleTexturePoint(Surface* tex, vec2 uv);
+	vec3 SampleSkydome(HDRBitmap* skydome, Ray* ray);
 
 	bool depthRendering = false;
 	bool renderShadow = true;
 	bool inShadow;
-
-	vec3 Sample(Ray* ray, int depth);
-	vec3 CosineWeightedDiffuseReflection(vec3 normal);
-	vec3 Trace(Ray* ray);
-
-	vec3 SampleSkydome(HDRBitmap* skydome, Ray* ray);
-	vec3 sampleTexturePoint(Surface* tex, const vec2 uv);
 };

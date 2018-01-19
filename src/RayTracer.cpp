@@ -23,8 +23,8 @@ int RayTracer::Render(int samples)
 		for (x = 0; x < SCRWIDTH; x++)
 		{
 			Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
-			//vec3 color = GetColor(x, y, &ray, 0); // Whitted-style ray tracing
-			vec3 color = Sample(&ray, 0); // Pathtracing
+			//vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
+			vec3 color = Sample(&ray, 0);					// Pathtracing
 
 			accumulator[y][x].r = (accumulator[y][x].r * (1 - invSample) + color.r * invSample * 255.0f);
 			accumulator[y][x].g = (accumulator[y][x].g * (1 - invSample) + color.y * invSample * 255.0f);
@@ -56,7 +56,7 @@ int RayTracer::Render(int samples)
 // Whitted-style ray tracing stuff
 // -----------------------------------------------------------
 
-vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
+vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 {
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
 	float nearest = INFINITY;
@@ -93,7 +93,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 #endif // ENABLEBVH
 
 	if (nearest == INFINITY) return BACKGROUND_COLOR; 	// If ray does not intersect
-	if (!renderShadow) return ray->hit->material->diffuse; 	// Toggle shadows on / off
+	if (!renderShadow) return GetColor(ray);			// Toggle shadows on / off
 
 #if ALTERNATERENDERMODE // pseudo diffuse + shininess + dissolve rendering method (used for loaded obj files)
 	else
@@ -119,21 +119,19 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 
 				if (dot(lightDir, normal) < 0) { continue; }
 
-				diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], *ray->hit->material);
+				diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], ray);
 
 				vec3 reflectionDirection = reflect(-lightDir, normal);
 				specularColor += powf(glm::max(0.0f, -dot(reflectionDirection, ray->dir)), ray->hit->material->shininess);// * this->scene->lightList[i]->color;
 
 				color += diffuseColor + specularColor * ray->hit->material->shininess;
 			}
-			//ray->t = INFINITY;
 		}
 
 		if (ray->hit->material->shader == Material::Shader::MIRROR)
 		{
 			Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
-			color += ray->hit->material->diffuse * GetColor(x, y, &reflectRay, depth += 1);
-			//ray->t = INFINITY;
+			color += GetColor(ray) * SampleWhitted(x, y, &reflectRay, depth += 1);
 		}
 
 		if (ray->hit->material->shader == Material::Shader::GLASS)
@@ -148,10 +146,10 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 				hitPoint + normal * 0.0001f;
 
 			Ray reflectRay = Ray(reflectionRayOrig, reflectionDirection);
-			vec3 reflectionColor = GetColor(x, y, &reflectRay, depth += 1);
+			vec3 reflectionColor = SampleWhitted(x, y, &reflectRay, depth += 1);
 
 			Ray refractRay = Ray(refractionRayOrig, refractionDirection);
-			vec3 refractionColor = GetColor(x, y, &refractRay, depth += 1);
+			vec3 refractionColor = SampleWhitted(x, y, &refractRay, depth += 1);
 
 			color += reflectionColor * (ray->hit->material->dissolve) + refractionColor * (1 - ray->hit->material->dissolve);
 		}
@@ -167,27 +165,27 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 		vec3 color = BLACK;
 
 		// DIFFUSE material shader hit
-		if (ray->hit->material.shader == Material::Shader::DIFFUSE)
+		if (ray->hit->material->shader == Material::Shader::DIFFUSE)
 		{
 			for (size_t i = 0; i < this->scene->lightList.size(); i++)
 			{
 				vec3 dir = normalize(scene->lightList[i]->pos - hitPoint);
 				if (dot(dir, normal) < 0) continue;
-				color += DirectIllumination(hitPoint, dir, normal, scene->lightList[i], ray->hit->material);
+				color += DirectIllumination(hitPoint, dir, normal, scene->lightList[i], ray);
 			}
 			ray->t = INFINITY;
 		}
 
 		// MIRROR material shader hit
-		if (ray->hit->material.shader == Material::Shader::MIRROR)
+		if (ray->hit->material->shader == Material::Shader::MIRROR)
 		{
 			Ray reflectRay = Ray(hitPoint, Reflect(ray->dir, normal));
-			color += ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
+			color += GetColor(ray) * SampleWhitted(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
 		}
 
 		// GLASS material shader hit
-		if (ray->hit->material.shader == Material::Shader::GLASS)
+		if (ray->hit->material->shader == Material::Shader::GLASS)
 		{
 			vec3 refractColor = BLACK;
 
@@ -222,11 +220,11 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 				vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
 				refractRay.orig = hitEpsilon;
 
-				refractColor = this->GetColor(x, y, &refractRay, depth += 1);
+				refractColor = this->SampleWhitted(x, y, &refractRay, depth += 1);
 			}
 
 			Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
-			vec3 reflectColor = ray->hit->material.Kd * GetColor(x, y, &reflectRay, depth += 1);
+			vec3 reflectColor = GetColor(ray) * SampleWhitted(x, y, &reflectRay, depth += 1);
 			ray->t = INFINITY;
 
 			color += reflectColor * kr + refractColor * (1 - kr);
@@ -236,7 +234,7 @@ vec3 RayTracer::GetColor(int x, int y, Ray* ray, int depth)
 #endif
 }
 
-vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Material mat)
+vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Ray* ray)
 {
 	vec3 hitEpsilon = hitPoint + dir * 0.0001f;
 	Ray shadowRay = Ray(hitPoint, dir);
@@ -264,7 +262,7 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	}
 
 	float euclidianDistanceToLight = distance(hitPoint, light->pos);
-	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (mat.diffuse * INVPI);
+	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (GetColor(ray) * INVPI);
 }
 
 vec3 RayTracer::Reflect(vec3 dir, vec3 normal)
@@ -306,14 +304,7 @@ vec3 RayTracer::Trace(Ray* ray)
 	scene->bvh->Traverse(ray, scene->bvh->root);
 	nearest = ray->t;
 
-	if (nearest == INFINITY)
-	{
-		return BACKGROUND_COLOR;
-	}
-	else
-	{
-		return ray->orig + ray->dir * nearest;
-	}
+	return ray->orig + ray->dir * nearest;
 }
 
 vec3 RayTracer::Sample(Ray* ray, int depth)
@@ -346,17 +337,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	Ray newRay = Ray(hitPoint, R);
 
 	// update throughput
-	vec3 color;
-	if (ray->hit->material->texture)
-	{
-		vec2 uv = ray->hit->getTexCoord(ray);
-		color = sampleTexturePoint(ray->hit->material->texture, uv);
-	}
-	else
-	{
-		color = ray->hit->material->diffuse;
-	}
-	vec3 BRDF = color * INVPI;
+	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
 	return PI * 2.0f * BRDF * Ei;
 }
@@ -379,23 +360,36 @@ vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 	return tangentSpace * dir;
 }
 
+// -----------------------------------------------------------
+// Global stuff
+// -----------------------------------------------------------
+
+vec3 RayTracer::GetColor(Ray* ray)
+{
+	if (ray->hit->material->texture)
+	{
+		vec2 uv = ray->hit->getTexCoord(ray);
+		return SampleTexturePoint(ray->hit->material->texture, uv);
+	}
+	else
+	{
+		return ray->hit->material->diffuse;
+	}
+}
+
+vec3 RayTracer::SampleTexturePoint(Surface* tex, vec2 uv)
+{
+	const vec2 nuv(fmodf(uv.x + 1000.0f, 1.0f), fmodf(uv.y + 1000.0f, 1.0f));
+	const int x = (int)(nuv.x * (float)(tex->GetWidth() - 1));
+	const int y = tex->GetHeight() - 1 - (int)(nuv.y * (float)(tex->GetHeight() - 1));
+	const Pixel color = tex->GetBuffer()[y*tex->GetPitch() + x];
+	return vec3((float)((color >> 16) & 0xff), (float)((color >> 8) & 0xff), (float)((color) & 0xff)) / 255.0f;
+}
+
 vec3 RayTracer::SampleSkydome(HDRBitmap* skydome, Ray* ray)
 {
 	float u = fmodf(0.5f * (1.0f + atan2(ray->dir.x, -ray->dir.z) * INVPI), 1.0f);
 	float v = acosf(ray->dir.y) * INVPI;
 	int pixel = (int)(u * (float)(skydome->width - 1)) + ((int)(v * (float)(skydome->height - 1)) * skydome->width);
 	return skydome->buffer[pixel];
-}
-
-vec3 RayTracer::sampleTexturePoint(Surface* tex, const vec2 uv)
-{
-	const vec2 nuv(fmodf(uv.x + 1000.0f, 1.0f), fmodf(uv.y + 1000.0f, 1.0f));
-	const int x = (int)(nuv.x * (float)(tex->GetWidth() - 1));
-	const int y = tex->GetHeight() - 1 - (int)(nuv.y * (float)(tex->GetHeight() - 1));
-	const Pixel color = tex->GetBuffer()[y*tex->GetPitch() + x];
-	return vec3(
-		(float)((color >> 16) & 0xff),
-		(float)((color >> 8) & 0xff),
-		(float)((color) & 0xff)
-	) / 255.0f;
 }

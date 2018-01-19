@@ -1,7 +1,7 @@
 #pragma once
 
-#define SCRWIDTH	800
-#define SCRHEIGHT	600
+#define SCRWIDTH	1280
+#define SCRHEIGHT	720
 #define MAXDEPTH	10
 
 #define ALTERNATERENDERMODE 1
