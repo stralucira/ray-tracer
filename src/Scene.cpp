@@ -242,10 +242,10 @@ void Scene::LoadObject(std::string inputfile)
 		std::cerr << err << std::endl;
 	}
 
+	// Loop over materials
 	for (size_t i = 0; i < materials.size(); i++)
 	{
 		matList.push_back(new Material());
-		//Material mat = Material();
 		matList.back()->diffuse = vec3(materials[i].diffuse[0], materials[i].diffuse[1], materials[i].diffuse[2]);
 		matList.back()->specular = vec3(materials[i].specular[0], materials[i].specular[1], materials[i].specular[2]);
 		matList.back()->shininess = materials[i].shininess;
@@ -318,64 +318,13 @@ void Scene::LoadObject(std::string inputfile)
 				normals[0], normals[1], normals[2],
 				texcoord[0], texcoord[1], texcoord[2]
 			));
-			//primList.back()->index = index;
-
-			//size_t test = shapes[s].mesh.material_ids[f];
-
 			primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
 
-			/*if (materials.size() > 0)
-			{
-				primList.back()->material = new Material(
-					vec3(
-						materials[shapes[s].mesh.material_ids[f]].diffuse[0],	// Kd red
-						materials[shapes[s].mesh.material_ids[f]].diffuse[1],	// Kd green
-						materials[shapes[s].mesh.material_ids[f]].diffuse[2]),	// Kd blue
-					vec3(
-						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks red
-						materials[shapes[s].mesh.material_ids[f]].specular[1],	// Ks green
-						materials[shapes[s].mesh.material_ids[f]].specular[2]),	// Ks blue
-					materials[shapes[s].mesh.material_ids[f]].shininess,		// Ns
-					materials[shapes[s].mesh.material_ids[f]].dissolve			//d
-				);
-
-				if (materials[shapes[s].mesh.material_ids[f]].dissolve < 1.0f)
-				{
-					primList.back()->material->shader = Material::Shader::GLASS;
-				}
-				else
-				{
-					primList.back()->material->shader = Material::Shader::DIFFUSE;
-				}
-			}*/
 #if ENABLETOPBVH // Experimental top BVH construction helper
 			primLoadList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 			primLoadList.back()->index = index;
 
-			if (materials.size() > 0)
-			{
-				primLoadList.back()->material = Material(
-					vec3(
-						materials[shapes[s].mesh.material_ids[f]].diffuse[0],	// Kd red
-						materials[shapes[s].mesh.material_ids[f]].diffuse[1],	// Kd green
-						materials[shapes[s].mesh.material_ids[f]].diffuse[2]),	// Kd blue
-					vec3(
-						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks red
-						materials[shapes[s].mesh.material_ids[f]].specular[0],	// Ks green
-						materials[shapes[s].mesh.material_ids[f]].specular[0]),	// Kd blue
-					materials[shapes[s].mesh.material_ids[f]].shininess,		// Ns
-					materials[shapes[s].mesh.material_ids[f]].dissolve			//d
-				);
-
-				if (materials[shapes[s].mesh.material_ids[f]].dissolve < 1.0f)
-				{
-					primLoadList.back()->material.shader = Material::Shader::GLASS;
-				}
-				else
-				{
-					primLoadList.back()->material.shader = Material::Shader::DIFFUSE;
-				}
-			}
+			primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
 		}
 	}
 	// Top level BVH loader

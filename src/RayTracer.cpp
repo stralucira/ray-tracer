@@ -356,7 +356,6 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	{
 		color = ray->hit->material->diffuse;
 	}
-	//vec3 BRDF = ray->hit->material->diffuse * INVPI;
 	vec3 BRDF = color * INVPI;
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
 	return PI * 2.0f * BRDF * Ei;
