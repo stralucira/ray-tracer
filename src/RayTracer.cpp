@@ -25,7 +25,7 @@ int RayTracer::Render(int samples)
 			Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
 			//vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
 			vec3 color = Sample(&ray, 0);					// Pathtracing
-
+			
 			accumulator[y][x].r = (accumulator[y][x].r * (1 - invSample) + color.r * invSample * 255.0f);
 			accumulator[y][x].g = (accumulator[y][x].g * (1 - invSample) + color.y * invSample * 255.0f);
 			accumulator[y][x].b = (accumulator[y][x].b * (1 - invSample) + color.z * invSample * 255.0f);
@@ -33,6 +33,11 @@ int RayTracer::Render(int samples)
 			int r = glm::min((int)accumulator[y][x].r, 255);
 			int g = glm::min((int)accumulator[y][x].g, 255);
 			int b = glm::min((int)accumulator[y][x].b, 255);
+
+			/*color *= 255.0f;
+			int r = glm::min((int)color.r, 255);
+			int g = glm::min((int)color.g, 255);
+			int b = glm::min((int)color.b, 255);*/
 
 			pixelCount += r + g + b;
 
@@ -303,8 +308,11 @@ vec3 RayTracer::Trace(Ray* ray)
 
 	scene->bvh->Traverse(ray, scene->bvh->root);
 	nearest = ray->t;
-
-	return ray->orig + ray->dir * nearest;
+	if (nearest == INFINITY)
+	{
+		return BLACK;
+	}
+	else return ray->orig + ray->dir * nearest;
 }
 
 vec3 RayTracer::Sample(Ray* ray, int depth)
@@ -320,8 +328,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		//return BACKGROUND_COLOR;
-		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
+		return BACKGROUND_COLOR;
+		//return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source

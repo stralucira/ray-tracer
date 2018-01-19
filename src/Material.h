@@ -7,10 +7,23 @@ public:
 
 	Material() : texture(nullptr){}
 
+	Material(vec3 diffuseColor)
+	{
+		this->diffuse = diffuseColor;
+		this->texture = nullptr;
+	}
+
+	Material(Shader shader)
+	{
+		this->shader = shader;
+		this->texture = nullptr;
+	}
+
 	Material(vec3 diffuseColor, Shader shader)
 	{
 		this->diffuse = diffuseColor;
 		this->shader = shader;
+		this->texture = nullptr;
 	}
 
 	Material(vec3 diffuseColor, vec3 specularColor, float shininess, Shader shader)
@@ -19,6 +32,7 @@ public:
 		this->specular = specularColor;
 		this->shininess = shininess;
 		this->shader = shader;
+		this->texture = nullptr;
 	}
 
 	Material(vec3 diffuseColor, vec3 specularColor, float shininess, float dissolve)
@@ -27,11 +41,7 @@ public:
 		this->specular = specularColor;
 		this->shininess = shininess;
 		this->dissolve = dissolve;
-	}
-
-	Material(Shader shader)
-	{
-		this->shader = shader;
+		this->texture = nullptr;
 	}
 	
 	vec3 ambient = BLACK;		// Ka

@@ -9,19 +9,19 @@ public:
 		this->a = a;
 		this->b = b;
 		this->c = c;
-		this->normal = normal;
+		this->normal0 = normal;
 	
 		this->centroid = calculateCentroid();
 		this->bounds = calculateAABB();
 	}
-	Triangle(vec3 a, vec3 b, vec3 c, vec3 normal, vec3 normal1, vec3 normal2, vec2 uv0, vec2 uv1, vec2 uv2) : Primitive(a)
+	Triangle(vec3 a, vec3 b, vec3 c, vec3 normal0, vec3 normal1, vec3 normal2, vec2 uv0, vec2 uv1, vec2 uv2) : Primitive(a)
 	{
 		this->a = a;
 		this->b = b;
 		this->c = c;
-		this->normal = normal;
-		this->normal = normal1;
-		this->normal = normal2;
+		this->normal0 = normal0;
+		this->normal1 = normal1;
+		this->normal2 = normal2;
 		this->uv0 = uv0;
 		this->uv1 = uv1;
 		this->uv2 = uv2;
@@ -35,8 +35,8 @@ public:
 		this->b = b;
 		this->c = c;
 		
-		if (sign) this->normal = -normalize(cross(b - a, c - a));
-		else this->normal = normalize(cross(b - a, c - a));
+		if (sign) this->normal0 = -normalize(cross(b - a, c - a));
+		else this->normal0 = normalize(cross(b - a, c - a));
 
 		this->centroid = calculateCentroid();
 		this->bounds = calculateAABB();
@@ -54,8 +54,8 @@ public:
 	vec3 calculateCentroid();
 
 	vec3 a, b, c;
-	vec3 normal, normal1, normal2;
+	vec3 normal0, normal1, normal2;
 	vec2 uv0, uv1, uv2;
 	float area;
-	bool isLight;
+	bool isLight = false;
 };

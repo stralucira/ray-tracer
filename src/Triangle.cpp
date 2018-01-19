@@ -48,7 +48,7 @@ bool Triangle::getIsLight()
 
 vec3 Triangle::getNormal(vec3 point)
 {
-	return this->normal;
+	return this->normal0;
 }
 
 vec3 Triangle::calculateCentroid()

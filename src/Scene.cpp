@@ -15,8 +15,6 @@ Scene::Scene(int scene_id)
 	primList.clear();
 	lightList.clear();
 
-	
-
 	switch (scene_id)
 	{
 	case 1: // orignal scene
@@ -263,10 +261,12 @@ void Scene::LoadObject(std::string inputfile)
 		{
 			auto lastSlash = materials[i].diffuse_texname.find_last_of('/');
 			std::string texturePath;
-			if (lastSlash != std::string::npos) {
+			if (lastSlash != std::string::npos)
+			{
 				texturePath = materials[i].diffuse_texname.substr(0, lastSlash + 1);
 			}
-			else {
+			else
+			{
 				texturePath = materials[i].diffuse_texname;
 			}
 			matList.back()->texture = new Surface(const_cast<char*>(materials[i].diffuse_texname.c_str()));
@@ -318,7 +318,14 @@ void Scene::LoadObject(std::string inputfile)
 				normals[0], normals[1], normals[2],
 				texcoord[0], texcoord[1], texcoord[2]
 			));
-			primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
+			if (shapes[s].mesh.material_ids[f] < 0)
+			{
+				primList.back()->material = new Material(BLACK);
+			}
+			else
+			{
+				primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
+			}
 
 #if ENABLETOPBVH // Experimental top BVH construction helper
 			primLoadList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));

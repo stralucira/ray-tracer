@@ -45,7 +45,7 @@ void Game::HandleInput( float dt ) { }
 
 void Game::KeyDown(int a_Key)
 {
-	frameCount = 1;
+	frameCount = 0;
 
 	switch (a_Key)
 	{
