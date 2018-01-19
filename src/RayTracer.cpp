@@ -328,8 +328,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		return BACKGROUND_COLOR;
-		//return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
+		//return BACKGROUND_COLOR;
+		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source
