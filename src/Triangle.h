@@ -53,6 +53,8 @@ public:
 	AABB* calculateAABB();
 	vec3 calculateCentroid();
 
+	vec3 randomPointOnTriangle();
+
 	vec3 a, b, c;
 	vec3 normal0, normal1, normal2;
 	vec2 uv0, uv1, uv2;

@@ -62,3 +62,16 @@ AABB* Triangle::calculateAABB()
 	vec3 min = glm::min(glm::min(a, b), c);
 	return new AABB(min, max);
 }
+
+vec3 Triangle::randomPointOnTriangle(){
+
+	float x, y;
+	do {
+		x = ((float)rand())/((float)RAND_MAX)*2 - 1;
+	 	y = ((float)rand())/((float)RAND_MAX)*2 - 1;
+	} while (x + y >= 1);
+
+	return a + (b - a)*x + (c - a)*y;
+}
+
+

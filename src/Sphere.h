@@ -12,6 +12,18 @@ public:
 		this->centroid = position;
 		this->bounds = calculateAABB();
 	}
+
+	Sphere(vec3 position, float radius, bool isLight) : Primitive(position)
+	{
+		this->radius = radius;
+		this->radius2 = radius * radius;
+		
+		this->centroid = position;
+		this->bounds = calculateAABB();
+
+		this->isLight = isLight;
+	}
+
 	~Sphere();
 
 	bool intersect(Ray* ray);
@@ -21,5 +33,9 @@ public:
 
 	AABB* calculateAABB();
 
+	vec3 randomPointOnSphere(vec3 p);
+
 	float radius, radius2;
+
+	bool isLight = false;
 };
