@@ -22,6 +22,10 @@ public:
 		return vec3(0,0,1);
 	};
 
+	virtual float calculateArea(){
+		return 0;
+	}
+
 	vec3 centroid;
 	AABB* bounds;
 };

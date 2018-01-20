@@ -74,4 +74,11 @@ vec3 Triangle::randomPointOnPrimitive(vec3 p){
 	return a + (b - a)*x + (c - a)*y;
 }
 
+float Triangle::calculateArea(){
+	vec3 ab = normalize(b-a);
+	vec3 ac = normalize(c-a);
+	float theta = acos(dot(ab,ac));
+
+	return glm::length(ab)*glm::length(ac)*sin(theta)*0.5f;
+}
 

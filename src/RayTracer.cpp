@@ -360,7 +360,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	// terminate if we hit a light source
 	if (ray->hit->getIsLight())
 	{
-		return ray->hit->material->diffuse;
+		return BLACK;
+		//return ray->hit->material->diffuse;
 	}
 
 	// TODO -- Pick a random light and create a random ray towards that light
@@ -370,15 +371,25 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	vec3 randPointOnLight = randLight->randomPointOnPrimitive(hitPoint);
 	vec3 randDirToRandLight =  normalize(randPointOnLight - hitPoint);
 
+	float dist = glm::length(randPointOnLight-hitPoint);
+
+
 	// Create a ray to random point on light
 	Ray lr = Ray(hitPoint, randDirToRandLight); 
 
-	// TODO -- Calculate direct illumination
 	vec3 lightNormal = randLight->getNormal(randPointOnLight);
 	vec3 normal = ray->hit->getNormal(hitPoint);
+
+	vec3 Ld;
 	if (Trace(&lr) != BLACK && dot(normal, randDirToRandLight) > 0 && dot(lightNormal, randDirToRandLight*-1.0f) > 0) {
 		//TODO--calculate area of light, solid angle and irradiance
-	} 
+		float solidAngle = (dot(lightNormal, randDirToRandLight*-1.0f)*randLight->calculateArea()) / (dist*dist);
+
+
+		Ld = randLight->material->diffuse * ((solidAngle * INVPI) * dot(normal,randDirToRandLight));
+	} else {
+		Ld = BLACK;
+	}
 
 	// continue random walk
 	vec3 R = CosineWeightedDiffuseReflection(normal);
@@ -387,7 +398,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	// update throughput
 	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
-	return PI * 2.0f * BRDF * Ei;
+	return PI * 2.0f * BRDF * Ei + Ld;
 }
 
 vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
