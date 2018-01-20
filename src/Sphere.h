@@ -33,7 +33,7 @@ public:
 
 	AABB* calculateAABB();
 
-	vec3 randomPointOnSphere(vec3 p);
+	vec3 randomPointOnPrimitive(vec3 p);
 
 	float radius, radius2;
 

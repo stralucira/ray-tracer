@@ -47,7 +47,7 @@ AABB* Sphere::calculateAABB()
 	return new AABB(this->centroid - radius, this->centroid + radius);
 }
 
-vec3 Sphere::randomPointOnSphere(vec3 p) {
+vec3 Sphere::randomPointOnPrimitive(vec3 p) {
 		
 		vec3 e2 = vec3(1.0f,0.0f,0.0f);
 	  	vec3 e3 = cross((this->centroid-p) , e2);
@@ -65,4 +65,4 @@ vec3 Sphere::randomPointOnSphere(vec3 p) {
 	  	} while (x*x + y*y > 1);
 
 	  	return this->centroid + (x * e2 + e3*y);
-	}
+}

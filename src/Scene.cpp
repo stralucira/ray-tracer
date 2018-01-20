@@ -15,6 +15,8 @@ Scene::Scene(int scene_id)
 	primList.clear();
 	lightList.clear();
 
+	areaLightList.clear();
+
 	switch (scene_id)
 	{
 	case 1: // orignal scene
@@ -68,6 +70,7 @@ Scene::Scene(int scene_id)
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1, true));
 		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 0, true));

@@ -19,6 +19,8 @@ public:
 	std::vector<Primitive*> primList;
 	std::vector<Material*> matList;
 
+	std::vector<Primitive*> areaLightList;
+
 	std::vector<std::vector<Primitive*>> objectList;
 	std::vector<BVH*> bvhList;
 

@@ -63,7 +63,7 @@ AABB* Triangle::calculateAABB()
 	return new AABB(min, max);
 }
 
-vec3 Triangle::randomPointOnTriangle(){
+vec3 Triangle::randomPointOnPrimitive(vec3 p){
 
 	float x, y;
 	do {

@@ -356,15 +356,25 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 
+
 	// terminate if we hit a light source
 	if (ray->hit->getIsLight())
 	{
 		return ray->hit->material->diffuse;
 	}
 
+	// TODO -- Pick a random light and create a random ray towards that light
+	vec3 randDirToRandLight = this->scene->areaLightList.back()->randomPointOnPrimitive(hitPoint) - hitPoint;
+
+	// Create a ray to random point on light
+	Ray lr = Ray(hitPoint, normalize(randDirToRandLight)); 
+
+	// TODO -- Calculate direct illumination
+
+
 	vec3 normal = ray->hit->getNormal(hitPoint);
 
-	// continue in random direction
+	// continue random walk
 	vec3 R = CosineWeightedDiffuseReflection(normal);
 	Ray newRay = Ray(hitPoint, R);
 
