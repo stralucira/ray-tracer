@@ -1,6 +1,8 @@
 ﻿#include "template.h"
 #include "Ray.h"
 
+Ray::Ray(){}
+
 Ray::Ray(vec3 origin, vec3 direction)
 {
 	this->orig = origin;

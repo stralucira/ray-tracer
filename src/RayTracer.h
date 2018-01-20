@@ -17,6 +17,7 @@ public:
 	vec3 accumulator[SCRHEIGHT][SCRWIDTH];
 	
 	int Render(int samples);
+	void RenderPacket();
 
 	// Whitted-style ray tracing stuff
 	vec3 SampleWhitted(int x, int y, Ray* ray, int depth);

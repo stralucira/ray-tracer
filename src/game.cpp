@@ -27,7 +27,7 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(3); // <-- Change scene here
+	LoadScene(1); // <-- Change scene here
 }
 
 void Game::LoadScene(int scene_id)

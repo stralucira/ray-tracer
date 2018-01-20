@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "template.h"
 #include "Ray.h"
+#include "RayPacket.h"
 
 class Camera
 {
@@ -11,7 +12,9 @@ public:
 	void CalculateScreen();
 	void PrintPosition();
 
-	Ray GenerateRay(int x, int y);
+	//Ray GenerateRay(int x, int y);
+	void GenerateRay(Ray* ray, int x, int y);
+	void GenerateRays(RayPacket* rays, int x, int y);
 	
 	// Camera movement
 	// Translation:
@@ -26,7 +29,7 @@ public:
 	void Zoom(float distance);
 
 	vec3 pos;
-	vec3 p0, p1, p2;
+	vec3 p0, p1, p2, p3;
 
 	float d;
 	float aspectRatio;

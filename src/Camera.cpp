@@ -37,6 +37,7 @@ void Camera::CalculateScreen()
 	this->p0 = screenCenter - this->GetRight() + this->GetUp() * this->aspectRatio; // top left corner
 	this->p1 = screenCenter + this->GetRight() + this->GetUp() * this->aspectRatio; // top right corner
 	this->p2 = screenCenter - this->GetRight() - this->GetUp() * this->aspectRatio; // bottom left corner
+	this->p3 = screenCenter + this->GetRight() + this->GetUp() * this->aspectRatio; // bottom right corner
 }
 
 void Camera::PrintPosition()
@@ -98,8 +99,39 @@ void Camera::Zoom(float increment)
 }
 
 // Generate ray
-Ray Camera::GenerateRay(int x, int y)
+void Camera::GenerateRay(Ray* ray, int x, int y)
 {
-	return Ray(this->pos, normalize((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos));
+	//return Ray(this->pos, normalize((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos));
 	//return Ray(this->pos, normalizeSSE((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos));
+
+	ray->orig = this->pos;
+	ray->dir = normalize((this->p0 + (x / (float)SCRWIDTH) * (this->p1 - this->p0) + (y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
+	ray->t = INFINITY;
+	ray->u = INFINITY;
+	ray->v = INFINITY;
+	ray->invDir = 1.0f / ray->dir;
+}
+
+void Camera::GenerateRays(RayPacket* rays, int x, int y)
+{
+	static __m128i offsetX4 = _mm_set_epi32(1, 0, 1, 0);
+	static __m128i offsetY4 = _mm_set_epi32(0, 1, 0, 1);
+	vec3 pos = GetPosition();
+	for (int i = 0; i < RayPacket::packetCount; i++)
+	{
+		rays->origX4[i] = _mm_set_ps1(pos.x);
+		rays->origY4[i] = _mm_set_ps1(pos.y);
+		rays->origZ4[i] = _mm_set_ps1(pos.z);
+
+		__m128i screenX4 = _mm_add_epi32(_mm_set1_epi32(x * RayPacket::width + (i % (RayPacket::width / 2)) * 2), offsetX4);
+		__m128i screenY4 = _mm_add_epi32(_mm_set1_epi32(y * RayPacket::height + (i / (RayPacket::height / 2)) * 2), offsetY4);
+		__m128 px4 = _mm_cvtepi32_ps(screenX4);
+		__m128 py4 = _mm_cvtepi32_ps(screenY4);
+		px4 = _mm_div_ps(px4, _mm_set_ps1(SCRWIDTH));
+		py4 = _mm_div_ps(py4, _mm_set_ps1(SCRHEIGHT));
+
+		__m128 p0X4 = _mm_set_ps1(p0.x);
+		__m128 p0Y4 = _mm_set_ps1(p0.y);
+		__m128 p0Z4 = _mm_set_ps1(p0.z);
+	}
 }

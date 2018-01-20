@@ -22,22 +22,30 @@ int RayTracer::Render(int samples)
 	{
 		for (x = 0; x < SCRWIDTH; x++)
 		{
-			Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
+			//Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
+			Ray ray; this->scene->camera->GenerateRay(&ray, x, y);
 			//vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
 			vec3 color = Sample(&ray, 0);					// Pathtracing
 			
-			accumulator[y][x].r = (accumulator[y][x].r * (1 - invSample) + color.r * invSample * 255.0f);
-			accumulator[y][x].g = (accumulator[y][x].g * (1 - invSample) + color.y * invSample * 255.0f);
-			accumulator[y][x].b = (accumulator[y][x].b * (1 - invSample) + color.z * invSample * 255.0f);
+			/*color *= 255.0f;
+			int r = glm::min((int)color.r, 255);
+			int g = glm::min((int)color.g, 255);
+			int b = glm::min((int)color.b, 255);*/
+
+			color *= 255.0f;
+			accumulator[y][x].r = (accumulator[y][x].r * (1 - invSample) + color.r * invSample);
+			accumulator[y][x].g = (accumulator[y][x].g * (1 - invSample) + color.y * invSample);
+			accumulator[y][x].b = (accumulator[y][x].b * (1 - invSample) + color.z * invSample);
 
 			int r = glm::min((int)accumulator[y][x].r, 255);
 			int g = glm::min((int)accumulator[y][x].g, 255);
 			int b = glm::min((int)accumulator[y][x].b, 255);
 
-			/*color *= 255.0f;
-			int r = glm::min((int)color.r, 255);
-			int g = glm::min((int)color.g, 255);
-			int b = glm::min((int)color.b, 255);*/
+			// Gamma correction
+			//float gamma = 1.5f;
+			//r = (int)(pow((float)r / 255, 1 / gamma) * 255);
+			//g = (int)(pow((float)g / 255, 1 / gamma) * 255);
+			//b = (int)(pow((float)b / 255, 1 / gamma) * 255);
 
 			pixelCount += r + g + b;
 
@@ -55,6 +63,22 @@ int RayTracer::Render(int samples)
 	}
 
 	return pixelCount;
+}
+
+void RayTracer::RenderPacket()
+{
+	omp_set_num_threads(iCPU2);
+	int x = 0;
+
+#pragma omp parallel for private(x)
+	for (int y = 0; y < SCRHEIGHT / RayPacket::width; y++)
+	{
+		for (x = 0; x < SCRWIDTH / RayPacket::height; x++)
+		{
+			RayPacket rays;
+			scene->camera->GenerateRays(&rays, x, y);
+		}
+	}
 }
 
 // -----------------------------------------------------------
