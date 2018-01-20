@@ -364,15 +364,21 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	}
 
 	// TODO -- Pick a random light and create a random ray towards that light
-	vec3 randDirToRandLight = this->scene->areaLightList.back()->randomPointOnPrimitive(hitPoint) - hitPoint;
+	Primitive* randLight = this->scene->areaLightList.back();
+
+
+	vec3 randPointOnLight = randLight->randomPointOnPrimitive(hitPoint);
+	vec3 randDirToRandLight =  normalize(randPointOnLight - hitPoint);
 
 	// Create a ray to random point on light
-	Ray lr = Ray(hitPoint, normalize(randDirToRandLight)); 
+	Ray lr = Ray(hitPoint, randDirToRandLight); 
 
 	// TODO -- Calculate direct illumination
-
-
+	vec3 lightNormal = randLight->getNormal(randPointOnLight);
 	vec3 normal = ray->hit->getNormal(hitPoint);
+	if (Trace(&lr) != BLACK && dot(normal, randDirToRandLight) > 0 && dot(lightNormal, randDirToRandLight*-1.0f) > 0) {
+		//TODO--calculate area of light, solid angle and irradiance
+	} 
 
 	// continue random walk
 	vec3 R = CosineWeightedDiffuseReflection(normal);
