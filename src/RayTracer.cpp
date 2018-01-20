@@ -75,8 +75,7 @@ void RayTracer::RenderPacket()
 	{
 		for (x = 0; x < SCRWIDTH / RayPacket::height; x++)
 		{
-			RayPacket rays;
-			scene->camera->GenerateRays(&rays, x, y);
+			RayPacket rays; this->scene->camera->GenerateRays(&rays, x, y);
 		}
 	}
 }
@@ -95,9 +94,9 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 	{
 		int depthRender = 0;
 #if ENABLETOPBVH
-		scene->bvhTop->TraverseTop(ray, scene->bvhTop->topRoot, 0, &depthRender);
+		this->scene->bvhTop->TraverseTop(ray, this->scene->bvhTop->topRoot, 0, &depthRender);
 #else
-		scene->bvh->Traverse(ray, scene->bvh->root, 0, &depthRender);
+		this->scene->bvh->Traverse(ray, this->scene->bvh->root, 0, &depthRender);
 #endif
 		return vec3(clamp((depthRender * 0.005f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.005f), 0.0f, 1.0f), 0.0f);
 	}
@@ -105,9 +104,9 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 	// Trace function
 #if ENABLEBVH
 #if ENABLETOPBVH
-	scene->bvhTop->TraverseTop(ray, scene->bvhTop->topRoot);
+	this->scene->bvhTop->TraverseTop(ray, this->scene->bvhTop->topRoot);
 #else
-	scene->bvh->Traverse(ray, scene->bvh->root);
+	this->scene->bvh->Traverse(ray, this->scene->bvh->root);
 #endif // ENABLETOPBVH
 	nearest = ray->t;
 #else
@@ -148,7 +147,7 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 
 				if (dot(lightDir, normal) < 0) { continue; }
 
-				diffuseColor += DirectIllumination(hitPoint, lightDir, normal, scene->lightList[i], ray);
+				diffuseColor += DirectIllumination(hitPoint, lightDir, normal, this->scene->lightList[i], ray);
 
 				vec3 reflectionDirection = reflect(-lightDir, normal);
 				specularColor += powf(glm::max(0.0f, -dot(reflectionDirection, ray->dir)), ray->hit->material->shininess);// * this->scene->lightList[i]->color;
@@ -198,9 +197,9 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 		{
 			for (size_t i = 0; i < this->scene->lightList.size(); i++)
 			{
-				vec3 dir = normalize(scene->lightList[i]->pos - hitPoint);
+				vec3 dir = normalize(this->scene->lightList[i]->pos - hitPoint);
 				if (dot(dir, normal) < 0) continue;
-				color += DirectIllumination(hitPoint, dir, normal, scene->lightList[i], ray);
+				color += DirectIllumination(hitPoint, dir, normal, this->scene->lightList[i], ray);
 			}
 			ray->t = INFINITY;
 		}
@@ -276,9 +275,9 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	{
 #if ENABLEBVH
 #if ENABLETOPBVH
-		scene->bvhTop->TraverseTop(&shadowRay, scene->bvhTop->topRoot, true);
+		this->scene->bvhTop->TraverseTop(&shadowRay, this->scene->bvhTop->topRoot, true);
 #else
-		scene->bvh->Traverse(&shadowRay, scene->bvh->root, true);
+		this->scene->bvh->Traverse(&shadowRay, this->scene->bvh->root, true);
 #endif
 		if (shadowRay.t < tToLight) { return BLACK; }
 #else
@@ -330,7 +329,7 @@ vec3 RayTracer::Trace(Ray* ray)
 {
 	float nearest = INFINITY;
 
-	scene->bvh->Traverse(ray, scene->bvh->root);
+	this->scene->bvh->Traverse(ray, this->scene->bvh->root);
 	nearest = ray->t;
 	if (nearest == INFINITY)
 	{
@@ -353,7 +352,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	if (ray->t == INFINITY)
 	{
 		//return BACKGROUND_COLOR;
-		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
+		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source

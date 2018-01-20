@@ -3,6 +3,8 @@
 #include "Ray.h"
 #include "RayPacket.h"
 
+#define _mm_dot_ps(ax,ay,az,bx,by,bz) _mm_add_ps(_mm_add_ps(_mm_mul_ps(ax, bx), _mm_mul_ps(ay, by)), _mm_mul_ps(az, bz))
+
 class Camera
 {
 public:

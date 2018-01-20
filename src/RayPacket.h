@@ -25,4 +25,5 @@ struct RayPacket
 	union { __m128i sign4[4]; uint sign[12]; };	// sign
 
 	__m128 fX4, fY4, fZ4, fDir4;	// ray frustum
+	union { __m128i address4[packetCount]; uint address[rayCount]; };	// writeback address
 };
