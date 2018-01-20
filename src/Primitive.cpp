@@ -3,4 +3,5 @@
 
 Primitive::Primitive(vec3 pos)
 {
+	this->centroid = pos;
 };

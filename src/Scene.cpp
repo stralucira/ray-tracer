@@ -15,21 +15,24 @@ Scene::Scene(int scene_id)
 	primList.clear();
 	lightList.clear();
 
+	areaLightList.clear();
+
 	switch (scene_id)
 	{
 	case 1: // orignal scene
-		pos = vec3(0.0f, 0.0f, -1.0f);
-		lookAt = pos + vec3(0.0f, 0.0f, 1.0f);
+		pos = vec3(7.8f, -0.46f, -10.8f);
+		//lookAt = pos + vec3(0.0f, 0.0f, 1.0f);
+		lookAt = vec3(-0.53f, 0.0f, 0.85f);
 		camera = new Camera(pos, lookAt);
 
 		MOVEMODIFIER = 0.50f;
 
 		skydome = new HDRBitmap("space.hdr");
 
-		lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
-		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
+		//lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
+		//lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
-		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f));
+		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f, false));
 		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::GLASS);
 		//primList.back()->index = index; index++;
 
@@ -67,6 +70,7 @@ Scene::Scene(int scene_id)
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1, true));
 		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 0, true));

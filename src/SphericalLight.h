@@ -8,7 +8,7 @@ public:
 	SphericalLight(vec3 position, vec3 color, float radius) 
 	: Light(position, color) {
 		this->pos = position;
-		this->sph = new Sphere(position, radius);
+		this->sph = new Sphere(position, radius, true);
 		this->color = color;
 	}
 	~SphericalLight(){

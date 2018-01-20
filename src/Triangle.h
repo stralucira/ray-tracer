@@ -53,6 +53,10 @@ public:
 	AABB* calculateAABB();
 	vec3 calculateCentroid();
 
+	float calculateArea();
+
+	vec3 randomPointOnPrimitive(vec3 p);
+
 	vec3 a, b, c;
 	vec3 normal0, normal1, normal2;
 	vec2 uv0, uv1, uv2;

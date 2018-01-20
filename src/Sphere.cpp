@@ -34,7 +34,7 @@ vec2 Sphere::getTexCoord(Ray* ray)
 
 bool Sphere::getIsLight()
 {
-	return false;
+	return this->isLight;
 }
 
 vec3 Sphere::getNormal(vec3 point)
@@ -45,4 +45,24 @@ vec3 Sphere::getNormal(vec3 point)
 AABB* Sphere::calculateAABB()
 {
 	return new AABB(this->centroid - radius, this->centroid + radius);
+}
+
+vec3 Sphere::randomPointOnPrimitive(vec3 p) {
+		
+		vec3 e2 = vec3(1.0f,0.0f,0.0f);
+	  	vec3 e3 = cross((this->centroid-p) , e2);
+	  	normalize(e3);
+	  	e3 = e3*radius;
+	  	normalize(e2);
+	  	e2 = e2*radius;
+
+	  	//std::cout << e2 << ", " << e3 << std::endl;
+	  	//srand(time(NULL));
+	  	float x, y;
+	  	do {
+	   		x = ((float)rand())/((float)RAND_MAX)*2 - 1;
+	    	y = ((float)rand())/((float)RAND_MAX)*2 - 1;
+	  	} while (x*x + y*y > 1);
+
+	  	return this->centroid + (x * e2 + e3*y);
 }

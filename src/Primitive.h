@@ -18,6 +18,14 @@ public:
 	virtual vec2 getTexCoord(Ray* ray) = 0;
 	virtual AABB* calculateAABB() = 0;
 
+	virtual vec3 randomPointOnPrimitive(vec3 p) {
+		return vec3(0,0,1);
+	};
+
+	virtual float calculateArea(){
+		return 0;
+	}
+
 	vec3 centroid;
 	AABB* bounds;
 };
