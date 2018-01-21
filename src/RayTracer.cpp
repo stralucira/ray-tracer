@@ -37,7 +37,7 @@ int RayTracer::Render(int samples)
 			}
 			else
 			{
-				color = Sample(&ray, 0);
+				color = Sample(&ray, 0, false);
 			}
 
 			/*color *= 255.0f;
@@ -418,7 +418,7 @@ vec3 RayTracer::SampleSimple2(Ray* ray, int depth)
 	return PI * 2.0f * BRDF * Ei;
 }
 
-vec3 RayTracer::Sample(Ray* ray, int depth)
+vec3 RayTracer::Sample(Ray* ray, int depth, bool secondaryRay)
 {
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0) { return BACKGROUND_COLOR; }
 	
@@ -433,7 +433,17 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	}
 
 	// terminate if we hit a light source
-	if (ray->hit->getIsLight()) { return BLACK; }
+	if (ray->hit->getIsLight())
+	{
+		if (secondaryRay)
+		{
+			return BLACK;
+		}
+		else
+		{
+			return ray->hit->material->diffuse;
+		}
+	}
 
 	// sample a random light source
 	// TODO -- Pick a random light and create a random ray towards that light
@@ -469,7 +479,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 
 	// update throughput
 	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
-	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
+	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R); // irradiance
 	return PI * 2.0f * BRDF * Ei + Ld;
 }
 
