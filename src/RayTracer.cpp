@@ -17,6 +17,8 @@ int RayTracer::Render(int samples)
 	int pixelCount = 0;
 	float invSample = 1 / (float)samples;
 
+	int halfWidth = SCRWIDTH / 2;
+
 #pragma omp parallel for private(x)
 	for (int y = 0; y < SCRHEIGHT; y++)
 	{
@@ -25,8 +27,19 @@ int RayTracer::Render(int samples)
 			//Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
 			Ray ray; this->scene->camera->GenerateRay(&ray, x, y);
 			//vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
-			vec3 color = Sample(&ray, 0);					// Pathtracing
+			//vec3 color = SampleSimple(&ray, 0);			// Pathtracing simple
+			//vec3 color = Sample(&ray, 0);					// Pathtracing
 			
+			vec3 color;
+			if (x < halfWidth)
+			{
+				color = SampleSimple(&ray, 0);
+			}
+			else
+			{
+				color = SampleSimple2(&ray, 0);
+			}
+
 			/*color *= 255.0f;
 			int r = glm::min((int)color.r, 255);
 			int g = glm::min((int)color.g, 255);
@@ -338,13 +351,10 @@ vec3 RayTracer::Trace(Ray* ray)
 	else return ray->orig + ray->dir * nearest;
 }
 
-vec3 RayTracer::Sample(Ray* ray, int depth)
+vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 {
-	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
-	{
-		return BACKGROUND_COLOR;
-	}
-	
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0) { return BACKGROUND_COLOR; }
+
 	// trace ray
 	vec3 hitPoint = Trace(ray);
 
@@ -352,26 +362,88 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	if (ray->t == INFINITY)
 	{
 		//return BACKGROUND_COLOR;
-		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
-
 
 	// terminate if we hit a light source
 	if (ray->hit->getIsLight())
 	{
-		return BLACK;
-		//return ray->hit->material->diffuse;
+		return ray->hit->material->diffuse;
 	}
 
+	vec3 normal = ray->hit->getNormal(hitPoint);
+
+	// continue in random direction
+	vec3 R = CosineWeightedDiffuseReflection(normal);
+	Ray newRay = Ray(hitPoint, R);
+
+	// update throughput
+	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
+	vec3 Ei = SampleSimple(&newRay, depth + 1) * dot(normal, R); // irradiance
+	return PI * 2.0f * BRDF * Ei;
+}
+
+vec3 RayTracer::SampleSimple2(Ray* ray, int depth)
+{
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0)
+	{
+		return BACKGROUND_COLOR;
+	}
+
+	// trace ray
+	vec3 hitPoint = Trace(ray);
+
+	// teriminate if ray left the scene
+	if (ray->t == INFINITY)
+	{
+		//return BACKGROUND_COLOR;
+		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
+	}
+
+	// terminate if we hit a light source
+	if (ray->hit->getIsLight())
+	{
+		return ray->hit->material->diffuse;
+	}
+
+	vec3 normal = ray->hit->getNormal(hitPoint);
+
+	// continue in random direction
+	vec3 R = CosineWeightedDiffuseReflection2(normal);
+	Ray newRay = Ray(hitPoint, R);
+
+	// update throughput
+	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
+	vec3 Ei = SampleSimple2(&newRay, depth + 1) * dot(normal, R); // irradiance
+	return PI * 2.0f * BRDF * Ei;
+}
+
+vec3 RayTracer::Sample(Ray* ray, int depth)
+{
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0) { return BACKGROUND_COLOR; }
+	
+	// trace ray
+	vec3 hitPoint = Trace(ray);
+	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
+
+	// teriminate if ray left the scene
+	if (ray->t == INFINITY)
+	{
+		return BACKGROUND_COLOR;
+		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+	}
+
+	// terminate if we hit a light source
+	if (ray->hit->getIsLight()) { return BLACK; }
+
+	// sample a random light source
 	// TODO -- Pick a random light and create a random ray towards that light
 	Primitive* randLight = this->scene->areaLightList.back();
 
-
 	vec3 randPointOnLight = randLight->randomPointOnPrimitive(hitPoint);
-	vec3 randDirToRandLight =  normalize(randPointOnLight - hitPoint);
+	vec3 randDirToRandLight = normalize(randPointOnLight - hitPoint);
 
-	float dist = glm::length(randPointOnLight-hitPoint);
-
+	float dist = glm::length(randPointOnLight - hitPoint);
 
 	// Create a ray to random point on light
 	Ray lr = Ray(hitPoint, randDirToRandLight); 
@@ -380,13 +452,15 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	vec3 normal = ray->hit->getNormal(hitPoint);
 
 	vec3 Ld;
-	if (Trace(&lr) != BLACK && dot(normal, randDirToRandLight) > 0 && dot(lightNormal, randDirToRandLight*-1.0f) > 0) {
+	if (Trace(&lr) != BLACK && dot(normal, randDirToRandLight) > 0 && dot(lightNormal, randDirToRandLight*-1.0f) > 0)
+	{
 		//TODO--calculate area of light, solid angle and irradiance
-		float solidAngle = (dot(lightNormal, randDirToRandLight*-1.0f)*randLight->calculateArea()) / (dist*dist);
+		float solidAngle = (dot(lightNormal, randDirToRandLight*-1.0f) * randLight->calculateArea()) / (dist * dist);
 
 
 		Ld = randLight->material->diffuse * ((solidAngle * INVPI) * dot(normal,randDirToRandLight));
-	} else {
+	} else
+	{
 		Ld = BLACK;
 	}
 
@@ -395,7 +469,6 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	Ray newRay = Ray(hitPoint, R);
 
 	// update throughput
-	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
 	return PI * 2.0f * BRDF * Ei + Ld;
 }
@@ -416,6 +489,27 @@ vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 	mat3 tangentSpace = mat3(b, t, normal);
 
 	return tangentSpace * dir;
+}
+
+vec3 RayTracer::CosineWeightedDiffuseReflection2(vec3 normal)
+{
+	const vec3 absNormal(fabsf(normal.x), fabsf(normal.y), fabsf(normal.z));
+	vec3 axis(0, 0, 1);
+	if (absNormal.x <= absNormal.y && absNormal.y <= absNormal.z) {
+		axis = vec3(1, 0, 0);
+	}
+	else if (absNormal.y <= absNormal.x && absNormal.y <= absNormal.z) {
+		axis = vec3(0, 1, 0);
+	}
+	const vec3 u1 = cross(axis, normal);
+	const vec3 u2 = cross(u1, normal);
+	const float rand1 = (float)rand() / RAND_MAX;
+	const float tmp1 = sqrtf(1.0f - rand1);
+	const float tmp2 = 2.0f * PI * (float)rand() / RAND_MAX;
+
+	const vec3 dir = u1 * (cosf(tmp2) * tmp1) + u2 * (sinf(tmp2) * tmp1) + normal * sqrtf(rand1);
+	
+	return dot(dir, normal) > 0 ? dir : dir * -1.0f;
 }
 
 // -----------------------------------------------------------

@@ -32,8 +32,8 @@ public:
 	vec3 getNormal(vec3 point);
 
 	AABB* calculateAABB();
-
-	vec3 randomPointOnPrimitive(vec3 p);
+	float calculateArea();
+	vec3 randomPointOnPrimitive(vec3 point);
 
 	float radius, radius2;
 

@@ -22,7 +22,11 @@ public:
 	vec3 getNormal(vec3 point);
 
 	AABB* calculateAABB();
+	float calculateArea();
+	vec3 randomPointOnPrimitive(vec3 point);
 
 	float R, r;
 	vec3 axis;
+
+	bool isLight = false;
 };

@@ -84,7 +84,7 @@ vec2 Cylinder::getTexCoord(Ray* ray)
 
 bool Cylinder::getIsLight()
 {
-	return false;
+	return this->isLight;
 }
 
 vec3 Cylinder::getNormal(vec3 point)
@@ -114,4 +114,14 @@ AABB* Cylinder::calculateAABB()
 	{
 		return new AABB(this->centroid - this->radius, this->centroid + this->radius);
 	}
+}
+
+float Cylinder::calculateArea()
+{
+	return (2.0f * PI * this->radius * this->height) + (2.0f * PI * this->radius * this->radius);
+}
+
+vec3 Cylinder::randomPointOnPrimitive(vec3 point)
+{
+	return point;
 }

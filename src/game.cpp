@@ -228,7 +228,7 @@ void Game::Tick(float dt)
 	++frameCount;
 
 	int pixelCount = rayTracer->Render(frameCount);
-	rayTracer->RenderPacket();
+	//rayTracer->RenderPacket();
 
 	char buffer[500];
 	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt,

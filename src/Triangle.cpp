@@ -63,22 +63,24 @@ AABB* Triangle::calculateAABB()
 	return new AABB(min, max);
 }
 
-vec3 Triangle::randomPointOnPrimitive(vec3 p){
-
+vec3 Triangle::randomPointOnPrimitive(vec3 point)
+{
 	float x, y;
-	do {
-		x = ((float)rand())/((float)RAND_MAX)*2 - 1;
-	 	y = ((float)rand())/((float)RAND_MAX)*2 - 1;
-	} while (x + y >= 1);
+	do
+	{
+		x = (float)rand() / (float)RAND_MAX * 2 - 1;
+	 	y = (float)rand() / (float)RAND_MAX * 2 - 1;
+	}
+	while (x + y >= 1);
 
-	return a + (b - a)*x + (c - a)*y;
+	return a + (b - a) * x + (c - a) * y;
 }
 
-float Triangle::calculateArea(){
+float Triangle::calculateArea()
+{
 	vec3 ab = normalize(b-a);
 	vec3 ac = normalize(c-a);
 	float theta = acos(dot(ab,ac));
 
-	return glm::length(ab)*glm::length(ac)*sin(theta)*0.5f;
+	return glm::length(ab) * glm::length(ac) * sin(theta) * 0.5f;
 }
-

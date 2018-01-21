@@ -16,15 +16,10 @@ public:
 	virtual bool getIsLight() = 0;
 	virtual vec3 getNormal(vec3 point) = 0;
 	virtual vec2 getTexCoord(Ray* ray) = 0;
+	
 	virtual AABB* calculateAABB() = 0;
-
-	virtual vec3 randomPointOnPrimitive(vec3 p) {
-		return vec3(0,0,1);
-	};
-
-	virtual float calculateArea(){
-		return 0;
-	}
+	virtual float calculateArea() = 0;
+	virtual vec3 randomPointOnPrimitive(vec3 p) = 0;
 
 	vec3 centroid;
 	AABB* bounds;

@@ -25,7 +25,7 @@ vec2 Plane::getTexCoord(Ray* ray)
 
 bool Plane::getIsLight()
 {
-	return false;
+	return this->isLight;
 }
 
 vec3 Plane::getNormal(vec3 point)
@@ -36,4 +36,14 @@ vec3 Plane::getNormal(vec3 point)
 AABB* Plane::calculateAABB()
 {
 	return new AABB(vec3(-INFINITY, -INFINITY, -INFINITY), vec3(INFINITY, INFINITY, INFINITY));
+}
+
+float Plane::calculateArea()
+{
+	return INFINITY;
+}
+
+vec3 Plane::randomPointOnPrimitive(vec3 point)
+{
+	return point;
 }

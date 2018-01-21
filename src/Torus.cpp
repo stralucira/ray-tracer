@@ -59,7 +59,7 @@ vec2 Torus::getTexCoord(Ray* ray)
 
 bool Torus::getIsLight()
 {
-	return false;
+	return this->isLight;
 }
 
 vec3 Torus::getNormal(vec3 point)
@@ -74,4 +74,14 @@ vec3 Torus::getNormal(vec3 point)
 AABB* Torus::calculateAABB()
 {
 	return new AABB(this->centroid - R - r, this->centroid + R + r);
+}
+
+float Torus::calculateArea()
+{
+	return (2.0f * PI * R) * (2.0f * PI * r);
+}
+
+vec3 Torus::randomPointOnPrimitive(vec3 point)
+{
+	return point;
 }

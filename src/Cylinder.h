@@ -21,8 +21,12 @@ public:
 	vec3 getNormal(vec3 point);
 
 	AABB* calculateAABB();
+	float calculateArea();
+	vec3 randomPointOnPrimitive(vec3 point);
 
 	vec3 up;
 	float radius;
 	float height;
+
+	bool isLight = false;
 };

@@ -50,16 +50,14 @@ public:
 	bool getIsLight();
 	vec3 getNormal(vec3 point);
 
-	AABB* calculateAABB();
 	vec3 calculateCentroid();
-
+	AABB* calculateAABB();
 	float calculateArea();
-
-	vec3 randomPointOnPrimitive(vec3 p);
+	vec3 randomPointOnPrimitive(vec3 point);
 
 	vec3 a, b, c;
 	vec3 normal0, normal1, normal2;
 	vec2 uv0, uv1, uv2;
-	float area;
+	
 	bool isLight = false;
 };
