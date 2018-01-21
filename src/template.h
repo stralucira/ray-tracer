@@ -12,7 +12,7 @@
 #define GREEN				vec3(0.0f, 1.0f, 0.0f)
 #define BLUE				vec3(0.0f, 0.0f, 1.0f)
 //#define BACKGROUND_COLOR	vec3(0.0f, 0.3f, 0.6f)
-#define BACKGROUND_COLOR	vec3(1.0f, 1.0f, 1.0f)
+#define BACKGROUND_COLOR	vec3(0.5f, 0.5f, 0.5f)
 
 #ifndef _WIN32
 typedef unsigned int uint;	// Already defined in windows environments?

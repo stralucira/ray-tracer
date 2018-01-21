@@ -37,7 +37,7 @@ int RayTracer::Render(int samples)
 			}
 			else
 			{
-				color = SampleSimple2(&ray, 0);
+				color = Sample(&ray, 0);
 			}
 
 			/*color *= 255.0f;
@@ -361,8 +361,8 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		//return BACKGROUND_COLOR;
-		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
+		return BACKGROUND_COLOR;
+		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source
@@ -396,8 +396,8 @@ vec3 RayTracer::SampleSimple2(Ray* ray, int depth)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		//return BACKGROUND_COLOR;
-		return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
+		return BACKGROUND_COLOR;
+		//return scene->skydome ? SampleSkydome(scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source
@@ -424,7 +424,6 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	
 	// trace ray
 	vec3 hitPoint = Trace(ray);
-	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
@@ -457,8 +456,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 		//TODO--calculate area of light, solid angle and irradiance
 		float solidAngle = (dot(lightNormal, randDirToRandLight*-1.0f) * randLight->calculateArea()) / (dist * dist);
 
-
 		Ld = randLight->material->diffuse * ((solidAngle * INVPI) * dot(normal,randDirToRandLight));
+		//printf("");
 	} else
 	{
 		Ld = BLACK;
@@ -469,6 +468,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	Ray newRay = Ray(hitPoint, R);
 
 	// update throughput
+	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 	vec3 Ei = Sample(&newRay, depth + 1) * dot(normal, R); // irradiance
 	return PI * 2.0f * BRDF * Ei + Ld;
 }

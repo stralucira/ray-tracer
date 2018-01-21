@@ -4,16 +4,16 @@
 class Sphere : public Primitive
 {
 public:
-	Sphere(vec3 position, float radius) : Primitive(position)
+	/*Sphere(vec3 position, float radius) : Primitive(position)
 	{
 		this->radius = radius;
 		this->radius2 = radius * radius;
 		
 		this->centroid = position;
 		this->bounds = calculateAABB();
-	}
+	}*/
 
-	Sphere(vec3 position, float radius, bool isLight) : Primitive(position)
+	Sphere(vec3 position, float radius, bool isLight = false) : Primitive(position)
 	{
 		this->radius = radius;
 		this->radius2 = radius * radius;
