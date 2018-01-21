@@ -37,7 +37,7 @@ int RayTracer::Render(int samples)
 			}
 			else
 			{
-				color = Sample(&ray, 0, false);
+				color = Sample(&ray, 0, true);
 			}
 
 			/*color *= 255.0f;
@@ -418,7 +418,7 @@ vec3 RayTracer::SampleSimple2(Ray* ray, int depth)
 	return PI * 2.0f * BRDF * Ei;
 }
 
-vec3 RayTracer::Sample(Ray* ray, int depth, bool secondaryRay)
+vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 {
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0) { return BACKGROUND_COLOR; }
 	
@@ -432,16 +432,18 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool secondaryRay)
 		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
 	}
 
+	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
+
 	// terminate if we hit a light source
 	if (ray->hit->getIsLight())
 	{
-		if (secondaryRay)
+		if (lastSpecular)
 		{
-			return BLACK;
+			return ray->hit->material->diffuse;
 		}
 		else
 		{
-			return ray->hit->material->diffuse;
+			return BLACK;
 		}
 	}
 
@@ -452,7 +454,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 randPointOnLight = randLight->randomPointOnPrimitive(hitPoint);
 	vec3 randDirToRandLight = normalize(randPointOnLight - hitPoint);
 
-	float dist = glm::length(randPointOnLight - hitPoint);
+	float dist2 = glm::length2(randPointOnLight - hitPoint);
 
 	// Create a ray to random point on light
 	Ray lr = Ray(hitPoint, randDirToRandLight); 
@@ -463,23 +465,20 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool secondaryRay)
 	vec3 Ld;
 	if (Trace(&lr) != BLACK && dot(normal, randDirToRandLight) > 0 && dot(lightNormal, randDirToRandLight*-1.0f) > 0)
 	{
-		//TODO--calculate area of light, solid angle and irradiance
-		float solidAngle = (dot(lightNormal, randDirToRandLight*-1.0f) * randLight->calculateArea()) / (dist * dist);
-
-		Ld = randLight->material->diffuse * ((solidAngle * INVPI) * dot(normal,randDirToRandLight));
-		//printf("");
-	} else
+		float solidAngle = (dot(lightNormal, -randDirToRandLight) * randLight->calculateArea()) / (dist2);
+		Ld = randLight->material->diffuse * solidAngle * BRDF * dot(normal,randDirToRandLight);
+	}
+	else
 	{
 		Ld = BLACK;
 	}
 
 	// continue random walk
 	vec3 R = CosineWeightedDiffuseReflection(normal);
-	Ray newRay = Ray(hitPoint, R);
+	Ray r = Ray(hitPoint, R);
 
 	// update throughput
-	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
-	vec3 Ei = Sample(&newRay, depth + 1, true) * dot(normal, R); // irradiance
+	vec3 Ei = Sample(&r, depth + 1, false) * dot(normal, R); // irradiance
 	return PI * 2.0f * BRDF * Ei + Ld;
 }
 

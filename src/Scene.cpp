@@ -33,7 +33,7 @@ Scene::Scene(int scene_id)
 		//lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
 		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f, true));
-		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::GLASS);
+		primList.back()->material = new Material(vec3(50.0f, 50.0f, 50.0f), Material::Shader::GLASS);
 		areaLightList.push_back(primList.back());
 		//primList.back()->index = index; index++;
 
