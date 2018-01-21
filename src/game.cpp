@@ -28,6 +28,7 @@ void Game::Init()
 // -----------------------------------------------------------
 	
 	LoadScene(1); // <-- Change scene here
+	srand (time(NULL));
 }
 
 void Game::LoadScene(int scene_id)

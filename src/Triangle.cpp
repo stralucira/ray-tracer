@@ -64,12 +64,13 @@ AABB* Triangle::calculateAABB()
 }
 
 vec3 Triangle::randomPointOnPrimitive(vec3 p){
-
-	float x, y;
-	do {
-		x = ((float)rand())/((float)RAND_MAX)*2 - 1;
-	 	y = ((float)rand())/((float)RAND_MAX)*2 - 1;
-	} while (x + y >= 1);
+	
+	float x = (float) rand();
+	float y = (float) rand();
+	if (x + y >= 1) {
+		x = 1 - x;
+		y = 1 - y;
+	}
 
 	return a + (b - a)*x + (c - a)*y;
 }

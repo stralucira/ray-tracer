@@ -359,8 +359,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 	// terminate if we hit a light source
 	if (ray->hit->getIsLight())
 	{
-		return BLACK;
-		//return ray->hit->material->diffuse;
+		//return BLACK;
+		return ray->hit->material->diffuse;
 	}
 
 	// TODO -- Pick a random light and create a random ray towards that light
@@ -384,8 +384,9 @@ vec3 RayTracer::Sample(Ray* ray, int depth)
 		//TODO--calculate area of light, solid angle and irradiance
 		float solidAngle = (dot(lightNormal, randDirToRandLight*-1.0f)*randLight->calculateArea()) / (dist*dist);
 
-
 		Ld = randLight->material->diffuse * ((solidAngle * INVPI) * dot(normal,randDirToRandLight));
+
+		printf("Contribution: %f\n", Ld.x);
 	} else {
 		Ld = BLACK;
 	}
