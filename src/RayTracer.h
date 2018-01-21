@@ -28,8 +28,8 @@ public:
 	// Pathtracing stuff
 	vec3 Trace(Ray* ray);
 	vec3 Sample(Ray* ray, int depth, bool lastSpecular);
+	vec3 SampleMIS(Ray* ray);
 	vec3 SampleSimple(Ray* ray, int depth);
-	vec3 SampleSimple2(Ray* ray, int depth);
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 	vec3 CosineWeightedDiffuseReflection2(vec3 normal);
 
