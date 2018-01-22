@@ -385,13 +385,54 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 
 	if (ray->hit->material->shader == Material::Shader::GLASS)
 	{
-		vec3 refractionDirection = normalize(refract(ray->dir, N, 0.8f));
+		/*vec3 refractionDirection = normalize(refract(ray->dir, N, 0.8f));
 		vec3 refractionRayOrig = (dot(refractionDirection, N) < 0) ?
 			I - N * EPSILON :
 			I + N * EPSILON;
 
 		Ray r = Ray(refractionRayOrig, refractionDirection);
-		return GetColor(ray) * SampleSimple(&r, depth + 1);
+		return GetColor(ray) * SampleSimple(&r, depth + 1);*/
+
+		vec3 refractColor = BLACK;
+
+		float kr = Fresnel(ray->dir, N, 1.52f);
+		bool outside = dot(ray->dir, N) < 0;
+		vec3 bias = EPSILON * ray->hit->getNormal(I);
+
+		float cosi = clamp(-1.0f, 1.0f, dot(N, ray->dir));
+		float etai = 1, etat = 1.52f;
+		vec3 n = N;
+
+		if (cosi < 0)
+		{
+			cosi = -cosi;
+		}
+		else
+		{
+			std::swap(etai, etat);
+			n = -N;
+		}
+		float eta = etai / etat;
+		float k = 1 - eta * eta * (1 - cosi * cosi);
+
+		if (k < 0)
+		{
+			return GetColor(ray);
+		}
+		else
+		{
+			Ray refractRay = Ray(I, eta * ray->dir + (eta * cosi - sqrtf(k)) * n);
+
+			vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
+			refractRay.orig = hitEpsilon;
+
+			refractColor = this->SampleSimple(&refractRay, depth += 1);
+		}
+
+		Ray reflectRay = Ray(I, reflect(ray->dir, N));
+		vec3 reflectColor = GetColor(ray) * SampleSimple(&reflectRay, depth += 1);
+
+		return reflectColor * kr + refractColor * (1 - kr);
 	}
 
 	// continue in random direction
@@ -450,13 +491,54 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 	if (ray->hit->material->shader == Material::Shader::GLASS)
 	{
-		vec3 refractionDirection = normalize(refract(ray->dir, normal, 0.8f));
-		vec3 refractionRayOrig = (dot(refractionDirection, normal) < 0) ?
-			hitPoint - normal * EPSILON :
-			hitPoint + normal * EPSILON;
+		/*vec3 refractionDirection = normalize(refract(ray->dir, N, 0.8f));
+		vec3 refractionRayOrig = (dot(refractionDirection, N) < 0) ?
+		I - N * EPSILON :
+		I + N * EPSILON;
 
 		Ray r = Ray(refractionRayOrig, refractionDirection);
-		return GetColor(ray) * Sample(&r, depth + 1, false);
+		return GetColor(ray) * SampleSimple(&r, depth + 1);*/
+
+		vec3 refractColor = BLACK;
+
+		float kr = Fresnel(ray->dir, normal, 1.52f);
+		bool outside = dot(ray->dir, normal) < 0;
+		vec3 bias = EPSILON * ray->hit->getNormal(hitPoint);
+
+		float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
+		float etai = 1, etat = 1.52f;
+		vec3 n = normal;
+
+		if (cosi < 0)
+		{
+			cosi = -cosi;
+		}
+		else
+		{
+			std::swap(etai, etat);
+			n = -normal;
+		}
+		float eta = etai / etat;
+		float k = 1 - eta * eta * (1 - cosi * cosi);
+
+		if (k < 0)
+		{
+			return GetColor(ray);
+		}
+		else
+		{
+			Ray refractRay = Ray(hitPoint, eta * ray->dir + (eta * cosi - sqrtf(k)) * n);
+
+			vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
+			refractRay.orig = hitEpsilon;
+
+			refractColor = this->SampleSimple(&refractRay, depth += 1);
+		}
+
+		Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
+		vec3 reflectColor = GetColor(ray) * SampleSimple(&reflectRay, depth += 1);
+
+		return reflectColor * kr + refractColor * (1 - kr);
 	}
 
 	// sample a random light source
@@ -481,8 +563,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	vec3 Ld;
 	if (Trace(&lr) != BLACK && dot(normal, randomDirToRandomLight) > 0 && dot(lightNormal, -randomDirToRandomLight) > 0)
 	{
-		//float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randomLight->calculateArea()) / (dist * dist);
-		//Ld = randomLight->material->diffuse * solidAngle * BRDF * dot(normal, randomDirToRandomLight);
+		/*float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randomLight->calculateArea()) / dist2;
+		Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(normal, randomDirToRandomLight);*/
 
 		float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randomLight->calculateArea()) / dist2;
 		float lightPDF = 1 / solidAngle; if (lightPDF == 0) lightPDF = EPSILON;
