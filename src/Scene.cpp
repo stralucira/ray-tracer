@@ -33,7 +33,7 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
 		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f, true));
-		primList.back()->material = new Material(vec3(10.0f, 10.0f, 10.0f), Material::Shader::GLASS);
+		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::GLASS);
 		areaLightList.push_back(primList.back());
 		//primList.back()->index = index; index++;
 
@@ -69,15 +69,16 @@ Scene::Scene(int scene_id)
 		//primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
-		//primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1, true));
-		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1));
-		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
-		//areaLightList.push_back(primList.back());
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 0, true));
+		//primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1));
+		primList.back()->material = new Material(vec3(10.0f, 10.0f, 10.0f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
 		//primList.back()->index = index; index++;
 
-		//primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 0, true));
+		//primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 1, true));
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 0));
 		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::DIFFUSE);
+		//areaLightList.push_back(primList.back());
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(-5, 0, 0), vec3(1, 0, 0))); // left plane
@@ -85,11 +86,11 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), 1));
-		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), 1));
-		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(5, 0, 0), vec3(-1, 0, 0))); // right plane
@@ -97,11 +98,11 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f)));
-		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f)));
-		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane

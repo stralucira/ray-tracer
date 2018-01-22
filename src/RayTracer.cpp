@@ -365,8 +365,8 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		return BACKGROUND_COLOR;
-		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+		//return BACKGROUND_COLOR;
+		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source
@@ -420,8 +420,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		return BACKGROUND_COLOR;
-		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+		//return BACKGROUND_COLOR;
+		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source
@@ -461,20 +461,32 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 	// sample a random light source
 	// TODO -- Pick a random light and create a random ray towards that light
-	Primitive* randLight = this->scene->areaLightList.back();
-	vec3 randomPointOnLight = randLight->randomPointOnPrimitive(hitPoint);
+	//Primitive* randomLight = this->scene->areaLightList.back();
+
+	int lightIndex = rand() % this->scene->areaLightList.size();
+	Primitive* randomLight = this->scene->areaLightList[lightIndex];
+	vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(hitPoint);
 	
 	vec3 randomDirToRandomLight = normalize(randomPointOnLight - hitPoint);
-	vec3 lightNormal = randLight->getNormal(randomPointOnLight);
+	vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
 	float dist2 = glm::length2(randomPointOnLight - hitPoint);
+
+	/*vec3 randomDirToRandomLight = randomPointOnLight - hitPoint;
+	vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
+	float dist = length(randomDirToRandomLight);
+	randomDirToRandomLight /= dist;*/
 
 	Ray lr = Ray(hitPoint, randomDirToRandomLight);
 
 	vec3 Ld;
 	if (Trace(&lr) != BLACK && dot(normal, randomDirToRandomLight) > 0 && dot(lightNormal, -randomDirToRandomLight) > 0)
 	{
-		float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randLight->calculateArea()) / dist2;
-		Ld = randLight->material->diffuse * solidAngle * BRDF * dot(normal, randomDirToRandomLight);
+		//float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randomLight->calculateArea()) / (dist * dist);
+		//Ld = randomLight->material->diffuse * solidAngle * BRDF * dot(normal, randomDirToRandomLight);
+
+		float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randomLight->calculateArea()) / dist2;
+		float lightPDF = 1 / solidAngle; if (lightPDF == 0) lightPDF = EPSILON;
+		Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(normal, randomDirToRandomLight) / lightPDF);
 	}
 	else
 	{
