@@ -33,6 +33,10 @@ public:
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 	vec3 CosineWeightedDiffuseReflection2(vec3 normal);
 
+	glm::uint RandomInt(glm::uint seed);
+	float RandomFloat(glm::uint seed);
+	vec2 hash2(glm::uint seed);
+
 	// Global stuff
 	vec3 GetColor(Ray* ray);
 	vec3 SampleTexturePoint(Surface* tex, vec2 uv);

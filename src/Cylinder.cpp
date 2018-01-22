@@ -60,7 +60,7 @@ bool Cylinder::intersect(Ray* ray)
 	bool intersect = false;
 	for (size_t i = 0; i < points.size(); i++)
 	{
-		if (minT > points[i] && points[i] >= 0.0001f)
+		if (minT > points[i] && points[i] >= EPSILON)
 		{
 			minT = points[i];
 			intersect = true;

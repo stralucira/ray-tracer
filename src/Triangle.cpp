@@ -11,7 +11,7 @@ bool Triangle::intersect(Ray* ray)
 	vec3 pvec = cross(ray->dir, ac);
 	float det = dot(ab, pvec);
 
-	//if (det > -0.0001f && det < 0.0001f) return false;
+	//if (det > -EPSILON && det < EPSILON) return false;
 	
 	float invDet = 1.0f / det;
 	
@@ -25,7 +25,7 @@ bool Triangle::intersect(Ray* ray)
 
 	float t = dot(ac, qvec) * invDet;
 
-	if (t > 0.0001f && t < ray->t)
+	if (t > EPSILON && t < ray->t)
 	{
 		ray->t = t;
 		ray->u = u;
