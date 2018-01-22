@@ -25,17 +25,15 @@ public:
 	vec3 Reflect(vec3 dir, vec3 normal);
 	float Fresnel(vec3 dir, vec3 normal, float index);
 
-	// Pathtracing stuff
+	// Path tracing stuff
 	vec3 Trace(Ray* ray);
 	vec3 Sample(Ray* ray, int depth, bool lastSpecular);
 	vec3 SampleMIS(Ray* ray);
 	vec3 SampleSimple(Ray* ray, int depth);
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
-	vec3 CosineWeightedDiffuseReflection2(vec3 normal);
 
-	glm::uint RandomInt(glm::uint seed);
-	float RandomFloat(glm::uint seed);
-	vec2 hash2(glm::uint seed);
+	glm::uint RandomInt(glm::uint* seed);
+	float RandomFloat(glm::uint* seed);
 
 	// Global stuff
 	vec3 GetColor(Ray* ray);

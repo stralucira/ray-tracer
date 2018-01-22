@@ -1,11 +1,11 @@
 #pragma once
 
-#define SCRWIDTH	1024
-#define SCRHEIGHT	576
-#define MAXDEPTH	10
+#define SCRWIDTH	800
+#define SCRHEIGHT	600
+#define MAXDEPTH	16
 #define EPSILON		0.0001f
 
-#define ALTERNATERENDERMODE 1
+#define ALTERNATERENDERMODE 0
 #define ENABLEBINNING 1
 #define ENABLETOPBVH 0
 #define ENABLEBVH 1

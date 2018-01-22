@@ -1,7 +1,10 @@
 ﻿#include "template.h"
 #include "RayTracer.h"
+#include "Sphere.h"
 
 int iCPU2 = omp_get_num_procs();
+glm::uint seed1 = 161219 * 49977;
+glm::uint seed2 = 324867 * 67869;
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
 {
@@ -27,8 +30,9 @@ int RayTracer::Render(int samples)
 			//Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
 			Ray ray; this->scene->camera->GenerateRay(&ray, x, y);
 			//vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
-			//vec3 color = SampleSimple(&ray, 0);			// Pathtracing simple
-			//vec3 color = Sample(&ray, 0);					// Pathtracing
+			//vec3 color = SampleSimple(&ray, 0);			// Path tracing with importance sampling
+			//vec3 color = Sample(&ray, 0);					// Path tracing with importance sampling and next event estimation
+			//vec3 color = SampleMIS(&ray);					// Path tracing with multiple importance sampling
 			
 			vec3 color;
 			if (x < halfWidth)
@@ -335,7 +339,7 @@ float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)
 }
 
 // -----------------------------------------------------------
-// Pathtracing stuff
+// Path tracing stuff
 // -----------------------------------------------------------
 
 vec3 RayTracer::Trace(Ray* ray)
@@ -359,13 +363,36 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 	vec3 I = Trace(ray); // ray intersection
 
 	// teriminate if ray left the scene
-	if (ray->t == INFINITY) return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BACKGROUND_COLOR;
+	if (ray->t == INFINITY)
+	{
+		return BACKGROUND_COLOR;
+		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+	}
 
 	// terminate if we hit a light source
 	if (ray->hit->getIsLight()) return ray->hit->material->diffuse;
 	/// Emission Le(x, ωo) (outgoing radiance), direct illumination
 
 	vec3 N = ray->hit->getNormal(I); // intersection normal
+
+	// surface interaction
+	if (ray->hit->material->shader == Material::Shader::MIRROR)
+	{
+		// continue in fixed direction
+		Ray r = Ray(I, reflect(ray->dir, N));
+		return GetColor(ray) * SampleSimple(&r, depth + 1);
+	}
+
+	if (ray->hit->material->shader == Material::Shader::GLASS)
+	{
+		vec3 refractionDirection = normalize(refract(ray->dir, N, 0.8f));
+		vec3 refractionRayOrig = (dot(refractionDirection, N) < 0) ?
+			I - N * EPSILON :
+			I + N * EPSILON;
+
+		Ray r = Ray(refractionRayOrig, refractionDirection);
+		return GetColor(ray) * SampleSimple(&r, depth + 1);
+	}
 
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(N);
@@ -393,8 +420,8 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		//return BACKGROUND_COLOR;
-		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+		return BACKGROUND_COLOR;
+		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
 	}
 
 	// terminate if we hit a light source
@@ -410,28 +437,44 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 		}
 	}
 
+	vec3 normal = ray->hit->getNormal(hitPoint);
 	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
+
+	// surface interaction
+	if (ray->hit->material->shader == Material::Shader::MIRROR)
+	{
+		// continue in fixed direction
+		Ray r = Ray(hitPoint, reflect(ray->dir, normal));
+		return GetColor(ray) * SampleSimple(&r, depth + 1);
+	}
+
+	if (ray->hit->material->shader == Material::Shader::GLASS)
+	{
+		vec3 refractionDirection = normalize(refract(ray->dir, normal, 0.8f));
+		vec3 refractionRayOrig = (dot(refractionDirection, normal) < 0) ?
+			hitPoint - normal * EPSILON :
+			hitPoint + normal * EPSILON;
+
+		Ray r = Ray(refractionRayOrig, refractionDirection);
+		return GetColor(ray) * Sample(&r, depth + 1, false);
+	}
 
 	// sample a random light source
 	// TODO -- Pick a random light and create a random ray towards that light
 	Primitive* randLight = this->scene->areaLightList.back();
+	vec3 randomPointOnLight = randLight->randomPointOnPrimitive(hitPoint);
+	
+	vec3 randomDirToRandomLight = normalize(randomPointOnLight - hitPoint);
+	vec3 lightNormal = randLight->getNormal(randomPointOnLight);
+	float dist2 = glm::length2(randomPointOnLight - hitPoint);
 
-	vec3 randPointOnLight = randLight->randomPointOnPrimitive(hitPoint);
-	vec3 randDirToRandLight = normalize(randPointOnLight - hitPoint);
-
-	float dist2 = glm::length2(randPointOnLight - hitPoint);
-
-	// Create a ray to random point on light
-	Ray lr = Ray(hitPoint, randDirToRandLight); 
-
-	vec3 lightNormal = randLight->getNormal(randPointOnLight);
-	vec3 normal = ray->hit->getNormal(hitPoint);
+	Ray lr = Ray(hitPoint, randomDirToRandomLight);
 
 	vec3 Ld;
-	if (Trace(&lr) != BLACK && dot(normal, randDirToRandLight) > 0 && dot(lightNormal, -randDirToRandLight) > 0)
+	if (Trace(&lr) != BLACK && dot(normal, randomDirToRandomLight) > 0 && dot(lightNormal, -randomDirToRandomLight) > 0)
 	{
-		float solidAngle = (dot(lightNormal, -randDirToRandLight) * randLight->calculateArea()) / dist2;
-		Ld = randLight->material->diffuse * solidAngle * BRDF * dot(normal, randDirToRandLight);
+		float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randLight->calculateArea()) / dist2;
+		Ld = randLight->material->diffuse * solidAngle * BRDF * dot(normal, randomDirToRandomLight);
 	}
 	else
 	{
@@ -475,7 +518,7 @@ vec3 RayTracer::SampleMIS(Ray* ray)
 		if (dot(N, L) > 0 && dot(Nl, -L) > 0) if (Trace(&lr) != BLACK)
 		{
 			float solidAngle = (dot(Nl, -L) * randomLight->calculateArea()) / dist2;
-			float lightPDF = 1 / solidAngle;
+			float lightPDF = 1 / solidAngle; if (solidAngle = 0) solidAngle = EPSILON;
 			E += T * (dot(N, L) / lightPDF) * BRDF * randomLight->material->diffuse;
 		}
 
@@ -490,7 +533,9 @@ vec3 RayTracer::SampleMIS(Ray* ray)
 
 vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 {
-	float r0 = (float)rand() / RAND_MAX, r1 = (float)rand() / RAND_MAX;
+	/// RNG 1
+	//float r0 = (float)rand() / RAND_MAX, r1 = (float)rand() / RAND_MAX;
+	float r0 = RandomFloat(&seed1), r1 = RandomFloat(&seed2);
 	float r = sqrt(r0);
 	float theta = 2 * PI * r1;
 	float x = r * cosf(theta);
@@ -502,44 +547,63 @@ vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 	mat3 tangentSpace = mat3(b, t, normal);
 
 	return tangentSpace * vec3(x, y, sqrt(1 - r0));
+
+	/// RNG 2
+	/*float r1 = RandomFloat(&seed1), r2 = RandomFloat(&seed1);
+	float term1 = 2 * PI * r1;
+	float term2 = 2 * sqrt(r2 * (1 - r2));
+	vec3 R = vec3(cos(term1) * term2, sin(term1) * term2, 1 - 2 * r2);
+	if (R.z < 0) R.z = -R.z;
+
+	vec3 n = normal;
+	vec3 axis = fabs(n.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	vec3 t = normalize(cross(axis, n));
+	vec3 b = cross(n, t);
+
+	return normalize(R.x * t + R.y * b + R.z*n);*/
+
+	/// RNG 3
+	/*float r1 = 2.0f * PI * RandomFloat(&seed1);
+	float r2 = 1;
+	while (r2 == 1) r2 = RandomFloat(&seed1);
+
+	float r2s = sqrt(r2);
+	vec3 n = normal;
+	vec3 axis = fabs(n.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	vec3 t = normalize(cross(axis, n));
+	vec3 b = cross(n, t);
+
+	return normalize(t * cos(r1) * r2s + b * sin(r1) * r2s + n * sqrt(1.0f - r2));*/
+
+	/// RNG 4
+	/*float r0 = RandomFloat(&seed1), r1 = RandomFloat(&seed2);
+	float r = sqrt(r0);
+	float theta = 2 * PI * r1;
+	float x = r * cosf(theta);
+	float y = r * sinf(theta);
+	float minus = 1 - r0;
+	float sqrtR0 = sqrt(max(0.0f, minus));
+	vec3 randomDir = abs(normal.x) > 0.1f ? vec3(0.0f, 1.0f, 0.0f) : vec3(1.0f, 0.0f, 0.0f);
+	vec3 direction = normalize(vec3(x, y, sqrtR0));
+	vec3 t = cross(randomDir, normal);
+	vec3 b = cross(normal, t);
+	mat3 tangentSpace = mat3(t, b, normal);
+	return = tangentSpace * direction;*/
 }
 
-glm::uint RayTracer::RandomInt(glm::uint seed)
+glm::uint RayTracer::RandomInt(glm::uint* seed)
 {
 	// Marsaglia Xor32; see http://excamera.com/sphinx/article-xorshift.html
 	// also see https://github.com/WebDrake/xorshift/blob/master/xorshift.c for higher quality variants
-	seed ^= seed << 13;
-	seed ^= seed >> 17;
-	seed ^= seed << 5;
-	return seed;
+	*seed ^= *seed << 13;
+	*seed ^= *seed >> 17;
+	*seed ^= *seed << 5;
+	return *seed;
 }
 
-float RayTracer::RandomFloat(glm::uint seed)
+float RayTracer::RandomFloat(glm::uint* seed)
 {
 	return RandomInt(seed) * 2.3283064365387e-10f;
-}
-
-vec2 RayTracer::hash2(glm::uint seed)
-{
-	return fract(sin(vec2(seed += 0.1, seed += 0.1)) * vec2(43758.5453123, 22578.1459123));
-}
-
-vec3 RayTracer::CosineWeightedDiffuseReflection2(vec3 normal)
-{
-	/*glm::uint seed1 = ((uint)frameCount + pixel) * 160481219 * 49979687;
-	glm::uint seed2 = ((uint)frameCount + pixel) * 32452867 * 67867979;
-
-	vec2 r = hash2(seed1);
-	vec3  uu = normalize(cross(normal, vec3(0.0, 1.0, 1.0)));
-	vec3  vv = cross(uu, normal);
-	float ra = sqrt(r.y);
-	float rx = ra * cos(6.2831*r.x);
-	float ry = ra * sin(6.2831*r.x);
-	float rz = sqrt(1.0 - r.y);
-	vec3  rr = vec3(rx*uu + ry * vv + rz * normal);
-	return normalize(rr);*/
-
-	return BLACK;
 }
 
 // -----------------------------------------------------------

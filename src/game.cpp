@@ -28,7 +28,7 @@ void Game::Init()
 // -----------------------------------------------------------
 	
 	LoadScene(1); // <-- Change scene here
-	srand (time(NULL));
+	srand(time(NULL));
 }
 
 void Game::LoadScene(int scene_id)
@@ -48,7 +48,59 @@ void Game::HandleInput( float dt ) { }
 
 void Game::KeyUp(int a_Key) { keyState[a_Key] = false; }
 
-void Game::KeyDown(int a_Key) { keyState[a_Key] = true; }
+void Game::KeyDown(int a_Key)
+{
+	keyState[a_Key] = true;
+
+	switch (a_Key)
+	{
+		// Print Camera Position:
+	case SDL_SCANCODE_P:
+		frameCount = FRAMEMODIFIER;
+		rayTracer->scene->camera->PrintPosition();
+		break;
+
+		// Move light to current camera position
+	case SDL_SCANCODE_L:
+		frameCount = FRAMEMODIFIER;
+		rayTracer->scene->lightList.back()->pos = rayTracer->scene->camera->pos;
+		break;
+
+		// BVH Depth rendering
+	case SDL_SCANCODE_B:
+		frameCount = FRAMEMODIFIER;
+		rayTracer->depthRendering = !rayTracer->depthRendering;
+		break;
+
+		// Toggle Shadow
+	case SDL_SCANCODE_V:
+		frameCount = FRAMEMODIFIER;
+		rayTracer->renderShadow = !rayTracer->renderShadow;
+		break;
+
+		// Toggle Traversal Mode
+	case SDL_SCANCODE_T:
+		frameCount = FRAMEMODIFIER;
+#if ENABLETOPBVH
+		if (rayTracer->scene->bvhTop->traversalMode != 2)
+			rayTracer->scene->bvhTop->traversalMode++;
+		else
+			rayTracer->scene->bvhTop->traversalMode = 0;
+#else
+		if (rayTracer->scene->bvh->traversalMode != 2)
+			rayTracer->scene->bvh->traversalMode++;
+		else
+			rayTracer->scene->bvh->traversalMode = 0;
+#endif
+		break;
+
+		// Reset Camera Position:
+	case SDL_SCANCODE_R:
+		frameCount = FRAMEMODIFIER;
+		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt);
+		break;
+	}
+}
 
 //	frameCount = 0;
 //	switch (a_Key)
@@ -193,38 +245,6 @@ void Game::Tick(float dt)
 	// Zooming:
 	if (keyState[SDL_SCANCODE_EQUALS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Zoom(ZOOMMODIFIER); }
 	if (keyState[SDL_SCANCODE_MINUS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Zoom(-ZOOMMODIFIER); }
-
-	// Print Camera Position:
-	if (keyState[SDL_SCANCODE_P]) rayTracer->scene->camera->PrintPosition();
-
-	// Move light to current camera position
-	if (keyState[SDL_SCANCODE_L]) { frameCount = FRAMEMODIFIER; rayTracer->scene->lightList.back()->pos = rayTracer->scene->camera->pos; }
-
-	// BVH Depth rendering
-	if (keyState[SDL_SCANCODE_B]) { frameCount = FRAMEMODIFIER; rayTracer->depthRendering = !rayTracer->depthRendering; }
-
-	// Toggle Shadow
-	if (keyState[SDL_SCANCODE_V]) { frameCount = FRAMEMODIFIER; rayTracer->renderShadow = !rayTracer->renderShadow; }
-
-	// Toggle Traversal Mode
-	if (keyState[SDL_SCANCODE_T])
-	{
-		frameCount = FRAMEMODIFIER;
-#if ENABLETOPBVH
-		if (rayTracer->scene->bvhTop->traversalMode != 2)
-			rayTracer->scene->bvhTop->traversalMode++;
-		else
-			rayTracer->scene->bvhTop->traversalMode = 0;
-#else
-		if (rayTracer->scene->bvh->traversalMode != 2)
-			rayTracer->scene->bvh->traversalMode++;
-		else
-			rayTracer->scene->bvh->traversalMode = 0;
-#endif
-	}
-
-	// Reset Camera Position:
-	if (keyState[SDL_SCANCODE_R]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt); }
 
 	++frameCount;
 

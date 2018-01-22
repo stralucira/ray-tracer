@@ -29,8 +29,8 @@ Scene::Scene(int scene_id)
 
 		skydome = new HDRBitmap("space.hdr");
 
-		//lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
-		//lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
+		lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
 		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f, true));
 		primList.back()->material = new Material(vec3(10.0f, 10.0f, 10.0f), Material::Shader::GLASS);
@@ -46,7 +46,7 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
-		primList.back()->material = new Material(vec3(0.0f, 1.0f, 0.0f), Material::Shader::GLASS);
+		primList.back()->material = new Material(vec3(1.0f, 1.0f, 1.0f), Material::Shader::GLASS);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
@@ -85,11 +85,11 @@ Scene::Scene(int scene_id)
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), 1));
-		primList.back()->material = new Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
 		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), 1));
-		primList.back()->material = new Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::MIRROR);
+		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::MIRROR);
 		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(5, 0, 0), vec3(-1, 0, 0))); // right plane
