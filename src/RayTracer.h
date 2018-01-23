@@ -30,6 +30,7 @@ public:
 	vec3 Sample(Ray* ray, int depth, bool lastSpecular);
 	vec3 SampleMIS(Ray* ray);
 	vec3 SampleSimple(Ray* ray, int depth);
+	vec3 SampleEX(Ray* ray);
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 
 	glm::uint RandomInt(glm::uint* seed);

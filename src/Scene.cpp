@@ -32,93 +32,73 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(1.0f, 0.0f, 1.0f), vec3(100.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(0.0f, 2.0f, 0.0f), vec3(50.0f, 50.0f, 50.0f)));
 
-		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f, false));
-		primList.back()->material = new Material(vec3(0.5f, 0.5f, 0.5f), Material::Shader::DIFFUSE);
-		//areaLightList.push_back(primList.back());
-		//primList.back()->index = index; index++;
+		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 3.0f), 0.4f, true));
+		primList.back()->material = new Material(vec3(20.5f, 20.5f, 20.5f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
 
 		primList.push_back(new Sphere(vec3(-1.5f, 1.0f, 3.0f), 0.7f));
 		primList.back()->material = new Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
 		//areaLightList.push_back(primList.back());
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Cylinder(vec3(2.0f, -1.0f, 2.0f), vec3(1.0f, 0.0f, 0.0f), 0.2f, 0.5f));
 		primList.back()->material = new Material(vec3(0.0f, 0.0f, 1.0f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Torus(vec3(1.0f, -2.0f, 1.0f), vec3(0.0f, 0.0f, 0.5f), 0.5f, 0.2f));
 		primList.back()->material = new Material(vec3(0.f, .5f, .5f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-0.1f, -2.0f, 4.0f), vec3(-0.75f, -0.1f, 4.0f), vec3(0.5, -0.5, 3)));
 		primList.back()->material = new Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(0, -5, 0), vec3(0, 1, 0))); // bottom plane
 		//primList.back()->material = Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f)));
 		primList.back()->material = new Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f), 1));
 		primList.back()->material = new Material(vec3(0.0f, 0.5f, 0.2f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(0, 5, 0), vec3(0, -1, 0))); // top plane
 		//primList.back()->material = Material(vec3(0.8f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
-		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1, true));
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1, false));
 		//primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1));
 		primList.back()->material = new Material(vec3(2.0f, 2.0f, 2.0f), Material::Shader::DIFFUSE);
-		areaLightList.push_back(primList.back());
-		//primList.back()->index = index; index++;
+		//areaLightList.push_back(primList.back());
 
-		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 1, true));
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 0, false));
 		//primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, 5.0f, 10.0f), 0));
 		primList.back()->material = new Material(vec3(2.0f, 2.0f, 2.0f), Material::Shader::DIFFUSE);
-		areaLightList.push_back(primList.back());
-		//primList.back()->index = index; index++;
+		//areaLightList.push_back(primList.back());
 
 		//primList.push_back(new Plane(vec3(-5, 0, 0), vec3(1, 0, 0))); // left plane
 		//primList.back()->material = Material(vec3(0.95f, 1.0f, 0.95f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, -5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), 1));
 		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, -5.0f, 10.0f), 1));
 		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(5, 0, 0), vec3(-1, 0, 0))); // right plane
 		//primList.back()->material = Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(5.0f, -5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f)));
 		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 0.0f), vec3(5.0f, -5.0f, 10.0f)));
 		primList.back()->material = new Material(vec3(0.7f, 0.8f, 0.8f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		//primList.push_back(new Plane(vec3(0, 0, 10), vec3(0, 0, -1))); // back plane
 		//primList.back()->material = Material(vec3(0.2f, 0.7f, 1.0f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(-5.0f, -5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f), 1));
 		primList.back()->material = new Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
 		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), vec3(5.0f, -5.0f, 10.0f)));
 		primList.back()->material = new Material(vec3(1.0f, 0.0f, 0.0f), Material::Shader::DIFFUSE);
-		//primList.back()->index = index; index++;
 
-		//this->LoadObject("cube.obj");
+		this->LoadObject("cube.obj", true);
 
 		break;
 	case 2: // lego han solo scene
@@ -187,7 +167,7 @@ Scene::Scene(int scene_id)
 
 		break;
 	case 0:
-		pos = vec3(0.0f, 0.0f, -1.0f);
+		pos = vec3(0.0f, 2.0f, -1.0f);
 		lookAt = pos + vec3(0.0f, 0.0f, 1.0f);
 		camera = new Camera(pos, lookAt);
 
@@ -195,10 +175,48 @@ Scene::Scene(int scene_id)
 
 		skydome = new HDRBitmap("space.hdr");
 
-		lightList.push_back(new Light(vec3(0.0f, 0.0f, 0.0f), vec3(100.0f, 100.0f, 100.0f)));
+		lightList.push_back(new Light(vec3(0.0f, 4.7f, 7.45f), vec3(50.0f, 50.0f, 50.0f)));
 
-		this->LoadObject("f-16.obj");
-		this->LoadObject("cube.obj");
+		primList.push_back(new Triangle(vec3(-1.5, 4.9, 5), vec3(-1.5, 4.9, 9.9), vec3(1.5, 4.9, 5), 1, true));
+		primList.back()->material = new Material(vec3(2.0f, 2.0f, 2.0f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
+		primList.push_back(new Triangle(vec3(-1.5, 4.9, 9.9), vec3(1.5, 4.9, 9.9), vec3(1.5, 4.9, 5), 1, true));
+		primList.back()->material = new Material(vec3(2.0f, 2.0f, 2.0f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
+
+
+		primList.push_back(new Triangle(vec3(-3, 5, -5), vec3(-3, 5, 10), vec3(3, 5, -5), 1));
+		primList.back()->material = new Material(vec3(0.9, 0.9, 0.9), Material::Shader::DIFFUSE);		
+		primList.push_back(new Triangle(vec3(3, 5, -5), vec3(-3, 5, 10), vec3(3, 5, 10), 1));
+		primList.back()->material = new Material(vec3(0.9, 0.9, 0.9), Material::Shader::DIFFUSE);
+
+
+		primList.push_back(new Triangle(vec3(-3, 5, 10), vec3(-3, 5, -5), vec3(-3, -3, -5), 1));
+		primList.back()->material = new Material(vec3(0, 0.9, 0), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(-3, 5, 10), vec3(-3, -3, -5), vec3(-3, -3, 10), 1));
+		primList.back()->material = new Material(vec3(0, 0.9, 0), Material::Shader::DIFFUSE);
+
+
+		primList.push_back(new Triangle(vec3(3, 5, -5), vec3(3, 5, 10), vec3(3, -3, -5), 1));
+		primList.back()->material = new Material(vec3(0.9, 0, 0), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(3, -3, -5), vec3(3, 5, 10), vec3(3, -3, 10), 1));
+		primList.back()->material = new Material(vec3(0.9, 0, 0), Material::Shader::DIFFUSE);
+
+
+		primList.push_back(new Triangle(vec3(-3, -3, 10), vec3(-3, -3, -5), vec3(3, -3, -5), 1));
+		primList.back()->material = new Material(vec3(0.9, 0.9, 0.9), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(3, -3, 10), vec3(-3, -3, 10), vec3(3, -3, -5), 1));
+		primList.back()->material = new Material(vec3(0.9, 0.9, 0.9), Material::Shader::DIFFUSE);
+
+
+		primList.push_back(new Triangle(vec3(-3, 5, 10), vec3(-3, -3, 10), vec3(3, -3, 10), 1));
+		primList.back()->material = new Material(vec3(0.9, 0.9, 0.9), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(3, 5, 10), vec3(-3, 5, 10), vec3(3, -3, 10), 1));
+		primList.back()->material = new Material(vec3(0.9, 0.9, 0.9), Material::Shader::DIFFUSE);
+
+
+		//this->LoadObject("f-16.obj", true);
+		this->LoadObject("cube.obj", true);
 
 		break;
 	}
@@ -231,7 +249,7 @@ Scene::Scene(int scene_id)
 }
 
 // wavefront .obj file loader
-void Scene::LoadObject(std::string inputfile)
+void Scene::LoadObject(std::string inputfile, bool simple)
 {
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
@@ -270,14 +288,8 @@ void Scene::LoadObject(std::string inputfile)
 		{
 			auto lastSlash = materials[i].diffuse_texname.find_last_of('/');
 			std::string texturePath;
-			if (lastSlash != std::string::npos)
-			{
-				texturePath = materials[i].diffuse_texname.substr(0, lastSlash + 1);
-			}
-			else
-			{
-				texturePath = materials[i].diffuse_texname;
-			}
+			if (lastSlash != std::string::npos) texturePath = materials[i].diffuse_texname.substr(0, lastSlash + 1);
+			else texturePath = materials[i].diffuse_texname;
 			matList.back()->texture = new Surface(const_cast<char*>(materials[i].diffuse_texname.c_str()));
 		}
 	}
@@ -293,49 +305,64 @@ void Scene::LoadObject(std::string inputfile)
 
 			vec3 vertices[3];
 			vec3 normals[3];
-			vec2 texcoord[3];
 
-			// Loop over vertices in the face.
-			for (int v = 0; v < fv; v++)
+			if (!simple)
 			{
-				// access to vertex
-				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-				float vx = attrib.vertices[3 * idx.vertex_index + 0];
-				float vy = attrib.vertices[3 * idx.vertex_index + 1];
-				float vz = attrib.vertices[3 * idx.vertex_index + 2];
-				float nx = attrib.normals[3 * idx.normal_index + 0];
-				float ny = attrib.normals[3 * idx.normal_index + 1];
-				float nz = attrib.normals[3 * idx.normal_index + 2];
-				float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
-				float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
-				// Optional: vertex colors
-				//tinyobj::real_t red = attrib.colors[3 * idx.vertex_index + 0];
-				//tinyobj::real_t green = attrib.colors[3 * idx.vertex_index + 1];
-				//tinyobj::real_t blue = attrib.colors[3 * idx.vertex_index + 2];
+				vec2 texcoord[3];
+				// Loop over vertices in the face.
+				for (int v = 0; v < fv; v++)
+				{
+					// access to vertex
+					tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+					float vx = attrib.vertices[3 * idx.vertex_index + 0];
+					float vy = attrib.vertices[3 * idx.vertex_index + 1];
+					float vz = attrib.vertices[3 * idx.vertex_index + 2];
+					float nx = attrib.normals[3 * idx.normal_index + 0];
+					float ny = attrib.normals[3 * idx.normal_index + 1];
+					float nz = attrib.normals[3 * idx.normal_index + 2];
+					float tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+					float ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+					// Optional: vertex colors
+					//tinyobj::real_t red = attrib.colors[3 * idx.vertex_index + 0];
+					//tinyobj::real_t green = attrib.colors[3 * idx.vertex_index + 1];
+					//tinyobj::real_t blue = attrib.colors[3 * idx.vertex_index + 2];
 
-				vertices[v] = vec3(vx, vy, vz);
-				normals[v] = vec3(nx, ny, nz);
-				texcoord[v] = vec2(tx, ty);
+					vertices[v] = vec3(vx, vy, vz);
+					normals[v] = vec3(nx, ny, nz);
+					texcoord[v] = vec2(tx, ty);
+				}
+				index_offset += fv;
+
+				// per-face material
+				// shapes[s].mesh.material_ids[f];
+
+				primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2],normals[0], normals[1], normals[2],texcoord[0], texcoord[1], texcoord[2]));
+				if (shapes[s].mesh.material_ids[f] < 0) primList.back()->material = new Material(GRAY);
+				else primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
 			}
-			index_offset += fv;
-
-			// per-face material
-			// shapes[s].mesh.material_ids[f];
-
-			primList.push_back(new Triangle(
-				vertices[0], vertices[1], vertices[2],
-				normals[0], normals[1], normals[2],
-				texcoord[0], texcoord[1], texcoord[2]
-			));
-			if (shapes[s].mesh.material_ids[f] < 0)
+			else // simple obj loader
 			{
-				primList.back()->material = new Material(BLACK);
-			}
-			else
-			{
-				primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
-			}
+				// Loop over vertices in the face.
+				for (int v = 0; v < fv; v++)
+				{
+					// access to vertex
+					tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+					float vx = attrib.vertices[3 * idx.vertex_index + 0];
+					float vy = attrib.vertices[3 * idx.vertex_index + 1];
+					float vz = attrib.vertices[3 * idx.vertex_index + 2];
+					float nx = attrib.normals[3 * idx.normal_index + 0];
+					float ny = attrib.normals[3 * idx.normal_index + 1];
+					float nz = attrib.normals[3 * idx.normal_index + 2];
 
+					vertices[v] = vec3(vx, vy, vz);
+					normals[v] = vec3(nx, ny, nz);
+		}
+				index_offset += fv;
+
+				primList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normals[0], normals[1], normals[2]));
+				if (shapes[s].mesh.material_ids[f] < 0) primList.back()->material = new Material(GRAY);
+				else primList.back()->material = matList[shapes[s].mesh.material_ids[f]];
+			}
 #if ENABLETOPBVH // Experimental top BVH construction helper
 			primLoadList.push_back(new Triangle(vertices[0], vertices[1], vertices[2], normal));
 			primLoadList.back()->index = index;

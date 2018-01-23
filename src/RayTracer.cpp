@@ -30,19 +30,19 @@ int RayTracer::Render(int samples)
 			//Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
 			Ray ray; this->scene->camera->GenerateRay(&ray, x, y);
 			//vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
-			//vec3 color = SampleSimple(&ray, 0);			// Path tracing with importance sampling
-			//vec3 color = Sample(&ray, 0);					// Path tracing with importance sampling and next event estimation
+			vec3 color = SampleSimple(&ray, 0);			// Path tracing with importance sampling
+			//vec3 color = Sample(&ray, 0, true);					// Path tracing with importance sampling and next event estimation
 			//vec3 color = SampleMIS(&ray);					// Path tracing with multiple importance sampling
 			
-			vec3 color;
+			/*vec3 color;
 			if (x < halfWidth)
 			{
-				color = SampleMIS(&ray);
+				color = SampleSimple(&ray, 0);
 			}
 			else
 			{
 				color = Sample(&ray, 0, true);
-			}
+			}*/
 
 			/*color *= 255.0f;
 			int r = glm::min((int)color.r, 255);
@@ -386,54 +386,7 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 
 	if (ray->hit->material->shader == Material::Shader::GLASS)
 	{
-		/*vec3 refractionDirection = normalize(refract(ray->dir, N, 0.8f));
-		vec3 refractionRayOrig = (dot(refractionDirection, N) < 0) ?
-			I - N * EPSILON :
-			I + N * EPSILON;
-
-		Ray r = Ray(refractionRayOrig, refractionDirection);
-		return GetColor(ray) * SampleSimple(&r, depth + 1);*/
-
-		vec3 refractColor = BLACK;
-
-		float kr = Fresnel(ray->dir, N, 1.52f);
-		bool outside = dot(ray->dir, N) < 0;
-		vec3 bias = EPSILON * ray->hit->getNormal(I);
-
-		float cosi = clamp(-1.0f, 1.0f, dot(N, ray->dir));
-		float etai = 1, etat = 1.52f;
-		vec3 n = N;
-
-		if (cosi < 0)
-		{
-			cosi = -cosi;
-		}
-		else
-		{
-			std::swap(etai, etat);
-			n = -N;
-		}
-		float eta = etai / etat;
-		float k = 1 - eta * eta * (1 - cosi * cosi);
-
-		if (k < 0)
-		{
-			return GetColor(ray);
-		}
-		else
-		{
-			Ray refractRay = Ray(I, eta * ray->dir + (eta * cosi - sqrtf(k)) * n);
-
-			vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
-			refractRay.orig = hitEpsilon;
-
-			refractColor = this->SampleSimple(&refractRay, depth += 1);
-		}
-
-		Ray reflectRay = Ray(I, reflect(ray->dir, N));
-		vec3 reflectColor = GetColor(ray) * SampleSimple(&reflectRay, depth += 1);
-
-		return reflectColor * kr + refractColor * (1 - kr);
+		
 	}
 #pragma endregion
 
@@ -618,6 +571,16 @@ vec3 RayTracer::SampleMIS(Ray* ray)
 		T *= (dot(N, R) / hemiPDF) * BRDF;
 	}
 	return E;
+}
+
+vec3 RayTracer::SampleEX(Ray* ray)
+{
+	vec3 I = Trace(ray);
+
+	if (ray->t == INFINITY)
+	{
+		return BACKGROUND_COLOR;
+	}
 }
 
 vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)

@@ -12,7 +12,7 @@ public:
 	Scene(int scene_id);
 	Camera* camera;
 
-	void LoadObject(std::string filename);
+	void LoadObject(std::string filename, bool simple = false);
 
 	std::vector<Light*> lightList;
 	std::vector<Primitive*> primList;

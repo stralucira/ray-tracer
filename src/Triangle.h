@@ -14,6 +14,18 @@ public:
 		this->centroid = calculateCentroid();
 		this->bounds = calculateAABB();
 	}
+	Triangle(vec3 a, vec3 b, vec3 c, vec3 normal0, vec3 normal1, vec3 normal2) : Primitive(a)
+	{
+		this->a = a;
+		this->b = b;
+		this->c = c;
+		this->normal0 = normal0;
+		this->normal1 = normal1;
+		this->normal2 = normal2;
+
+		this->centroid = calculateCentroid();
+		this->bounds = calculateAABB();
+	}
 	Triangle(vec3 a, vec3 b, vec3 c, vec3 normal0, vec3 normal1, vec3 normal2, vec2 uv0, vec2 uv1, vec2 uv2) : Primitive(a)
 	{
 		this->a = a;
