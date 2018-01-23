@@ -3,8 +3,8 @@
 #include "Sphere.h"
 
 int iCPU2 = omp_get_num_procs();
-glm::uint seed1 = 161219 * 49977;
-glm::uint seed2 = 324867 * 67869;
+glm::uint seed1 = 1219 * 49977;
+glm::uint seed2 = 3267 * 67869;
 
 RayTracer::RayTracer(Scene* scene, Surface* screen)
 {
@@ -37,7 +37,7 @@ int RayTracer::Render(int samples)
 			vec3 color;
 			if (x < halfWidth)
 			{
-				color = SampleSimple(&ray, 0);
+				color = SampleMIS(&ray);
 			}
 			else
 			{
@@ -375,6 +375,7 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 
 	vec3 N = ray->hit->getNormal(I); // intersection normal
 
+#pragma region surface interaction
 	// surface interaction
 	if (ray->hit->material->shader == Material::Shader::MIRROR)
 	{
@@ -434,6 +435,7 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 
 		return reflectColor * kr + refractColor * (1 - kr);
 	}
+#pragma endregion
 
 	// continue in random direction
 	vec3 R = CosineWeightedDiffuseReflection(N);
@@ -478,14 +480,15 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 		}
 	}
 
-	vec3 normal = ray->hit->getNormal(hitPoint);
+	vec3 N = ray->hit->getNormal(hitPoint);
 	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 
+#pragma region surface interaction
 	// surface interaction
 	if (ray->hit->material->shader == Material::Shader::MIRROR)
 	{
 		// continue in fixed direction
-		Ray r = Ray(hitPoint, reflect(ray->dir, normal));
+		Ray r = Ray(hitPoint, reflect(ray->dir, N));
 		return GetColor(ray) * SampleSimple(&r, depth + 1);
 	}
 
@@ -501,13 +504,13 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 		vec3 refractColor = BLACK;
 
-		float kr = Fresnel(ray->dir, normal, 1.52f);
-		bool outside = dot(ray->dir, normal) < 0;
+		float kr = Fresnel(ray->dir, N, 1.52f);
+		bool outside = dot(ray->dir, N) < 0;
 		vec3 bias = EPSILON * ray->hit->getNormal(hitPoint);
 
-		float cosi = clamp(-1.0f, 1.0f, dot(normal, ray->dir));
+		float cosi = clamp(-1.0f, 1.0f, dot(N, ray->dir));
 		float etai = 1, etat = 1.52f;
-		vec3 n = normal;
+		vec3 n = N;
 
 		if (cosi < 0)
 		{
@@ -516,7 +519,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 		else
 		{
 			std::swap(etai, etat);
-			n = -normal;
+			n = -N;
 		}
 		float eta = etai / etat;
 		float k = 1 - eta * eta * (1 - cosi * cosi);
@@ -535,53 +538,42 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 			refractColor = this->SampleSimple(&refractRay, depth += 1);
 		}
 
-		Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
+		Ray reflectRay = Ray(hitPoint, reflect(ray->dir, N));
 		vec3 reflectColor = GetColor(ray) * SampleSimple(&reflectRay, depth += 1);
 
 		return reflectColor * kr + refractColor * (1 - kr);
 	}
+#pragma endregion
 
 	// sample a random light source
-	// TODO -- Pick a random light and create a random ray towards that light
-	//Primitive* randomLight = this->scene->areaLightList.back();
-
 	int lightIndex = rand() % this->scene->areaLightList.size();
 	Primitive* randomLight = this->scene->areaLightList[lightIndex];
 	vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(hitPoint);
 	
-	vec3 randomDirToRandomLight = normalize(randomPointOnLight - hitPoint);
+	vec3 L = normalize(randomPointOnLight - hitPoint);
 	vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
 	float dist2 = glm::length2(randomPointOnLight - hitPoint);
 
-	/*vec3 randomDirToRandomLight = randomPointOnLight - hitPoint;
-	vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
-	float dist = length(randomDirToRandomLight);
-	randomDirToRandomLight /= dist;*/
+	Ray lr = Ray(hitPoint, L);
 
-	Ray lr = Ray(hitPoint, randomDirToRandomLight);
-
-	vec3 Ld;
-	if (Trace(&lr) != BLACK && dot(normal, randomDirToRandomLight) > 0 && dot(lightNormal, -randomDirToRandomLight) > 0)
+	vec3 Ld = BLACK;
+	if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr) != BLACK)
 	{
 		/*float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randomLight->calculateArea()) / dist2;
 		Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(normal, randomDirToRandomLight);*/
 
-		float solidAngle = (dot(lightNormal, -randomDirToRandomLight) * randomLight->calculateArea()) / dist2;
-		float lightPDF = 1 / solidAngle; if (lightPDF == 0) lightPDF = EPSILON;
-		Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(normal, randomDirToRandomLight) / lightPDF);
-	}
-	else
-	{
-		Ld = BLACK;
+		float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+		float lightPDF = 1 / solidAngle;
+		Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
 	}
 
 	// continue random walk
-	vec3 R = CosineWeightedDiffuseReflection(normal);
+	vec3 R = CosineWeightedDiffuseReflection(N);
 	Ray r = Ray(hitPoint, R);
 
 	// update throughput
-	float PDF = dot(normal, R) * INVPI; if (PDF == 0) PDF = EPSILON;
-	vec3 Ei = Sample(&r, depth + 1, false) * dot(normal, R) / PDF; // irradiance
+	float PDF = dot(N, R) * INVPI; if (PDF == 0) PDF = EPSILON;
+	vec3 Ei = Sample(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance
 	return BRDF * Ei + Ld;
 }
 
@@ -599,7 +591,8 @@ vec3 RayTracer::SampleMIS(Ray* ray)
 		vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 
 		// sample a random light source
-		Primitive* randomLight = this->scene->areaLightList.back();
+		int lightIndex = rand() % this->scene->areaLightList.size();
+		Primitive* randomLight = this->scene->areaLightList[lightIndex];
 		vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
 
 		vec3 L = normalize(randomPointOnLight - I); // random direction to random light
@@ -612,8 +605,10 @@ vec3 RayTracer::SampleMIS(Ray* ray)
 		if (dot(N, L) > 0 && dot(Nl, -L) > 0) if (Trace(&lr) != BLACK)
 		{
 			float solidAngle = (dot(Nl, -L) * randomLight->calculateArea()) / dist2;
-			float lightPDF = 1 / solidAngle; if (solidAngle = 0) solidAngle = EPSILON;
-			E += T * (dot(N, L) / lightPDF) * BRDF * randomLight->material->diffuse;
+			float lightPDF = 1.0f / solidAngle;
+			float brdfPDF = 0.5f * INVPI;
+			float misPDF = lightPDF + brdfPDF;
+			E += T * (dot(N, L) / misPDF) * BRDF * randomLight->material->diffuse;
 		}
 
 		// continue random walk

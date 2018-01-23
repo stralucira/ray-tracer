@@ -68,7 +68,8 @@ vec3 Triangle::randomPointOnPrimitive(vec3 point)
 	
 	float x = (float)rand() / (RAND_MAX);
 	float y = (float)rand() / (RAND_MAX);
-	if (x + y >= 1) {
+	if (x + y > 1)
+	{
 		x = 1 - x;
 		y = 1 - y;
 	}
@@ -82,6 +83,5 @@ float Triangle::calculateArea()
 	vec3 ac = normalize(c-a);
 	float theta = acos(dot(ab,ac));
 
-	return glm::length(ab) * glm::length(ac) * sin(theta) * 0.5f;
+	return glm::length(distance(b,a)) * glm::length(distance(c,a)) * sin(theta) * 0.5f;
 }
-
