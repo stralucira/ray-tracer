@@ -28,7 +28,7 @@ public:
 
 	// Path tracing stuff
 	vec3 Trace(Ray* ray, bool isShadowRay = false);
-	vec3 Sample(Ray* ray, int depth, bool lastSpecular);
+	vec3 Sample(Ray* ray, int depth, bool lastSpecular = false);
 	vec3 SampleMIS(Ray* ray);
 	vec3 SampleSimple(Ray* ray, int depth);
 	vec3 SampleEX(Ray* ray, int depth, bool secondaryRay);

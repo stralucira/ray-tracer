@@ -109,7 +109,28 @@ void Camera::GenerateRay(Ray* ray, int x, int y)
 	ray->v = INFINITY;
 
 	ray->orig = this->pos;
-	ray->dir = normalize((this->p0 + (x / (float)SCRWIDTH) * (this->p1 - this->p0) + (y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
+	ray->dir = normalize((this->p0 + ((float)x / SCRWIDTH) * (this->p1 - this->p0) + ((float)y / SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
+	ray->invDir = 1.0f / ray->dir;
+}
+
+void Camera::GenerateRayDOF(Ray* ray, int x, int y)
+{
+	vec3 DoF(0, 0, 0);
+	float dff = 0.05f;
+	float fx, fy;
+
+	DoF = vec3(((float)rand() / RAND_MAX) * dff - dff * 0.5f, ((float)rand() / RAND_MAX) * dff - dff * 0.5f, 0.f);
+	
+	fx = ((float)x + (rand() / RAND_MAX)) / (SCRWIDTH), fy = ((float)y + (rand() / RAND_MAX)) / SCRHEIGHT;
+
+	vec3 P = ((this->p0 + ((float)x / SCRWIDTH) * (this->p1 - this->p0) + ((float)y / SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
+
+	ray->t = INFINITY;
+	ray->u = INFINITY;
+	ray->v = INFINITY;
+
+	ray->orig = this->pos + DoF;
+	ray->dir = normalize(P);
 	ray->invDir = 1.0f / ray->dir;
 }
 

@@ -16,6 +16,7 @@ public:
 
 	//Ray GenerateRay(int x, int y);
 	void GenerateRay(Ray* ray, int x, int y);
+	void GenerateRayDOF(Ray* ray, int x, int y);
 	void GenerateRays(RayPacket* rays, int x, int y);
 	
 	// Camera movement

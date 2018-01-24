@@ -30,10 +30,10 @@ int RayTracer::Render(int samples)
 		for (x = 0; x < SCRWIDTH; x++)
 		{
 			//Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
-			Ray ray; this->scene->camera->GenerateRay(&ray, x, y);
-			//vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
+			Ray ray; this->scene->camera->GenerateRayDOF(&ray, x, y);
+			vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
 			//vec3 color = SampleSimple(&ray, 0);			// Path tracing with importance sampling
-			vec3 color = Sample(&ray, 0, true);			// Path tracing with importance sampling and next event estimation
+			//vec3 color = Sample(&ray, 0, true);			// Path tracing with importance sampling and next event estimation
 			//vec3 color = SampleMIS(&ray);					// Path tracing with multiple importance sampling
 			//vec3 color = SampleEX(&ray, 0, true);			// DEBUG STUFF
 
@@ -512,6 +512,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	{
 		if (lastSpecular)
 		{
+			//return ray->hit->material->diffuse;
 			if (dot(ray->hit->getNormal(I), ray->dir) > 0)
 			{
 				return BLACK;
@@ -530,7 +531,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 #if RR // russian roulette
 	float a = RandomFloat(&seed1);
 	float pSurvive = min(1.0f, max(max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
-	if (a > pSurvive && !lastSpecular) return BLACK;
+	if (a > pSurvive) return BLACK;
 #endif
 
 	vec3 N = ray->hit->getNormal(I);
@@ -542,7 +543,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	{
 		// continue in fixed direction
 		Ray r = Ray(I, reflect(ray->dir, N));
-		return GetColor(ray) * Sample(&r, depth + 1, true);
+		return (GetColor(ray) * Sample(&r, depth + 1, true));
 	}
 
 	if (ray->hit->material->shader == Material::Shader::GLASS)
@@ -571,7 +572,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 		if (k < 0)
 		{
-			return GetColor(ray);
+			return BLACK; // GetColor(ray);
 		}
 		else
 		{
@@ -580,16 +581,17 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 			vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
 			refractRay.orig = hitEpsilon;
 
-			refractColor = Sample(&refractRay, depth += 1, true);
+			refractColor = Sample(&refractRay, depth + 1, true);
 		}
 
 		Ray reflectRay = Ray(I, reflect(ray->dir, N));
-		vec3 reflectColor = GetColor(ray) * Sample(&reflectRay, depth += 1, false);
+		vec3 reflectColor = GetColor(ray) * Sample(&reflectRay, depth + 1, true);
 
-		return reflectColor * kr + refractColor * (1 - kr);
+		return (reflectColor * kr + refractColor * (1 - kr));
 	}
 #pragma endregion
 
+#pragma region direct illumination
 	// sample a random light source
 	int lightIndex = rand() % this->scene->areaLightList.size();
 	Primitive* randomLight = this->scene->areaLightList[lightIndex];
@@ -615,6 +617,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 			Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
 		}
 	}
+#pragma endregion
 
 	// continue random walk
 	vec3 R = CosineWeightedDiffuseReflection(N);
