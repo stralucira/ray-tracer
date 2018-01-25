@@ -52,18 +52,18 @@ int RayTracer::Render(int samples)
 			{
 				//color = SampleWhitted(x, y, &ray, 0);	// whitted-style ray tracing
 				//color = SampleSimple(&ray, 0);			// path tracing with importance sampling
-				//color = Sample(&ray, 0, true);			// path tracing with importance sampling and next event estimation
+				color = Sample(&ray, 0, true);			// path tracing with importance sampling and next event estimation
 				//color = SampleMIS(&ray);					// path tracing with multiple importance sampling
 				//color = SampleEX(&ray, 0, true);			// DEBUG STUFF
 
-				if (x < halfWidth)
+				/*if (x < halfWidth)
 				{
 					color = Sample(&ray, 0, true);
 				}
 				else
 				{
 					color = SampleEX(&ray, 0, true);
-				}
+				}*/
 			}
 
 			/*color *= 255.0f;
@@ -81,7 +81,7 @@ int RayTracer::Render(int samples)
 			int b = glm::min((int)accumulator[y][x].b, 255);
 
 			// Gamma correction
-			/*float gamma = 1.8f;
+			/*float gamma = 2.2f;
 			r = (int)(pow((float)r / 255, 1 / gamma) * 255);
 			g = (int)(pow((float)g / 255, 1 / gamma) * 255);
 			b = (int)(pow((float)b / 255, 1 / gamma) * 255);*/

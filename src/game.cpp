@@ -27,7 +27,7 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(3); // <-- Change scene here
+	LoadScene(0); // <-- Change scene here
 	srand((glm::uint)time(NULL));
 }
 
@@ -275,18 +275,10 @@ void Game::Tick(float dt)
 		rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z);
 	screen->Print(buffer, 2, 2, 0xffffff);
 
-	if (rayTracer->depthOfField)
-	{
-		sprintf(buffer, "Press F to disable depth of field. Zoom: %.2fx Focal distance: %.5f Aperture size: %.5f \n",
-			rayTracer->scene->camera->d, rayTracer->scene->camera->focalLength, rayTracer->scene->camera->apertureSize);
-		screen->Print(buffer, 2, 12, 0xffffff);
-	}
-	else
-	{
-		sprintf(buffer, "Press F to enable depth of field. \n");
-		screen->Print(buffer, 2, 12, 0xffffff);
-	}
-
+	if (rayTracer->depthOfField) sprintf(buffer, "Press F to disable depth of field. Zoom: %.2fx Focal distance: %.5f Aperture size: %.5f \n",
+		rayTracer->scene->camera->d, rayTracer->scene->camera->focalLength, rayTracer->scene->camera->apertureSize);
+	else sprintf(buffer, "Press F to enable depth of field. Zoom: %.2fx\n", rayTracer->scene->camera->d);
+	screen->Print(buffer, 2, 12, 0xffffff);
 
 	switch (rayTracer->scene->bvh->traversalMode)
 	{
@@ -302,13 +294,16 @@ void Game::Tick(float dt)
 	}
 	screen->Print(buffer, 2, 22, 0xffffff);
 
-	sprintf(buffer, "Press B to toggle depth rendering.");
+	if (!rayTracer->depthRendering) sprintf(buffer, "Press B to enable depth rendering.");
+	else sprintf(buffer, "Press B to disable depth rendering.");
 	screen->Print(buffer, 2, 32, 0xffffff);
 
-	sprintf(buffer, "Press M to toggle motion blur.");
+	if (FRAMEMODIFIER == 0) sprintf(buffer, "Press M to enable motion blur.");
+	else sprintf(buffer, "Press M to disable motion blur.");
 	screen->Print(buffer, 2, 42, 0xffffff);
 
-	sprintf(buffer, "Press V to toggle shadows.");
+	if (rayTracer->renderShadow) sprintf(buffer, "Press V to disable shadows.");
+	else sprintf(buffer, "Press V to enable shadows.");
 	screen->Print(buffer, 2, 52, 0xffffff);
 
 	sprintf(buffer, "Pixel summed: %i. Frame count: %i", pixelCount, frameCount);
