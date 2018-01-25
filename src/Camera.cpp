@@ -23,6 +23,8 @@ void Camera::Init(vec3 pos, vec3 lookAt)
 	this->LookAt(lookAt);
 
 	this->d = 1.0f;
+	this->focalLength = 1.0f;
+	this->apertureSize = 0.f;
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
 
 	CalculateScreen();
@@ -32,12 +34,16 @@ void Camera::CalculateScreen()
 {
 	this->SetPosition(pos);
 	
-	vec3 screenCenter = this->pos + this->d * this->GetForward();
-
+	/*vec3 screenCenter = this->pos + this->d * this->GetForward();
 	this->p0 = screenCenter - this->GetRight() + this->GetUp() * this->aspectRatio; // top left corner
 	this->p1 = screenCenter + this->GetRight() + this->GetUp() * this->aspectRatio; // top right corner
 	this->p2 = screenCenter - this->GetRight() - this->GetUp() * this->aspectRatio; // bottom left corner
-	this->p3 = screenCenter + this->GetRight() + this->GetUp() * this->aspectRatio; // bottom right corner
+	this->p3 = screenCenter + this->GetRight() + this->GetUp() * this->aspectRatio; // bottom right corner*/
+
+	p0 = *(vec3*)&(transform * vec4(focalLength * vec3(-1.f,  1.f * aspectRatio, -1), 1.0f));
+	p1 = *(vec3*)&(transform * vec4(focalLength * vec3( 1.f,  1.f * aspectRatio, -1), 1.0f));
+	p2 = *(vec3*)&(transform * vec4(focalLength * vec3(-1.f, -1.f * aspectRatio, -1), 1.0f));
+	p3 = *(vec3*)&(transform * vec4(focalLength * vec3( 1.f, -1.f * aspectRatio, -1), 1.0f));
 }
 
 void Camera::PrintPosition()
@@ -91,9 +97,27 @@ void Camera::Yaw(float angle)
 // Zooming:
 void Camera::Zoom(float increment)
 {
-	if (d + increment > 0)
+	if (d + increment > EPSILON)
 	{
 		d += increment;
+		CalculateScreen();
+	}
+}
+// Focusing:
+void Camera::Focus(float increment)
+{
+	if (focalLength + increment > EPSILON)
+	{
+		focalLength += increment;
+		CalculateScreen();
+	}
+}
+// Aperture size: DAT SWEET SWEET BOKEH
+void Camera::Aperture(float increment)
+{
+	if (apertureSize + increment > EPSILON)
+	{
+		apertureSize += increment;
 		CalculateScreen();
 	}
 }
@@ -101,9 +125,6 @@ void Camera::Zoom(float increment)
 // Generate ray
 void Camera::GenerateRay(Ray* ray, int x, int y)
 {
-	//return Ray(this->pos, normalize((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos));
-	//return Ray(this->pos, normalizeSSE((this->p0 + ((float)x / (float)SCRWIDTH) * (this->p1 - this->p0) + ((float)y / (float)SCRHEIGHT) * (this->p2 - this->p0)) - this->pos));
-
 	ray->t = INFINITY;
 	ray->u = INFINITY;
 	ray->v = INFINITY;
@@ -115,22 +136,17 @@ void Camera::GenerateRay(Ray* ray, int x, int y)
 
 void Camera::GenerateRayDOF(Ray* ray, int x, int y)
 {
-	vec3 DoF(0, 0, 0);
-	float dff = 0.05f;
-	float fx, fy;
-
-	DoF = vec3(((float)rand() / RAND_MAX) * dff - dff * 0.5f, ((float)rand() / RAND_MAX) * dff - dff * 0.5f, 0.f);
+	vec3 DoF = vec3(((float)rand() / RAND_MAX) * apertureSize - apertureSize * 0.5f, ((float)rand() / RAND_MAX) * apertureSize - apertureSize * 0.5f, 0.0f);
 	
-	fx = ((float)x + (rand() / RAND_MAX)) / (SCRWIDTH), fy = ((float)y + (rand() / RAND_MAX)) / SCRHEIGHT;
-
-	vec3 P = ((this->p0 + ((float)x / SCRWIDTH) * (this->p1 - this->p0) + ((float)y / SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
+	float fx = ((float)x + (rand() / RAND_MAX)) / SCRWIDTH;
+	float fy = ((float)y + (rand() / RAND_MAX)) / SCRHEIGHT;
 
 	ray->t = INFINITY;
 	ray->u = INFINITY;
 	ray->v = INFINITY;
 
 	ray->orig = this->pos + DoF;
-	ray->dir = normalize(P);
+	ray->dir = normalize(this->p0 + fx * (this->p1 - this->p0) + fy * (this->p2 - this->p0) - (this->pos + DoF));
 	ray->invDir = 1.0f / ray->dir;
 }
 

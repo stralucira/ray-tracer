@@ -29,13 +29,17 @@ public:
 	void Pitch(float angle);	// Tilting forward and backward on the Y-axis.
 	void Yaw(float angle);		// Turning left and right on the Z-axis.
 	// Zooming:
-	void Zoom(float distance);
+	void Zoom(float increment);
+	void Focus(float increment);
+	void Aperture(float increment);
 
 	vec3 pos;
 	vec3 p0, p1, p2, p3;
 
 	float d;
 	float aspectRatio;
+	float focalLength;
+	float apertureSize;
 
 	// Camera matrix
 	void SetPosition(vec3& pos)

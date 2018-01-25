@@ -111,6 +111,11 @@ Scene::Scene(int scene_id)
 
 		skydome = new HDRBitmap("space.hdr");
 
+		primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 0, true));
+		//primList.push_back(new Triangle(vec3(-5.0f, 5.0f, 0.0f), vec3(-5.0f, 5.0f, 10.0f), vec3(5.0f, 5.0f, 10.0f), 1));
+		primList.back()->material = new Material(vec3(1.f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
+
 		lightList.push_back(new Light(vec3(0.50f, 16.77f, 10.85f), vec3(200.0f, 200.0f, 200.0f)));
 		lightList.push_back(new Light(vec3(12.37f, 19.72f, 11.91f), vec3(200.0f, 200.0f, 200.0f)));
 

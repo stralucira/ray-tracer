@@ -4,6 +4,7 @@
 
 float ROTATEMODIFIER = 0.05f;
 float ZOOMMODIFIER = 0.05f;
+float FOCUSMODIFIER = 0.01f;
 int FRAMEMODIFIER = 0;
 
 Scene* scene;
@@ -27,7 +28,7 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(1); // <-- Change scene here
+	LoadScene(2); // <-- Change scene here
 	srand(time(NULL));
 }
 
@@ -241,10 +242,14 @@ void Game::Tick(float dt)
 	if (keyState[SDL_SCANCODE_RIGHT]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Yaw(-ROTATEMODIFIER); }
 	//if (keyState[SDL_SCANCODE_Z]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Roll(-ROTATEMODIFIER); }
 	//if (keyState[SDL_SCANCODE_X]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Roll(ROTATEMODIFIER); }
+	
+	if (keyState[SDL_SCANCODE_Z]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Aperture(dt * 0.05f); }
+	if (keyState[SDL_SCANCODE_X]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Aperture(-dt * 0.05f); }
 
 	// Zooming:
-	if (keyState[SDL_SCANCODE_EQUALS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Zoom(ZOOMMODIFIER); }
-	if (keyState[SDL_SCANCODE_MINUS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Zoom(-ZOOMMODIFIER); }
+	if (keyState[SDL_SCANCODE_EQUALS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Focus(dt); }
+	if (keyState[SDL_SCANCODE_MINUS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Focus(-dt); }
+
 
 	++frameCount;
 
@@ -252,10 +257,11 @@ void Game::Tick(float dt)
 	//rayTracer->RenderPacket();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt,
+	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f Focal distance: %.5f Aperture size: %.5f \n", 1 / dt,
 		polyCount,
 		rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z,
-		rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z);
+		rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z,
+		rayTracer->scene->camera->d, rayTracer->scene->camera->apertureSize);
 	screen->Print(buffer, 2, 2, 0xffffff);
 	
 	sprintf(buffer, "Press B to toggle depth rendering.");
