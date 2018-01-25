@@ -3,8 +3,6 @@
 #include "RayTracer.h"
 
 float ROTATEMODIFIER = 0.05f;
-float ZOOMMODIFIER = 0.05f;
-float FOCUSMODIFIER = 0.01f;
 int FRAMEMODIFIER = 0;
 
 Scene* scene;
@@ -19,6 +17,7 @@ int polyCount = 0;
 void Game::Init()
 {
 // -----------------------------------------------------------
+// 0 Cornell Box
 // 1 The original scene
 // 2 LEGO Han Solo, 8k triangles
 // 3 X-wing, 34k triangles
@@ -28,8 +27,8 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(2); // <-- Change scene here
-	srand(time(NULL));
+	LoadScene(3); // <-- Change scene here
+	srand((glm::uint)time(NULL));
 }
 
 void Game::LoadScene(int scene_id)
@@ -57,7 +56,6 @@ void Game::KeyDown(int a_Key)
 	{
 		// Print Camera Position:
 	case SDL_SCANCODE_P:
-		frameCount = FRAMEMODIFIER;
 		rayTracer->scene->camera->PrintPosition();
 		break;
 
@@ -93,6 +91,18 @@ void Game::KeyDown(int a_Key)
 		else
 			rayTracer->scene->bvh->traversalMode = 0;
 #endif
+		break;
+
+		// Toggle Depth of Field
+	case SDL_SCANCODE_F:
+		frameCount = FRAMEMODIFIER;
+		rayTracer->depthOfField = !rayTracer->depthOfField;
+		break;
+
+		// Toggle Motion Blur
+	case SDL_SCANCODE_M:
+		if (FRAMEMODIFIER == 0) FRAMEMODIFIER = 1;
+		else if (FRAMEMODIFIER == 1) FRAMEMODIFIER = 0;
 		break;
 
 		// Reset Camera Position:
@@ -243,29 +253,40 @@ void Game::Tick(float dt)
 	//if (keyState[SDL_SCANCODE_Z]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Roll(-ROTATEMODIFIER); }
 	//if (keyState[SDL_SCANCODE_X]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Roll(ROTATEMODIFIER); }
 	
-	if (keyState[SDL_SCANCODE_Z]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Aperture(dt * 0.05f); }
-	if (keyState[SDL_SCANCODE_X]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Aperture(-dt * 0.05f); }
-
 	// Zooming:
+	if (keyState[SDL_SCANCODE_9]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Zoom(-dt); }
+	if (keyState[SDL_SCANCODE_0]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Zoom(dt); }
+	
+	// Focusing:
 	if (keyState[SDL_SCANCODE_EQUALS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Focus(dt); }
 	if (keyState[SDL_SCANCODE_MINUS]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Focus(-dt); }
-
+	
+	// Aperture Size:
+	if (keyState[SDL_SCANCODE_LEFTBRACKET]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Aperture(-dt * 0.05f); }
+	if (keyState[SDL_SCANCODE_RIGHTBRACKET]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Aperture(dt * 0.05f); }
 
 	++frameCount;
 
 	int pixelCount = rayTracer->Render(frameCount);
-	//rayTracer->RenderPacket();
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f Focal distance: %.5f Aperture size: %.5f \n", 1 / dt,
-		polyCount,
+	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt, polyCount,
 		rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z,
-		rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z,
-		rayTracer->scene->camera->d, rayTracer->scene->camera->apertureSize);
+		rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z);
 	screen->Print(buffer, 2, 2, 0xffffff);
-	
-	sprintf(buffer, "Press B to toggle depth rendering.");
-	screen->Print(buffer, 2, 12, 0xffffff);
+
+	if (rayTracer->depthOfField)
+	{
+		sprintf(buffer, "Press F to disable depth of field. Zoom: %.2fx Focal distance: %.5f Aperture size: %.5f \n",
+			rayTracer->scene->camera->d, rayTracer->scene->camera->focalLength, rayTracer->scene->camera->apertureSize);
+		screen->Print(buffer, 2, 12, 0xffffff);
+	}
+	else
+	{
+		sprintf(buffer, "Press F to enable depth of field. \n");
+		screen->Print(buffer, 2, 12, 0xffffff);
+	}
+
 
 	switch (rayTracer->scene->bvh->traversalMode)
 	{
@@ -281,9 +302,15 @@ void Game::Tick(float dt)
 	}
 	screen->Print(buffer, 2, 22, 0xffffff);
 
-	sprintf(buffer, "Press V to toggle shadows.");
+	sprintf(buffer, "Press B to toggle depth rendering.");
 	screen->Print(buffer, 2, 32, 0xffffff);
 
-	sprintf(buffer, "Pixel summed: %i. Frame count: %i", pixelCount, frameCount);
+	sprintf(buffer, "Press M to toggle motion blur.");
 	screen->Print(buffer, 2, 42, 0xffffff);
+
+	sprintf(buffer, "Press V to toggle shadows.");
+	screen->Print(buffer, 2, 52, 0xffffff);
+
+	sprintf(buffer, "Pixel summed: %i. Frame count: %i", pixelCount, frameCount);
+	screen->Print(buffer, 2, 62, 0xffffff);
 }

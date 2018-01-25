@@ -29,23 +29,42 @@ int RayTracer::Render(int samples)
 	{
 		for (x = 0; x < SCRWIDTH; x++)
 		{
-			//Ray ray = Ray(this->scene->camera->GenerateRay(x, y));
-			Ray ray; this->scene->camera->GenerateRayDOF(&ray, x, y);
-			vec3 color = SampleWhitted(x, y, &ray, 0);	// Whitted-style ray tracing
-			//vec3 color = SampleSimple(&ray, 0);			// Path tracing with importance sampling
-			//vec3 color = Sample(&ray, 0, true);			// Path tracing with importance sampling and next event estimation
-			//vec3 color = SampleMIS(&ray);					// Path tracing with multiple importance sampling
-			//vec3 color = SampleEX(&ray, 0, true);			// DEBUG STUFF
-
-			/*vec3 color;
-			if (x < halfWidth)
+			Ray ray;
+			if (!depthOfField)
 			{
-				color = Sample(&ray, 0, true);
+				this->scene->camera->GenerateRay(&ray, x, y); // generate ray
 			}
 			else
 			{
-				color = SampleEX(&ray, 0, true);
-			}*/
+				this->scene->camera->GenerateRayDOF(&ray, x, y); // generate ray with randomization
+			}
+			
+			vec3 color;
+			if (!renderShadow)
+			{
+				color = SampleBasic(x, y, &ray, 0);
+			}
+			else if (depthRendering)
+			{
+				color = SampleDepth(x, y, &ray, 0); // depth renderer
+			}
+			else
+			{
+				//color = SampleWhitted(x, y, &ray, 0);	// whitted-style ray tracing
+				//color = SampleSimple(&ray, 0);			// path tracing with importance sampling
+				//color = Sample(&ray, 0, true);			// path tracing with importance sampling and next event estimation
+				//color = SampleMIS(&ray);					// path tracing with multiple importance sampling
+				//color = SampleEX(&ray, 0, true);			// DEBUG STUFF
+
+				if (x < halfWidth)
+				{
+					color = Sample(&ray, 0, true);
+				}
+				else
+				{
+					color = SampleEX(&ray, 0, true);
+				}
+			}
 
 			/*color *= 255.0f;
 			int r = glm::min((int)color.r, 255);
@@ -85,21 +104,6 @@ int RayTracer::Render(int samples)
 	return pixelCount;
 }
 
-void RayTracer::RenderPacket()
-{
-	omp_set_num_threads(iCPU2);
-	int x = 0;
-
-#pragma omp parallel for private(x)
-	for (int y = 0; y < SCRHEIGHT / RayPacket::width; y++)
-	{
-		for (x = 0; x < SCRWIDTH / RayPacket::height; x++)
-		{
-			RayPacket rays; this->scene->camera->GenerateRays(&rays, x, y);
-		}
-	}
-}
-
 // -----------------------------------------------------------
 // Whitted-style ray tracing stuff
 // -----------------------------------------------------------
@@ -107,21 +111,9 @@ void RayTracer::RenderPacket()
 vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 {
 	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
+
+#pragma region trace function
 	float nearest = INFINITY;
-
-	// BVH depth rendering
-	if (depthRendering)
-	{
-		int depthRender = 0;
-#if ENABLETOPBVH
-		this->scene->bvhTop->TraverseTop(ray, this->scene->bvhTop->topRoot, 0, &depthRender);
-#else
-		this->scene->bvh->Traverse(ray, this->scene->bvh->root, 0, &depthRender);
-#endif
-		return vec3(clamp((depthRender * 0.005f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.005f), 0.0f, 1.0f), 0.0f);
-	}
-
-	// Trace function
 #if ENABLEBVH
 #if ENABLETOPBVH
 	this->scene->bvhTop->TraverseTop(ray, this->scene->bvhTop->topRoot);
@@ -139,9 +131,8 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 		}
 	}
 #endif // ENABLEBVH
-
-	if (nearest == INFINITY) return BACKGROUND_COLOR; 	// If ray does not intersect
-	if (!renderShadow) return GetColor(ray);			// Toggle shadows on / off
+	if (nearest == INFINITY) return BACKGROUND_COLOR; 	// ray does not intersect
+#pragma endregion
 
 #if ALTERNATERENDERMODE // pseudo diffuse + shininess + dissolve rendering method (used for loaded obj files)
 	else
@@ -205,7 +196,6 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 	}
 
 #else
-	// If ray intersects
 	else
 	{
 		vec3 hitPoint = ray->orig + ray->dir * nearest;
@@ -282,6 +272,48 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 #endif
 }
 
+vec3 RayTracer::SampleBasic(int x, int y, Ray* ray, int depth)
+{
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
+
+#pragma region trace function
+	float nearest = INFINITY;
+#if ENABLEBVH
+#if ENABLETOPBVH
+	this->scene->bvhTop->TraverseTop(ray, this->scene->bvhTop->topRoot);
+#else
+	this->scene->bvh->Traverse(ray, this->scene->bvh->root);
+#endif // ENABLETOPBVH
+	nearest = ray->t;
+#else
+	for (size_t i = 0; i < this->scene->primList.size(); i++)
+	{
+		if (this->scene->primList[i]->intersect(ray) && nearest > ray->t)
+		{
+			nearest = ray->t;
+			ray->hit = this->scene->primList[i];
+		}
+	}
+#endif // ENABLEBVH
+	if (nearest == INFINITY) return BACKGROUND_COLOR; 	// ray does not intersect
+#pragma endregion
+
+	return GetColor(ray);
+}
+
+vec3 RayTracer::SampleDepth(int x, int y, Ray* ray, int depth)
+{
+	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
+
+	int depthRender = 0;
+#if ENABLETOPBVH
+	this->scene->bvhTop->TraverseTop(ray, this->scene->bvhTop->topRoot, 0, &depthRender);
+#else
+	this->scene->bvh->Traverse(ray, this->scene->bvh->root, 0, &depthRender);
+#endif
+	return vec3(clamp((depthRender * 0.005f), 0.0f, 1.0f), clamp((0.8f - depthRender * 0.005f), 0.0f, 1.0f), 0.0f);
+}
+
 vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* light, Ray* ray)
 {
 	vec3 hitEpsilon = hitPoint + dir * EPSILON;
@@ -291,70 +323,25 @@ vec3 RayTracer::DirectIllumination(vec3 hitPoint, vec3 dir, vec3 normal, Light* 
 	float lightInt = 0.0f;
 	float tToLight = length(light->pos - hitEpsilon);
 
-	if (renderShadow)
-	{
+#pragma region trace shadow ray
 #if ENABLEBVH
 #if ENABLETOPBVH
-		this->scene->bvhTop->TraverseTop(&shadowRay, this->scene->bvhTop->topRoot, true);
+	this->scene->bvhTop->TraverseTop(&shadowRay, this->scene->bvhTop->topRoot, true);
 #else
-		this->scene->bvh->Traverse(&shadowRay, this->scene->bvh->root, true);
+	this->scene->bvh->Traverse(&shadowRay, this->scene->bvh->root, true);
 #endif
-		if (shadowRay.t < tToLight) { return BLACK; }
+	if (shadowRay.t < tToLight) return BLACK;
 #else
-		for (size_t i = 0; i < this->scene->primList.size(); i++)
-		{
-			this->scene->primList[i]->intersect(&shadowRay);
-			if (shadowRay.t < tToLight) { return BLACK; }
-		}
-#endif // ENABLEBVH
+	for (size_t i = 0; i < this->scene->primList.size(); i++)
+	{
+		this->scene->primList[i]->intersect(&shadowRay);
+		if (shadowRay.t < tToLight) return BLACK;
 	}
+#endif // ENABLEBVH
+#pragma endregion
 
 	float euclidianDistanceToLight = distance(hitPoint, light->pos);
 	return light->color * dot(normal, dir) * (1 / (euclidianDistanceToLight*euclidianDistanceToLight)) * (GetColor(ray) * INVPI);
-}
-
-vec3 RayTracer::Reflect(vec3 dir, vec3 normal)
-{
-	return dir - 2 * dot(dir, normal) * normal;
-}
-
-vec3 RayTracer::Refract(vec3 dir, vec3 normal, bool inside)
-{
-	float n1 = inside ? 1.2f : 1, n2 = inside ? 1 : 1.2f;
-	float eta = n1 / n2, cosi = dot(-dir, normal);
-	float cost2 = 1.0f - eta * eta * (1 - cosi * cosi);
-	vec3 R = reflect(dir, normal);
-	if (cost2 > 0)
-	{
-		float r1 = RandomFloat(&seed1);
-		float a = n1 - n2, b = n1 + n2, R0 = (a * a) / (b * b), c = 1 - cosi;
-		float Fr = R0 + (1 - R0) * (c * c * c * c * c);
-		if (r1 > Fr) R = eta * dir + ((eta * cosi - sqrt(fabs(cost2))) * normal);
-	}
-	return R;
-}
-
-float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)
-{
-	float cosi = clamp(dot(normal, dir), -1.0f, 1.0f);
-	float etai = 1, etat = index;
-	if (cosi > 0)
-	{
-		std::swap(etai, etat);
-	}
-    float sint = etai / etat * sqrtf(glm::max(0.0f, 1 - cosi * cosi));
-	if (sint >= 1)
-	{
-		return 1;
-	}
-	else
-	{
-        float cost = sqrtf(glm::max(0.0f, 1 - sint * sint));
-		cosi = fabsf(cosi);
-		float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
-		float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
-		return (Rs * Rs + Rp * Rp) / 2;
-	}
 }
 
 // -----------------------------------------------------------
@@ -543,7 +530,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	{
 		// continue in fixed direction
 		Ray r = Ray(I, reflect(ray->dir, N));
-		return (GetColor(ray) * Sample(&r, depth + 1, true));
+		return (GetColor(ray) * Sample(&r, depth + 1, true)) / pSurvive;
 	}
 
 	if (ray->hit->material->shader == Material::Shader::GLASS)
@@ -587,34 +574,37 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 		Ray reflectRay = Ray(I, reflect(ray->dir, N));
 		vec3 reflectColor = GetColor(ray) * Sample(&reflectRay, depth + 1, true);
 
-		return (reflectColor * kr + refractColor * (1 - kr));
+		return (reflectColor * kr + refractColor * (1 - kr)) / pSurvive;
 	}
 #pragma endregion
 
 #pragma region direct illumination
-	// sample a random light source
-	int lightIndex = rand() % this->scene->areaLightList.size();
-	Primitive* randomLight = this->scene->areaLightList[lightIndex];
-	vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
-	
-	vec3 L = normalize(randomPointOnLight - I);
-	vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
-	float dist2 = glm::length2(randomPointOnLight - I);
-
-	Ray lr = Ray(I, L);
-	lr.t = length(randomPointOnLight - (I + L));
-
-	vec3 Ld = BLACK;
-	if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
+	vec3 Ld;
+	if (scene->areaLightList.size() != 0)
 	{
-		/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-		Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
+		// sample a random light source
+		int lightIndex = rand() % this->scene->areaLightList.size();
+		Primitive* randomLight = this->scene->areaLightList[lightIndex];
+		vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
 
-		float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-		if (solidAngle != 0)
+		vec3 L = normalize(randomPointOnLight - I);
+		vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
+		float dist2 = glm::length2(randomPointOnLight - I);
+
+		Ray lr = Ray(I, L);
+		lr.t = length(randomPointOnLight - (I + L));
+
+		if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
 		{
-			float lightPDF = 1 / solidAngle;
-			Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
+			/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+			Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
+
+			float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+			if (solidAngle != 0)
+			{
+				float lightPDF = 1 / solidAngle;
+				Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
+			}
 		}
 	}
 #pragma endregion
@@ -632,7 +622,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	}
 
 #if RR 
-	return ((BRDF * Ei) / pSurvive) + Ld;
+	return (BRDF * Ei + Ld) / pSurvive;
 #else
 	return BRDF * Ei + Ld;
 #endif
@@ -690,7 +680,7 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	// trace ray
 	vec3 I = Trace(ray);
 
-	// terminate if ray left the scene
+	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
 		//return BACKGROUND_COLOR;
@@ -702,6 +692,7 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	{
 		if (lastSpecular)
 		{
+			//return ray->hit->material->diffuse;
 			if (dot(ray->hit->getNormal(I), ray->dir) > 0)
 			{
 				return BLACK;
@@ -720,18 +711,20 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 #if RR // russian roulette
 	float a = RandomFloat(&seed1);
 	float pSurvive = min(1.0f, max(max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
-	if (a > pSurvive && !lastSpecular) return BLACK;
+	if (a > pSurvive) return BLACK;
 #endif
 
 	vec3 N = ray->hit->getNormal(I);
+	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
+	vec3 Ld = BLACK;
 
 #pragma region surface interaction
-	// surface interaction
+										// surface interaction
 	if (ray->hit->material->shader == Material::Shader::MIRROR)
 	{
 		// continue in fixed direction
 		Ray r = Ray(I, reflect(ray->dir, N));
-		return GetColor(ray) * Sample(&r, depth + 1, true);
+		return (GetColor(ray) * Sample(&r, depth + 1, true)) / pSurvive;
 	}
 
 	if (ray->hit->material->shader == Material::Shader::GLASS)
@@ -760,7 +753,7 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 
 		if (k < 0)
 		{
-			return GetColor(ray);
+			return BLACK; // GetColor(ray);
 		}
 		else
 		{
@@ -769,79 +762,63 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 			vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
 			refractRay.orig = hitEpsilon;
 
-			refractColor = Sample(&refractRay, depth += 1, true);
+			refractColor = Sample(&refractRay, depth + 1, true);
 		}
 
 		Ray reflectRay = Ray(I, reflect(ray->dir, N));
-		vec3 reflectColor = GetColor(ray) * Sample(&reflectRay, depth += 1, false);
+		vec3 reflectColor = GetColor(ray) * Sample(&reflectRay, depth + 1, true);
 
-		return reflectColor * kr + refractColor * (1 - kr);
+		return (reflectColor * kr + refractColor * (1 - kr)) / pSurvive;
 	}
 #pragma endregion
 
-	vec3 Ld = SampleDirectLight(I, N, ray);
+#pragma region direct illumination
+	if (scene->areaLightList.size() != 0)
+	{
+		// sample a random light source
+		int lightIndex = rand() % this->scene->areaLightList.size();
+		Primitive* randomLight = this->scene->areaLightList[lightIndex];
+		vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
 
-	// continue in random direction
+		vec3 L = normalize(randomPointOnLight - I);
+		vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
+		float dist2 = glm::length2(randomPointOnLight - I);
+
+		Ray lr = Ray(I, L);
+		lr.t = length(randomPointOnLight - (I + L));
+
+		if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
+		{
+			/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+			Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
+
+			float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+			if (solidAngle != 0)
+			{
+				float lightPDF = 1 / solidAngle;
+				Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
+			}
+		}
+	}
+#pragma endregion
+
+	// continue random walk
 	vec3 R = CosineWeightedDiffuseReflection(N);
 	Ray r = Ray(I, R);
 
 	// update throughput
-	vec3 BRDF = GetColor(ray) * INVPI;
 	float PDF = dot(N, R) * INVPI;
-	
 	vec3 Ei = BLACK;
 	if (PDF != 0)
 	{
-		Ei = SampleEX(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance;
+		Ei = Sample(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance
 	}
 
-#if RR
-	return ((BRDF * Ei) / pSurvive) + Ld;
+#if RR 
+	return (BRDF * Ei + Ld) / pSurvive;
 #else
 	return BRDF * Ei + Ld;
 #endif
-}
-
-vec3 RayTracer::SampleDirectLight(vec3 intersect, vec3 normal, Ray* ray, bool isMIS)
-{
-	int lightIndex = rand() % scene->areaLightList.size();
-	Primitive* randomLight = this->scene->areaLightList[lightIndex];
-
-	vec3 point = randomLight->randomPointOnPrimitive(intersect);;
-
-	vec3 L = point - intersect;
-	float dist = length(L);
-	L /= dist;
-
-	float cos_o = dot(-L, randomLight->getNormal(intersect));
-	float cos_i = dot(L, normal);
-	if ((cos_o <= 0) || (cos_i <= 0)) return BLACK;
-
-	// trace shadow ray
-	Ray r = Ray(intersect, L);
-	r.t = length(point - (intersect + L));
-	if (Trace(&r, true) == BLACK) return BLACK;
-
-	// V(p,p’)=1; calculate transport
-	vec3 BRDF = GetColor(ray) * INVPI;
-	vec3 Ld = BLACK;
-	float solidAngle = (cos_o * randomLight->calculateArea()) / (dist * dist);
-	if (solidAngle != 0)
-	{
-		float lightPDF = 1 / solidAngle;
-		if (isMIS)
-		{
-			float brdfPDF = dot(normal, L) * INVPI;
-			float misPDF = lightPDF + brdfPDF;
-			Ld = BRDF * (float)scene->areaLightList.size() * randomLight->material->diffuse * (cos_i / misPDF);
-		}
-
-		else
-		{
-			Ld = BRDF * (float)scene->areaLightList.size() * randomLight->material->diffuse * (cos_i / lightPDF);
-		}
-	}
-	return Ld;
 }
 
 vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
@@ -922,6 +899,50 @@ float RayTracer::RandomFloat(glm::uint* seed)
 // -----------------------------------------------------------
 // Global stuff
 // -----------------------------------------------------------
+
+vec3 RayTracer::Reflect(vec3 dir, vec3 normal)
+{
+	return dir - 2 * dot(dir, normal) * normal;
+}
+
+vec3 RayTracer::Refract(vec3 dir, vec3 normal, bool inside)
+{
+	float n1 = inside ? 1.2f : 1, n2 = inside ? 1 : 1.2f;
+	float eta = n1 / n2, cosi = dot(-dir, normal);
+	float cost2 = 1.0f - eta * eta * (1 - cosi * cosi);
+	vec3 R = reflect(dir, normal);
+	if (cost2 > 0)
+	{
+		float r1 = RandomFloat(&seed1);
+		float a = n1 - n2, b = n1 + n2, R0 = (a * a) / (b * b), c = 1 - cosi;
+		float Fr = R0 + (1 - R0) * (c * c * c * c * c);
+		if (r1 > Fr) R = eta * dir + ((eta * cosi - sqrt(fabs(cost2))) * normal);
+	}
+	return R;
+}
+
+float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)
+{
+	float cosi = clamp(dot(normal, dir), -1.0f, 1.0f);
+	float etai = 1, etat = index;
+	if (cosi > 0)
+	{
+		std::swap(etai, etat);
+	}
+	float sint = etai / etat * sqrtf(glm::max(0.0f, 1 - cosi * cosi));
+	if (sint >= 1)
+	{
+		return 1;
+	}
+	else
+	{
+		float cost = sqrtf(glm::max(0.0f, 1 - sint * sint));
+		cosi = fabsf(cosi);
+		float Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+		float Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+		return (Rs * Rs + Rp * Rp) / 2;
+	}
+}
 
 vec3 RayTracer::GetColor(Ray* ray)
 {
