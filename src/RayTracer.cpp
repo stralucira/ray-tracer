@@ -517,7 +517,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 #if RR // russian roulette
 	float a = RandomFloat(&seed1);
-	float pSurvive = min(1.0f, max(max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
+	float pSurvive = glm::min(1.0f, glm::max(glm::max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
 	if (a > pSurvive) return BLACK;
 #endif
 
@@ -710,7 +710,7 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 
 #if RR // russian roulette
 	float a = RandomFloat(&seed1);
-	float pSurvive = min(1.0f, max(max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
+	float pSurvive = glm::min(1.0f, glm::max(glm::max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
 	if (a > pSurvive) return BLACK;
 #endif
 
@@ -972,4 +972,15 @@ vec3 RayTracer::SampleSkydome(HDRBitmap* skydome, Ray* ray)
 	float v = acosf(ray->dir.y) * INVPI;
 	int pixel = (int)(u * (float)(skydome->width - 1)) + ((int)(v * (float)(skydome->height - 1)) * skydome->width);
 	return skydome->buffer[pixel];
+}
+
+void RayTracer::Focus(int x, int y)
+{
+	Ray ray; scene->camera->GenerateRay(&ray, x, y);
+	this->scene->bvh->Traverse(&ray, this->scene->bvh->root);
+	if (ray.t != INFINITY)
+	{
+		scene->camera->focalLength = ray.t;
+		scene->camera->CalculateScreen();
+	}
 }

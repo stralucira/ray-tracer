@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Ray.h"
-#include "RayPacket.h"
 #include "Material.h"
 #include "AABB.h"
 

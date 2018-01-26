@@ -4,6 +4,7 @@
 
 float ROTATEMODIFIER = 0.05f;
 int FRAMEMODIFIER = 0;
+POINT p;
 
 Scene* scene;
 RayTracer* rayTracer;
@@ -45,6 +46,8 @@ void Game::Shutdown() { }
 // Input handling
 // -----------------------------------------------------------
 void Game::HandleInput( float dt ) { }
+
+void Game::MouseDown(int _Button) { frameCount = FRAMEMODIFIER; rayTracer->Focus(p.x, p.y); };
 
 void Game::KeyUp(int a_Key) { keyState[a_Key] = false; }
 
@@ -237,6 +240,9 @@ void Game::KeyDown(int a_Key)
 // -----------------------------------------------------------
 void Game::Tick(float dt)
 {
+	GetCursorPos(&p);
+	ScreenToClient(FindWindow(NULL, "ReyTracer"), &p);
+
 	// Translation:
 	if (keyState[SDL_SCANCODE_W]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Surge(scene->MOVEMODIFIER); }
 	if (keyState[SDL_SCANCODE_A]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Sway(-scene->MOVEMODIFIER); }
@@ -308,4 +314,7 @@ void Game::Tick(float dt)
 
 	sprintf(buffer, "Pixel summed: %i. Frame count: %i", pixelCount, frameCount);
 	screen->Print(buffer, 2, 62, 0xffffff);
+
+	sprintf(buffer, "Click to focus. X: %i Y: %i", p.x, p.y);
+	screen->Print(buffer, 2, 72, 0xffffff);
 }

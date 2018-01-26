@@ -17,7 +17,6 @@ public:
 	vec3 accumulator[SCRHEIGHT][SCRWIDTH];
 	
 	int Render(int samples);
-	void RenderPacket();
 
 	// Whitted-style ray tracing stuff
 	vec3 SampleWhitted(int x, int y, Ray* ray, int depth);
@@ -44,6 +43,8 @@ public:
 	vec3 SampleTexturePoint(Surface* tex, vec2 uv);
 	vec3 SampleSkydome(HDRBitmap* skydome, Ray* ray);
 
+	void Focus(int x, int y);
+	
 	bool depthRendering = false;
 	bool depthOfField = true;
 	bool renderShadow = true;

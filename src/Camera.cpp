@@ -4,6 +4,8 @@
 #include <random>
 
 int iCPU = omp_get_num_procs();
+glm::uint seed3 = 2343 * 68365;
+glm::uint seed4 = 1853 * 28563;
 
 Camera::Camera()
 {
@@ -34,10 +36,10 @@ void Camera::CalculateScreen()
 {
 	this->SetPosition(pos);
 
-	this->p0 = *(vec3*)&(transform * vec4(focalLength * vec3(-1.f,  1.f * aspectRatio, -this->d), 1.0f)); // top left corner
-	this->p1 = *(vec3*)&(transform * vec4(focalLength * vec3( 1.f,  1.f * aspectRatio, -this->d), 1.0f)); // top right corner
-	this->p2 = *(vec3*)&(transform * vec4(focalLength * vec3(-1.f, -1.f * aspectRatio, -this->d), 1.0f)); // bottom left corner
-	this->p3 = *(vec3*)&(transform * vec4(focalLength * vec3( 1.f, -1.f * aspectRatio, -this->d), 1.0f)); // bottom right corner
+	this->p0 = vec3(transform * vec4(focalLength * vec3(-1.f,  1.f * aspectRatio, -this->d), 1.0f)); // top left corner
+	this->p1 = vec3(transform * vec4(focalLength * vec3( 1.f,  1.f * aspectRatio, -this->d), 1.0f)); // top right corner
+	this->p2 = vec3(transform * vec4(focalLength * vec3(-1.f, -1.f * aspectRatio, -this->d), 1.0f)); // bottom left corner
+	this->p3 = vec3(transform * vec4(focalLength * vec3( 1.f, -1.f * aspectRatio, -this->d), 1.0f)); // bottom right corner
 }
 
 void Camera::PrintPosition()
@@ -132,10 +134,10 @@ void Camera::GenerateRay(Ray* ray, int x, int y)
 
 void Camera::GenerateRayDOF(Ray* ray, int x, int y)
 {
-	vec3 DoF = vec3(((float)rand() / RAND_MAX) * apertureSize - apertureSize * 0.5f, ((float)rand() / RAND_MAX) * apertureSize - apertureSize * 0.5f, 0.0f);
+	vec3 DoF = vec3(RandomFloat(&seed3) * apertureSize - apertureSize * 0.5f, RandomFloat(&seed4) * apertureSize - apertureSize * 0.5f, 0.0f);
 	
-	float fx = ((float)x + (rand() / RAND_MAX)) / SCRWIDTH;
-	float fy = ((float)y + (rand() / RAND_MAX)) / SCRHEIGHT;
+	float fx = ((float)x + RandomFloat(&seed3)) / SCRWIDTH;
+	float fy = ((float)y + RandomFloat(&seed4)) / SCRHEIGHT;
 
 	ray->t = INFINITY;
 	ray->u = INFINITY;
@@ -144,4 +146,19 @@ void Camera::GenerateRayDOF(Ray* ray, int x, int y)
 	ray->orig = this->pos + DoF;
 	ray->dir = normalize(this->p0 + fx * (this->p1 - this->p0) + fy * (this->p2 - this->p0) - (this->pos + DoF));
 	ray->invDir = 1.0f / ray->dir;
+}
+
+glm::uint Camera::RandomInt(glm::uint* seed)
+{
+	// Marsaglia Xor32; see http://excamera.com/sphinx/article-xorshift.html
+	// also see https://github.com/WebDrake/xorshift/blob/master/xorshift.c for higher quality variants
+	*seed ^= *seed << 13;
+	*seed ^= *seed >> 17;
+	*seed ^= *seed << 5;
+	return *seed;
+}
+
+float Camera::RandomFloat(glm::uint* seed)
+{
+	return RandomInt(seed) * 2.3283064365387e-10f;
 }

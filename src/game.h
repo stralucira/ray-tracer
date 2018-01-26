@@ -25,12 +25,12 @@ public:
 	void HandleInput( float dt );
 	void Tick( float dt );
 	void MouseUp( int _Button ) { /* implement if you want to detect mouse button presses */ }
-	void MouseDown( int _Button ) { /* implement if you want to detect mouse button presses */ }
+	void MouseDown( int _Button ); // { /* implement if you want to detect mouse button presses */ }
 	void MouseMove( int _X, int _Y ) { /* implement if you want to detect mouse movement */ }
 	void KeyUp(int a_Key);
 	void KeyDown(int a_Key);
-
 	void LoadScene( int scene_id );
+	bool LeftButton;
 private:
 	Surface* screen;
 	int frameCount;
