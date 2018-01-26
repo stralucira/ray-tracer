@@ -111,7 +111,7 @@ void Game::KeyDown(int a_Key)
 		// Reset Camera Position:
 	case SDL_SCANCODE_R:
 		frameCount = FRAMEMODIFIER;
-		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt);
+		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt, 5.0f, 0.0f);
 		break;
 	}
 }
@@ -282,8 +282,8 @@ void Game::Tick(float dt)
 	screen->Print(buffer, 2, 2, 0xffffff);
 
 	if (rayTracer->depthOfField) sprintf(buffer, "Press F to disable depth of field. Zoom: %.2fx Focal distance: %.5f Aperture size: %.5f \n",
-		rayTracer->scene->camera->d, rayTracer->scene->camera->focalLength, rayTracer->scene->camera->apertureSize);
-	else sprintf(buffer, "Press F to enable depth of field. Zoom: %.2fx\n", rayTracer->scene->camera->d);
+		rayTracer->scene->camera->magnification, rayTracer->scene->camera->focalLength, rayTracer->scene->camera->apertureSize);
+	else sprintf(buffer, "Press F to enable depth of field. Zoom: %.2fx\n", rayTracer->scene->camera->magnification);
 	screen->Print(buffer, 2, 12, 0xffffff);
 
 	switch (rayTracer->scene->bvh->traversalMode)

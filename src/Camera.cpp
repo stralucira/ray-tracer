@@ -9,24 +9,24 @@ glm::uint seed4 = 1853 * 28563;
 
 Camera::Camera()
 {
-	this->Init(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, -1.0f));
+	this->Init(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, -1.0f), 5.0f, 0.0f);
 }
 
-Camera::Camera(vec3 pos, vec3 lookAt)
+Camera::Camera(vec3 pos, vec3 lookAt, float focalLength, float apertureSize)
 {
-	this->Init(pos, lookAt);
+	this->Init(pos, lookAt, focalLength, apertureSize);
 }
 
 // Initialize camera and the transformation matrix
-void Camera::Init(vec3 pos, vec3 lookAt)
+void Camera::Init(vec3 pos, vec3 lookAt, float focalLength, float apertureSize)
 {
 	this->pos = pos;
 	this->SetPosition(pos);
 	this->LookAt(lookAt);
 
-	this->d = 1.0f;
-	this->focalLength = 5.0f;
-	this->apertureSize = 0.f;
+	this->magnification = 1.0f;
+	this->focalLength = focalLength;
+	this->apertureSize = apertureSize;
 	this->aspectRatio = (float)SCRHEIGHT / (float)SCRWIDTH;
 
 	CalculateScreen();
@@ -36,10 +36,10 @@ void Camera::CalculateScreen()
 {
 	this->SetPosition(pos);
 
-	this->p0 = vec3(transform * vec4(focalLength * vec3(-1.f,  1.f * aspectRatio, -this->d), 1.0f)); // top left corner
-	this->p1 = vec3(transform * vec4(focalLength * vec3( 1.f,  1.f * aspectRatio, -this->d), 1.0f)); // top right corner
-	this->p2 = vec3(transform * vec4(focalLength * vec3(-1.f, -1.f * aspectRatio, -this->d), 1.0f)); // bottom left corner
-	this->p3 = vec3(transform * vec4(focalLength * vec3( 1.f, -1.f * aspectRatio, -this->d), 1.0f)); // bottom right corner
+	this->p0 = vec3(transform * vec4(focalLength * vec3(-1.f,  1.f * aspectRatio, -this->magnification), 1.0f)); // top left corner
+	this->p1 = vec3(transform * vec4(focalLength * vec3( 1.f,  1.f * aspectRatio, -this->magnification), 1.0f)); // top right corner
+	this->p2 = vec3(transform * vec4(focalLength * vec3(-1.f, -1.f * aspectRatio, -this->magnification), 1.0f)); // bottom left corner
+	this->p3 = vec3(transform * vec4(focalLength * vec3( 1.f, -1.f * aspectRatio, -this->magnification), 1.0f)); // bottom right corner
 }
 
 void Camera::PrintPosition()
@@ -95,9 +95,9 @@ void Camera::Yaw(float angle)
 // Zooming:
 void Camera::Zoom(float increment)
 {
-	if (d + increment > EPSILON)
+	if (magnification + increment > EPSILON)
 	{
-		d += increment;
+		magnification += increment;
 		CalculateScreen();
 	}
 }

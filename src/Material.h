@@ -49,9 +49,9 @@ public:
 	vec3 specular = BLACK;		// Ks
 	vec3 transmittance = BLACK;	// Kt, Tf
 	vec3 emission = BLACK;		// Ke
-	float shininess = 0.0f;		// Ns
-	float ior = 0.0f;			// Ni (index of refraction)
-	float dissolve = 0.0f;		// d, Tr
+	float shininess = 0.f;		// Ns
+	float ior = 0.f;			// Ni (index of refraction)
+	float dissolve = 0.f;		// d, Tr
 	int illum = 0;				// illum model
 
 	Surface* texture;

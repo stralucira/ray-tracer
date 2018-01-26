@@ -37,7 +37,7 @@ public:
 
 	// Global stuff
 	vec3 Reflect(vec3 dir, vec3 normal);
-	vec3 Refract(vec3 dir, vec3 normal, bool inside);
+	vec3 Refract(vec3 dir, vec3 normal, float ior);
 	float Fresnel(vec3 dir, vec3 normal, float index);
 	vec3 GetColor(Ray* ray);
 	vec3 SampleTexturePoint(Surface* tex, vec2 uv);

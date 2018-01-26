@@ -6,8 +6,8 @@ class Camera
 {
 public:
 	Camera();
-	Camera(vec3 pos, vec3 lookAt);
-	void Init(vec3 pos, vec3 lookAt);
+	Camera(vec3 pos, vec3 lookAt, float focalLength = 5.0f, float apertureSize = 0.0f);
+	void Init(vec3 pos, vec3 lookAt, float focalLength, float apertureSize);
 	void CalculateScreen();
 	void PrintPosition();
 
@@ -32,7 +32,7 @@ public:
 	vec3 pos;
 	vec3 p0, p1, p2, p3;
 
-	float d;
+	float magnification;
 	float aspectRatio;
 	float focalLength;
 	float apertureSize;
