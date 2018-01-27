@@ -1,4 +1,5 @@
 #pragma once
+#include "template.h"
 
 class Material
 {
@@ -51,7 +52,7 @@ public:
 	vec3 emission = BLACK;		// Ke
 	float shininess = 0.f;		// Ns
 	float ior = 0.f;			// Ni (index of refraction)
-	float dissolve = 0.f;		// d, Tr
+	float dissolve = 1.f;		// d, Tr
 	int illum = 0;				// illum model
 
 	Surface* texture;

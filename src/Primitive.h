@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "template.h"
 #include "Ray.h"
 #include "Material.h"
 #include "AABB.h"
@@ -6,7 +7,10 @@
 class Primitive
 {
 public:
-	Primitive(vec3 pos);
+	Primitive(vec3 pos)
+	{
+		this->centroid = pos;
+	}
 
 	// default material color and shader
 	Material* material;

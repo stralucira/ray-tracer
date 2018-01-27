@@ -52,9 +52,9 @@ int RayTracer::Render(int samples)
 			{
 				//color = SampleWhitted(x, y, &ray, 0);	// whitted-style ray tracing
 				//color = SampleSimple(&ray, 0);			// path tracing with importance sampling
-				//color = Sample(&ray, 0, true);			// path tracing with importance sampling and next event estimation
+				color = Sample(&ray, 0, true);			// path tracing with importance sampling and next event estimation
 				//color = SampleMIS(&ray);					// path tracing with multiple importance sampling
-				color = SampleEX(&ray, 0, true);			// DEBUG STUFF
+				//color = SampleEX(&ray, 0, true);			// DEBUG STUFF
 
 				/*if (x < halfWidth)
 				{
@@ -258,7 +258,7 @@ vec3 RayTracer::SampleWhitted(int x, int y, Ray* ray, int depth)
 				vec3 hitEpsilon = refractRay.orig + refractRay.dir * 0.01f;
 				refractRay.orig = hitEpsilon;
 
-				refractColor = this->SampleWhitted(x, y, &refractRay, depth += 1);
+				refractColor = GetColor(ray) * SampleWhitted(x, y, &refractRay, depth += 1);
 			}
 
 			Ray reflectRay = Ray(hitPoint, reflect(ray->dir, normal));
@@ -517,7 +517,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 #if RR // russian roulette
 	float a = RandomFloat(&seed1);
-	float surviveProb = glm::min(1.0f, glm::max(glm::max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
+	float surviveProb = glm::min(.5f, glm::max(glm::max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
 	if (a > surviveProb) return BLACK;
 	float survivePower = 1.0f / surviveProb;
 #else
@@ -528,7 +528,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 
 #pragma region surface interaction
-										// surface interaction
+	// surface interaction
 	if (ray->hit->material->shader == Material::Shader::MIRROR)
 	{
 		// continue in fixed direction
@@ -536,6 +536,26 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 		return GetColor(ray) * Sample(&r, depth + 1, true) * survivePower;
 	}
 
+	/*if (ray->hit->material->dissolve < 1.0f)
+	{
+		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
+		bool outside = dot(ray->dir, N) < 0;
+		vec3 bias = EPSILON * ray->hit->getNormal(I);
+		
+		float path = RandomFloat(&seed1);
+
+		if (path < 1.0f)
+		{
+			vec3 refractDir = refract(ray->dir, N, 1.0f);
+			vec3 refractOrig = outside ? I - bias : I + bias;
+			Ray r = Ray(refractOrig, refractDir);
+			return Sample(&r, depth + 1, false) * survivePower;
+		}
+
+		Ray r = Ray(I, reflect(ray->dir, N));
+		return GetColor(ray) * Sample(&r, depth + 1, true) * survivePower;
+	}*/
+	
 	if (ray->hit->material->ior > EPSILON)
 	{
 		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
@@ -597,11 +617,11 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	vec3 Ei = BLACK;
 	if (PDF != 0)
 	{
-		Ei = Sample(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance
+		Ei = (Sample(&r, depth + 1, false) * dot(N, R) / PDF) * survivePower; // irradiance
 	}
 
 #if RR 
-	return (BRDF * Ei + Ld) * survivePower;
+	return (BRDF * Ei + Ld);
 #else
 	return BRDF * Ei + Ld;
 #endif
@@ -650,134 +670,134 @@ vec3 RayTracer::SampleMIS(Ray* ray)
 	return E;
 }
 
-vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
-{
-#if !RR
-	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
-#endif
-
-	// trace ray
-	vec3 I = Trace(ray);
-
-	// teriminate if ray left the scene
-	if (ray->t == INFINITY)
-	{
-		//return BACKGROUND_COLOR;
-		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
-	}
-
-	// terminate if we hit a light source
-	if (ray->hit->getIsLight())
-	{
-		if (lastSpecular)
-		{
-			//return ray->hit->material->diffuse;
-			if (dot(ray->hit->getNormal(I), ray->dir) > 0)
-			{
-				return BLACK;
-			}
-			else
-			{
-				return ray->hit->material->diffuse;
-			}
-		}
-		else
-		{
-			return BLACK;
-		}
-	}
-
-#if RR // russian roulette
-	float a = RandomFloat(&seed1);
-	float surviveProb = glm::min(1.0f, glm::max(glm::max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
-	if (a > surviveProb) return BLACK;
-	float survivePower = 1.0f / surviveProb;
-#else
-	float survivePower = 1.0f;
-#endif
-
-	vec3 N = ray->hit->getNormal(I);
-	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
-
-#pragma region surface interaction
-	// surface interaction
-	if (ray->hit->material->shader == Material::Shader::MIRROR)
-	{
-		// continue in fixed direction
-		Ray r = Ray(I, reflect(ray->dir, N));
-		return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
-	}
-
-	if (ray->hit->material->ior > EPSILON)
-	{
-		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
-		bool outside = dot(ray->dir, N) < 0;
-		vec3 bias = EPSILON * ray->hit->getNormal(I);
-
-		float path = RandomFloat(&seed1);
-
-		if (path < (1 - kr))
-		{
-			vec3 refractDir = Refract(ray->dir, N, ray->hit->material->ior);
-			vec3 refractOrig = outside ? I - bias : I + bias;
-			Ray r = Ray(refractOrig, refractDir);
-			return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
-		}	
-		
-		Ray r = Ray(I, reflect(ray->dir, N));
-		return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
-	}
-#pragma endregion
-
-#pragma region direct illumination
-	vec3 Ld;
-	if (scene->areaLightList.size() != 0)
-	{
-		// sample a random light source
-		int lightIndex = rand() % this->scene->areaLightList.size();
-		Primitive* randomLight = this->scene->areaLightList[lightIndex];
-		vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
-
-		vec3 L = normalize(randomPointOnLight - I);
-		vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
-		float dist2 = glm::length2(randomPointOnLight - I);
-
-		Ray lr = Ray(I, L);
-		lr.t = length(randomPointOnLight - (I + L));
-
-		if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
-		{
-			/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-			Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
-
-			float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-			if (solidAngle != 0)
-			{
-				float lightPDF = 1 / solidAngle;
-				Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
-			}
-		}
-	}
-#pragma endregion
-
-	// continue random walk
-	vec3 R = CosineWeightedDiffuseReflection(N);
-	Ray r = Ray(I, R);
-
-	// update throughput
-	float PDF = dot(N, R) * INVPI;
-	vec3 Ei = BLACK;
-	if (PDF != 0)
-	{
-		Ei = SampleEX(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance
-	}
-
-#if RR 
-	return (BRDF * Ei + Ld) * survivePower;
-#else
-	return BRDF * Ei + Ld;
-#endif
-}
+//vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
+//{
+//#if !RR
+//	if (depth > MAXDEPTH || this->scene->primList.size() == 0) return BACKGROUND_COLOR;
+//#endif
+//
+//	// trace ray
+//	vec3 I = Trace(ray);
+//
+//	// teriminate if ray left the scene
+//	if (ray->t == INFINITY)
+//	{
+//		//return BACKGROUND_COLOR;
+//		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+//	}
+//
+//	// terminate if we hit a light source
+//	if (ray->hit->getIsLight())
+//	{
+//		if (lastSpecular)
+//		{
+//			//return ray->hit->material->diffuse;
+//			if (dot(ray->hit->getNormal(I), ray->dir) > 0)
+//			{
+//				return BLACK;
+//			}
+//			else
+//			{
+//				return ray->hit->material->diffuse;
+//			}
+//		}
+//		else
+//		{
+//			return BLACK;
+//		}
+//	}
+//
+//#if RR // russian roulette
+//	float a = RandomFloat(&seed1);
+//	float surviveProb = glm::min(1.0f, glm::max(glm::max(ray->hit->material->diffuse.r, ray->hit->material->diffuse.g), ray->hit->material->diffuse.b));
+//	if (a > surviveProb) return BLACK;
+//	float survivePower = 1.0f / surviveProb;
+//#else
+//	float survivePower = 1.0f;
+//#endif
+//
+//	vec3 N = ray->hit->getNormal(I);
+//	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
+//
+//#pragma region surface interaction
+//	// surface interaction
+//	if (ray->hit->material->shader == Material::Shader::MIRROR)
+//	{
+//		// continue in fixed direction
+//		Ray r = Ray(I, reflect(ray->dir, N));
+//		return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
+//	}
+//
+//	if (ray->hit->material->ior > EPSILON)
+//	{
+//		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
+//		bool outside = dot(ray->dir, N) < 0;
+//		vec3 bias = EPSILON * ray->hit->getNormal(I);
+//
+//		float path = RandomFloat(&seed1);
+//
+//		if (path < (1 - kr))
+//		{
+//			vec3 refractDir = Refract(ray->dir, N, ray->hit->material->ior);
+//			vec3 refractOrig = outside ? I - bias : I + bias;
+//			Ray r = Ray(refractOrig, refractDir);
+//			return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
+//		}	
+//		
+//		Ray r = Ray(I, reflect(ray->dir, N));
+//		return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
+//	}
+//#pragma endregion
+//
+//#pragma region direct illumination
+//	vec3 Ld;
+//	if (scene->areaLightList.size() != 0)
+//	{
+//		// sample a random light source
+//		int lightIndex = rand() % this->scene->areaLightList.size();
+//		Primitive* randomLight = this->scene->areaLightList[lightIndex];
+//		vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
+//
+//		vec3 L = normalize(randomPointOnLight - I);
+//		vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
+//		float dist2 = glm::length2(randomPointOnLight - I);
+//
+//		Ray lr = Ray(I, L);
+//		lr.t = length(randomPointOnLight - (I + L));
+//
+//		if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
+//		{
+//			/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+//			Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
+//
+//			float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+//			if (solidAngle != 0)
+//			{
+//				float lightPDF = 1 / solidAngle;
+//				Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
+//			}
+//		}
+//	}
+//#pragma endregion
+//
+//	// continue random walk
+//	vec3 R = CosineWeightedDiffuseReflection(N);
+//	Ray r = Ray(I, R);
+//
+//	// update throughput
+//	float PDF = dot(N, R) * INVPI;
+//	vec3 Ei = BLACK;
+//	if (PDF != 0)
+//	{
+//		Ei = SampleEX(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance
+//	}
+//
+//#if RR 
+//	return (BRDF * Ei + Ld) * survivePower;
+//#else
+//	return BRDF * Ei + Ld;
+//#endif
+//}
 
 vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 {
@@ -786,8 +806,8 @@ vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 	float r0 = RandomFloat(&seed1), r1 = RandomFloat(&seed2);
 	float r = sqrt(r0);
 	float theta = 2 * PI * r1;
-	float x = r * cosf(theta);
-	float y = r * sinf(theta);
+	float x = r * sine(theta + PI * 0.05); // cosf(theta);
+	float y = r * sine(theta); // sinf(theta);
 
 	vec3 randomDir = normalize(vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
 	vec3 t = cross(randomDir, normal);
@@ -933,7 +953,7 @@ void RayTracer::Focus(int x, int y)
 	this->scene->bvh->Traverse(&ray, this->scene->bvh->root);
 	if (ray.t != INFINITY)
 	{
-		scene->camera->focalLength = ray.t;
+		scene->camera->focalLength = ray.t / scene->camera->magnification;
 		scene->camera->CalculateScreen();
 	}
 }

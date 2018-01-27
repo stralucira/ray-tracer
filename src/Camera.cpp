@@ -128,23 +128,28 @@ void Camera::GenerateRay(Ray* ray, int x, int y)
 	ray->v = INFINITY;
 
 	ray->orig = this->pos;
-	ray->dir = normalize((this->p0 + ((float)x / SCRWIDTH) * (this->p1 - this->p0) + ((float)y / SCRHEIGHT) * (this->p2 - this->p0)) - this->pos);
+	ray->dir = normalize((this->p0 + ((float)x / SCRWIDTH) * (this->p1 - this->p0) + ((float)y / SCRHEIGHT) * (this->p2 - this->p0)) - ray->orig);
 	ray->invDir = 1.0f / ray->dir;
 }
 
 void Camera::GenerateRayDOF(Ray* ray, int x, int y)
 {
-	vec3 DoF = vec3(RandomFloat(&seed3) * apertureSize - apertureSize * 0.5f, RandomFloat(&seed4) * apertureSize - apertureSize * 0.5f, 0.0f);
-	
-	float fx = ((float)x + RandomFloat(&seed3)) / SCRWIDTH;
-	float fy = ((float)y + RandomFloat(&seed4)) / SCRHEIGHT;
+	/// fast rectangular plane depth of field
+	//vec3 DoF = transform * vec4(RandomFloat(&seed3) * apertureSize - apertureSize * 0.05f, RandomFloat(&seed4) * apertureSize - apertureSize * 0.05f, 0.0f, 0.f);
+
+	/// fast circular plane depth of field
+	float dir = RandomFloat(&seed3) * PI * 2.f;
+	float len = RandomFloat(&seed4) * apertureSize;
+	float dof_x = len * (float)sine(double(dir + PI * 0.5f));
+	float dof_y = len * (float)sine(double(dir));
+	vec3 DoF = transform * vec4(dof_x, dof_y, 0.f, 0.f);
 
 	ray->t = INFINITY;
 	ray->u = INFINITY;
 	ray->v = INFINITY;
 
 	ray->orig = this->pos + DoF;
-	ray->dir = normalize(this->p0 + fx * (this->p1 - this->p0) + fy * (this->p2 - this->p0) - (this->pos + DoF));
+	ray->dir = normalize((this->p0 + ((float)x / SCRWIDTH) * (this->p1 - this->p0) + ((float)y / SCRHEIGHT) * (this->p2 - this->p0)) - ray->orig);
 	ray->invDir = 1.0f / ray->dir;
 }
 

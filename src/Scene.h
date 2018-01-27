@@ -29,6 +29,8 @@ public:
 	BVH* bvh;
 
 	vec3 pos, lookAt;
+	float focalLength = 5.f;
+	float apertureSize = 0.f;
 	float MOVEMODIFIER;
 	int index = 0;
 

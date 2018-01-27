@@ -28,7 +28,7 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(0); // <-- Change scene here
+	LoadScene(3); // <-- Change scene here
 	srand((glm::uint)time(NULL));
 }
 
@@ -111,7 +111,7 @@ void Game::KeyDown(int a_Key)
 		// Reset Camera Position:
 	case SDL_SCANCODE_R:
 		frameCount = FRAMEMODIFIER;
-		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt, 5.0f, 0.0f);
+		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt, rayTracer->scene->focalLength, rayTracer->scene->apertureSize);
 		break;
 	}
 }
@@ -276,10 +276,13 @@ void Game::Tick(float dt)
 	int pixelCount = rayTracer->Render(frameCount);
 
 	char buffer[500];
-	sprintf(buffer, "FPS: %f Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", 1 / dt, polyCount,
+	sprintf(buffer, "%.2f FPS", 1 / dt);
+	screen->Print(buffer, 2, 2, 0xffffff);
+
+	sprintf(buffer, "Frame count: %i Polygons: %i Position: %.2f %.2f %.2f Direction: %.2f %.2f %.2f \n", frameCount, polyCount,
 		rayTracer->scene->camera->pos.x, rayTracer->scene->camera->pos.y, rayTracer->scene->camera->pos.z,
 		rayTracer->scene->camera->GetForward().x, rayTracer->scene->camera->GetForward().y, rayTracer->scene->camera->GetForward().z);
-	screen->Print(buffer, 2, 2, 0xffffff);
+	screen->Print(buffer, 72, 2, 0xffffff);
 
 	if (rayTracer->depthOfField) sprintf(buffer, "Press F to disable depth of field. Zoom: %.2fx Focal distance: %.5f Aperture size: %.5f \n",
 		rayTracer->scene->camera->magnification, rayTracer->scene->camera->focalLength, rayTracer->scene->camera->apertureSize);
@@ -312,7 +315,7 @@ void Game::Tick(float dt)
 	else sprintf(buffer, "Press V to enable shadows.");
 	screen->Print(buffer, 2, 52, 0xffffff);
 
-	sprintf(buffer, "Pixel summed: %i. Frame count: %i", pixelCount, frameCount);
+	sprintf(buffer, "Pixel summed: %i.", pixelCount);
 	screen->Print(buffer, 2, 62, 0xffffff);
 
 	sprintf(buffer, "Click to focus. X: %i Y: %i", p.x, p.y);
