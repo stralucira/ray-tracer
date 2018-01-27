@@ -47,7 +47,14 @@ void Game::Shutdown() { }
 // -----------------------------------------------------------
 void Game::HandleInput( float dt ) { }
 
-void Game::MouseDown(int _Button) { frameCount = FRAMEMODIFIER; rayTracer->Focus(p.x, p.y); };
+void Game::MouseDown(int _Button)
+{
+	if (p.x > 0 || p.y > 0)
+	{
+		frameCount = FRAMEMODIFIER;
+		rayTracer->Focus(p.x, p.y);
+	}
+};
 
 void Game::KeyUp(int a_Key) { keyState[a_Key] = false; }
 

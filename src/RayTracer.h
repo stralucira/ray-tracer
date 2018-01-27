@@ -40,7 +40,8 @@ public:
 	vec3 Refract(vec3 dir, vec3 normal, float ior);
 	float Fresnel(vec3 dir, vec3 normal, float index);
 	vec3 GetColor(Ray* ray);
-	vec3 SampleTexturePoint(Surface* tex, vec2 uv);
+	vec3 SampleTexturePoint(Surface* texture, vec2 uv);
+	vec3 SampleTextureBilinear(Surface* texture, vec2 uv);
 	vec3 SampleSkydome(HDRBitmap* skydome, Ray* ray);
 
 	void Focus(int x, int y);

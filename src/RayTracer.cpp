@@ -529,6 +529,26 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 #pragma region surface interaction
 	// surface interaction
+	/// dissolve property from OBJ
+	if (ray->hit->material->dissolve < 1.0f)
+	{
+		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
+		bool outside = dot(ray->dir, N) < 0;
+		vec3 bias = EPSILON * ray->hit->getNormal(I);
+
+		float path = RandomFloat(&seed1);
+
+		if (path < ray->hit->material->dissolve)
+		{
+			Ray r = Ray(I, reflect(ray->dir, N));
+			return GetColor(ray) * Sample(&r, depth + 1, true) * survivePower;
+		}
+
+		Ray r = Ray(I, ray->dir);
+		return GetColor(ray) * Sample(&r, depth + 1, false) * survivePower;
+	}
+
+	/// reflection
 	if (ray->hit->material->shader == Material::Shader::MIRROR)
 	{
 		// continue in fixed direction
@@ -536,26 +556,7 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 		return GetColor(ray) * Sample(&r, depth + 1, true) * survivePower;
 	}
 
-	/*if (ray->hit->material->dissolve < 1.0f)
-	{
-		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
-		bool outside = dot(ray->dir, N) < 0;
-		vec3 bias = EPSILON * ray->hit->getNormal(I);
-		
-		float path = RandomFloat(&seed1);
-
-		if (path < 1.0f)
-		{
-			vec3 refractDir = refract(ray->dir, N, 1.0f);
-			vec3 refractOrig = outside ? I - bias : I + bias;
-			Ray r = Ray(refractOrig, refractDir);
-			return Sample(&r, depth + 1, false) * survivePower;
-		}
-
-		Ray r = Ray(I, reflect(ray->dir, N));
-		return GetColor(ray) * Sample(&r, depth + 1, true) * survivePower;
-	}*/
-	
+	/// reflection + refraction
 	if (ray->hit->material->ior > EPSILON)
 	{
 		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
@@ -617,11 +618,11 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 	vec3 Ei = BLACK;
 	if (PDF != 0)
 	{
-		Ei = (Sample(&r, depth + 1, false) * dot(N, R) / PDF) * survivePower; // irradiance
+		Ei = Sample(&r, depth + 1, false) * dot(N, R) / PDF ; // irradiance
 	}
 
 #if RR 
-	return (BRDF * Ei + Ld);
+	return BRDF * Ei * survivePower + Ld;
 #else
 	return BRDF * Ei + Ld;
 #endif
@@ -922,7 +923,8 @@ vec3 RayTracer::GetColor(Ray* ray)
 	if (ray->hit->material->texture)
 	{
 		vec2 uv = ray->hit->getTexCoord(ray);
-		return SampleTexturePoint(ray->hit->material->texture, uv);
+		//return SampleTexturePoint(ray->hit->material->texture, uv);
+		return SampleTextureBilinear(ray->hit->material->texture, uv);
 	}
 	else
 	{
@@ -930,13 +932,50 @@ vec3 RayTracer::GetColor(Ray* ray)
 	}
 }
 
-vec3 RayTracer::SampleTexturePoint(Surface* tex, vec2 uv)
+vec3 RayTracer::SampleTexturePoint(Surface* texture, vec2 uv)
 {
-	const vec2 nuv(fmodf(uv.x + 1000.0f, 1.0f), fmodf(uv.y + 1000.0f, 1.0f));
-	const int x = (int)(nuv.x * (float)(tex->GetWidth() - 1));
-	const int y = tex->GetHeight() - 1 - (int)(nuv.y * (float)(tex->GetHeight() - 1));
-	const Pixel color = tex->GetBuffer()[y * tex->GetPitch() + x];
-	return vec3((float)((color >> 16) & 0xff), (float)((color >> 8) & 0xff), (float)((color) & 0xff)) / 255.0f;
+	const vec2 nUV(fmodf(uv.x + 1000.0f, 1.0f), fmodf(uv.y + 1000.0f, 1.0f));
+	const int x = (int)(nUV.x * (float)(texture->GetWidth() - 1));
+	const int y = texture->GetHeight() - 1 - (int)(nUV.y * (float)(texture->GetHeight() - 1));
+	const Pixel color = texture->GetBuffer()[y * texture->GetPitch() + x];
+	
+	return vec3(
+		(float)((color >> 16) & 0xff),
+		(float)((color >> 8) & 0xff),
+		(float)((color) & 0xff)
+	) / 255.0f;
+}
+
+vec3 RayTracer::SampleTextureBilinear(Surface* texture, const vec2 uv) {
+	const float u = fmodf(uv.x + 1000.0f, 1.0f) * (float)texture->GetWidth() - 0.5f;
+	const float v = fmodf(uv.y + 1000.0f, 1.0f) * (float)texture->GetHeight() - 0.5f;
+	const int x = (int)u; const int y = (int)v;
+
+	const float uFrac = u - (float)x;
+	const float vFrac = v - (float)y;
+	const float invUFrac = 1 - uFrac;
+	const float invVFrac = 1 - vFrac;
+
+	const float w0 = invUFrac * invUFrac;
+	const float w1 = uFrac * invVFrac;
+	const float w2 = invVFrac * vFrac;
+	const float w3 = 1 - (w0 + w1 + w2);
+
+	const int invY = texture->GetHeight() - 1 - y;
+	const int x2 = (x + 1) % texture->GetWidth();
+	const int y2 = abs((invY - 1) % texture->GetHeight());
+	
+	const ivec4 color(
+		texture->GetBuffer()[x + invY * texture->GetPitch()],
+		texture->GetBuffer()[x2 + invY * texture->GetPitch()],
+		texture->GetBuffer()[x + y2 * texture->GetPitch()],
+		texture->GetBuffer()[x2 + y2 * texture->GetPitch()]);
+	
+	return vec3(
+		w0 * (float)((color.w >> 16) & 0xff) + w1 * (float)((color.x >> 16) & 0xff) + w2 * (float)((color.y >> 16) & 0xff) + w3 * (float)((color.z >> 16) & 0xff),
+		w0 * (float)((color.w >> 8) & 0xff) + w1 * (float)((color.x >> 8) & 0xff) + w2 * (float)((color.y >> 8) & 0xff) + w3 * (float)((color.z >> 8) & 0xff),
+		w0 * (float)((color.w) & 0xff) + w1 * (float)((color.x) & 0xff) + w2 * (float)((color.y) & 0xff) + w3 * (float)((color.z) & 0xff)
+	) / 255.0f;
 }
 
 vec3 RayTracer::SampleSkydome(HDRBitmap* skydome, Ray* ray)
@@ -950,10 +989,11 @@ vec3 RayTracer::SampleSkydome(HDRBitmap* skydome, Ray* ray)
 void RayTracer::Focus(int x, int y)
 {
 	Ray ray; scene->camera->GenerateRay(&ray, x, y);
-	this->scene->bvh->Traverse(&ray, this->scene->bvh->root);
-	if (ray.t != INFINITY)
-	{
-		scene->camera->focalLength = ray.t / scene->camera->magnification;
-		scene->camera->CalculateScreen();
-	}
+
+		this->scene->bvh->Traverse(&ray, this->scene->bvh->root);
+		if (ray.t != INFINITY)
+		{
+			scene->camera->focalLength = ray.t / scene->camera->magnification;
+			scene->camera->CalculateScreen();
+		}
 }
