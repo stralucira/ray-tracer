@@ -49,6 +49,8 @@ public:
 
 	float chiGGX(float v);
 
+	float GGX_Distribution(vec3 n, vec3 h, float alpha);
+
 	float GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha);
 	
 	bool depthRendering = false;

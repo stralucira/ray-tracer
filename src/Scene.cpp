@@ -268,8 +268,9 @@ Scene::Scene(int scene_id)
 		//primList.back()->material = new Material(vec3(0.1f, 0.3f, 0.9f), Material::Shader::MIRROR);
 
 		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 8.9f), 1.0f));
-		primList.back()->material = new Material(vec3(0.1f, 0.3f, 0.9f), Material::Shader::MIRROR);
-		primList.back()->material->shininess = 100.f;
+		primList.back()->material = new Material(vec3(0.1, 0.1, 0.1), Material::Shader::MIRROR);
+		primList.back()->material->shininess = 500.f;
+		primList.back()->material->specular = vec3(1.00, 0.71, 0.29);
 
 		//primList.push_back(new Triangle(vec3(-3, 5, -5), vec3(-3, 5, 10), vec3(3, 5, -5), 1));
 		//primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
@@ -282,19 +283,19 @@ Scene::Scene(int scene_id)
 		//primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
 
 		primList.push_back(new Triangle(vec3(3, 5, -5), vec3(3, 5, 10), vec3(3, -3, -5), 1));
-		primList.back()->material = new Material(vec3(0.4), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
 		primList.push_back(new Triangle(vec3(3, -3, -5), vec3(3, 5, 10), vec3(3, -3, 10), 1));
-		primList.back()->material = new Material(vec3(0.4), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
 
 		primList.push_back(new Triangle(vec3(-3, -3, 10), vec3(-3, -3, -5), vec3(3, -3, -5), 1));
-		primList.back()->material = new Material(vec3(0.4), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
 		primList.push_back(new Triangle(vec3(3, -3, 10), vec3(-3, -3, 10), vec3(3, -3, -5), 1));
-		primList.back()->material = new Material(vec3(0.4), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
 
 		primList.push_back(new Triangle(vec3(-3, 5, 10), vec3(-3, -3, 10), vec3(3, -3, 10), 1));
-		primList.back()->material = new Material(vec3(0.4), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
 		primList.push_back(new Triangle(vec3(3, 5, 10), vec3(-3, 5, 10), vec3(3, -3, 10), 1));
-		primList.back()->material = new Material(vec3(0.4), Material::Shader::DIFFUSE);
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
 
 		this->LoadObject("cube.obj", true);
 

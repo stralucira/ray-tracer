@@ -692,8 +692,8 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	// teriminate if ray left the scene
 	if (ray->t == INFINITY)
 	{
-		return BLACK;
-		//return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BLACK;
+		//return BLACK;
+		return this->scene->skydome ? SampleSkydome(this->scene->skydome, ray) : BACKGROUND_COLOR;
 	}
 
 	// terminate if we hit a light source
@@ -729,6 +729,46 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	vec3 N = ray->hit->getNormal(I);
 	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 
+#pragma region material interaction
+	/// reflection
+	if (ray->hit->material->shininess > EPSILON || ray->hit->material->shader == Material::Shader::MIRROR)
+	{
+		// continue in direction depending on material shininess
+		float shininess = 1.f - (ray->hit->material->shininess / 1000.f);
+		float path = RandomFloat(&seed1);
+
+		if (path < 1 - shininess)
+		{
+			vec3 R = reflect(ray->dir, N);
+			vec3 P = I + R + (CosineWeightedDiffuseReflection(R) * shininess);
+			R = normalize(P - I);
+
+			Ray r = Ray(I, R);
+			return GetColor(ray) * Sample(&r, depth + 1, true) * survivePower;
+		}
+	}
+	/// reflection + refraction
+	if (ray->hit->material->ior > EPSILON)
+	{
+		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
+		bool outside = dot(ray->dir, N) < 0;
+		vec3 bias = EPSILON * ray->hit->getNormal(I);
+
+		float path = RandomFloat(&seed1);
+
+		if (path < (1 - kr))
+		{
+			vec3 refractDir = Refract(ray->dir, N, ray->hit->material->ior);
+			vec3 refractOrig = outside ? I - bias : I + bias;
+			Ray r = Ray(refractOrig, refractDir);
+			return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
+		}
+
+		Ray r = Ray(I, reflect(ray->dir, N));
+		return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
+	}
+#pragma endregion
+
 	vec3 Ld = BLACK;
 
 	// sample a random light source
@@ -743,16 +783,24 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	Ray lr = Ray(I, L);
 	lr.t = length(randomPointOnLight - (I + L));
 
+#pragma region microfacet BRDF
 	// microfacet BRDF
 	vec3 V = -ray->dir;
-	float alpha = 1.0f;
-	vec3 kS = vec3(1.00, 0.71, 0.29);
+	float alpha = .2f;
+	vec3 kS = ray->hit->material->specular;
 	/// halfway vector
 	vec3 H = normalize(V + L);
 	/// normal distribution
-	float D = ((alpha + 2) / (2 * PI)) * pow(dot(N, H), alpha);
+	/*float D = 0.f;
+	if (dot(N, H) > EPSILON)
+	{
+	D = ((alpha + 2.0f) / (2.0f * PI) * pow(dot(N, H), alpha));
+	}*/
+	float D_GGX = GGX_Distribution(N, H, alpha);
 	/// geometry term
 	float Gdenom = dot(V, H);
+	//float G1_GGX = GGX_PartialGeometryTerm(V, N, H, alpha);
+	//float G2_GGX = GGX_PartialGeometryTerm(L, N, H, alpha);
 	float G1 = (2.0f * dot(N, H) * dot(N, V)) / Gdenom;
 	float G2 = (2.0f * dot(N, H) * dot(N, L)) / Gdenom;
 	float G = glm::min(1.0f, glm::min(G1, G2));
@@ -760,7 +808,9 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	vec3 F = kS + (vec3(1.0f) - kS) * pow((1.0f - dot(L, H)), 5.0f);
 	/// microfacet BRDF
 	float denom = 4.0f * dot(N, L) * dot(N, V);
-	vec3 mfBRDF = (F * G * D) / denom;
+	//vec3 mfBRDF = (D * G * F) / denom;
+	vec3 mfBRDF = (D_GGX * G* F) / denom;
+#pragma endregion
 
 	if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
 	{
@@ -784,7 +834,7 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	vec3 Ei = BLACK;
 	if (PDF != 0)
 	{
-		Ei = SampleEX(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance
+		Ei = Sample(&r, depth + 1, false) * dot(N, R) / PDF; // irradiance
 	}
 
 #if RR 
@@ -1000,6 +1050,15 @@ void RayTracer::Focus(int x, int y)
 float RayTracer::chiGGX(float v)
 {
 	return v > 0 ? 1 : 0;
+}
+
+float RayTracer::GGX_Distribution(vec3 n, vec3 h, float alpha)
+{
+	float NoH = dot(n, h);
+	float alpha2 = alpha * alpha;
+	float NoH2 = NoH * NoH;
+	float den = NoH2 * alpha2 + (1 - NoH2);
+	return (chiGGX(NoH) * alpha2) / (PI * den * den);
 }
 
 float RayTracer::GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha)
