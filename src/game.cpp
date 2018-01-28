@@ -28,7 +28,7 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(3); // <-- Change scene here
+	LoadScene(9); // <-- Change scene here
 	srand((glm::uint)time(NULL));
 }
 

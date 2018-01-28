@@ -39,12 +39,17 @@ public:
 	vec3 Reflect(vec3 dir, vec3 normal);
 	vec3 Refract(vec3 dir, vec3 normal, float ior);
 	float Fresnel(vec3 dir, vec3 normal, float index);
+	vec3 Fresnel_Schlick(float cosT, vec3 F0);
 	vec3 GetColor(Ray* ray);
 	vec3 SampleTexturePoint(Surface* texture, vec2 uv);
 	vec3 SampleTextureBilinear(Surface* texture, vec2 uv);
 	vec3 SampleSkydome(HDRBitmap* skydome, Ray* ray);
 
 	void Focus(int x, int y);
+
+	float chiGGX(float v);
+
+	float GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha);
 	
 	bool depthRendering = false;
 	bool depthOfField = true;
