@@ -2,7 +2,7 @@
 #include "RayTracer.h"
 #include "Sphere.h"
 
-#define RR 1
+#define RR 0
 
 int iCPU2 = omp_get_num_procs();
 glm::uint seed1 = 1219 * 49977;
@@ -590,33 +590,32 @@ vec3 RayTracer::Sample(Ray* ray, int depth, bool lastSpecular)
 
 #pragma region direct illumination
 	vec3 Ld;
-	if (scene->areaLightList.size() != 0)
+
+	// sample a random light source
+	int lightIndex = rand() % this->scene->areaLightList.size();
+	Primitive* randomLight = this->scene->areaLightList[lightIndex];
+	vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
+
+	vec3 L = normalize(randomPointOnLight - I);
+	vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
+	float dist2 = glm::length2(randomPointOnLight - I);
+
+	Ray lr = Ray(I, L);
+	lr.t = length(randomPointOnLight - (I + L));
+
+	if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
 	{
-		// sample a random light source
-		int lightIndex = rand() % this->scene->areaLightList.size();
-		Primitive* randomLight = this->scene->areaLightList[lightIndex];
-		vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
+		/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+		Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
 
-		vec3 L = normalize(randomPointOnLight - I);
-		vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
-		float dist2 = glm::length2(randomPointOnLight - I);
-
-		Ray lr = Ray(I, L);
-		lr.t = length(randomPointOnLight - (I + L));
-
-		if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
+		float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+		if (solidAngle != 0)
 		{
-			/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-			Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
-
-			float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-			if (solidAngle != 0)
-			{
-				float lightPDF = 1 / solidAngle;
-				Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
-			}
+			float lightPDF = 1 / solidAngle;
+			Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
 		}
 	}
+
 #pragma endregion
 
 	// continue random walk
@@ -730,128 +729,51 @@ vec3 RayTracer::SampleEX(Ray* ray, int depth, bool lastSpecular)
 	vec3 N = ray->hit->getNormal(I);
 	vec3 BRDF = GetColor(ray) * INVPI;	// bidirectional reflectance distribution function
 
-#pragma region surface interaction
-	// surface interaction
-	/// dissolve property from OBJ
-	if (ray->hit->material->dissolve < 1.0f)
-	{
-		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
-		bool outside = dot(ray->dir, N) < 0;
-		vec3 bias = EPSILON * ray->hit->getNormal(I);
-
-		float path = RandomFloat(&seed1);
-
-		if (path < ray->hit->material->dissolve)
-		{
-			Ray r = Ray(I, reflect(ray->dir, N));
-			return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
-		}
-
-		Ray r = Ray(I, ray->dir);
-		return GetColor(ray) * SampleEX(&r, depth + 1, false) * survivePower;
-	}
-
-	/// reflection
-	if (ray->hit->material->shininess > EPSILON || ray->hit->material->shader == Material::Shader::MIRROR)
-	{
-		// continue in direction depending on material shininess
-		float shininess = 1.f - (ray->hit->material->shininess / 1000.f);
-		float path = RandomFloat(&seed1);
-
-		if (path < 1 - shininess)
-		{
-			vec3 R = reflect(ray->dir, N);
-			vec3 P = I + R + (CosineWeightedDiffuseReflection(R) * shininess);
-			R = normalize(P - I);
-
-			Ray r = Ray(I, R);
-			return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
-		}
-	}
-
-	/// reflection + refraction
-	if (ray->hit->material->ior > EPSILON || ray->hit->material->shader == Material::Shader::GLASS)
-	{
-		float kr = Fresnel(ray->dir, N, ray->hit->material->ior);
-		bool outside = dot(ray->dir, N) < 0;
-		vec3 bias = EPSILON * ray->hit->getNormal(I);
-
-		float path = RandomFloat(&seed1);
-
-		if (path < (1 - kr))
-		{
-			vec3 refractDir = Refract(ray->dir, N, ray->hit->material->ior);
-			vec3 refractOrig = outside ? I - bias : I + bias;
-			Ray r = Ray(refractOrig, refractDir);
-			return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
-		}
-		else
-		{
-			Ray r = Ray(I, reflect(ray->dir, N));
-			return GetColor(ray) * SampleEX(&r, depth + 1, true) * survivePower;
-		}
-	}
-#pragma endregion
-
-#pragma region direct illumination
 	vec3 Ld = BLACK;
-	if (scene->areaLightList.size() != 0)
+
+	// sample a random light source
+	int lightIndex = rand() % this->scene->areaLightList.size();
+	Primitive* randomLight = this->scene->areaLightList[lightIndex];
+	vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
+
+	vec3 L = normalize(randomPointOnLight - I);
+	vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
+	float dist2 = glm::length2(randomPointOnLight - I);
+
+	Ray lr = Ray(I, L);
+	lr.t = length(randomPointOnLight - (I + L));
+
+	// microfacet BRDF
+	vec3 V = -ray->dir;
+	float alpha = 1.0f;
+	vec3 kS = vec3(1.00, 0.71, 0.29);
+	/// halfway vector
+	vec3 H = normalize(V + L);
+	/// normal distribution
+	float D = ((alpha + 2) / (2 * PI)) * pow(dot(N, H), alpha);
+	/// geometry term
+	float Gdenom = dot(V, H);
+	float G1 = (2.0f * dot(N, H) * dot(N, V)) / Gdenom;
+	float G2 = (2.0f * dot(N, H) * dot(N, L)) / Gdenom;
+	float G = glm::min(1.0f, glm::min(G1, G2));
+	/// fresnel term
+	vec3 F = kS + (vec3(1.0f) - kS) * pow((1.0f - dot(L, H)), 5.0f);
+	/// microfacet BRDF
+	float denom = 4.0f * dot(N, L) * dot(N, V);
+	vec3 mfBRDF = (F * G * D) / denom;
+
+	if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
 	{
-		// sample a random light source
-		int lightIndex = rand() % this->scene->areaLightList.size();
-		Primitive* randomLight = this->scene->areaLightList[lightIndex];
-		vec3 randomPointOnLight = randomLight->randomPointOnPrimitive(I);
+		/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+		Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
 
-		vec3 L = normalize(randomPointOnLight - I);
-		vec3 lightNormal = randomLight->getNormal(randomPointOnLight);
-		float dist2 = glm::length2(randomPointOnLight - I);
-
-		Ray lr = Ray(I, L);
-		lr.t = length(randomPointOnLight - (I + L));
-
-		if (dot(N, L) > 0 && dot(lightNormal, -L) > 0) if (Trace(&lr, true) != BLACK)
+		float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
+		if (solidAngle != 0)
 		{
-			/*float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-			Ld = (float)this->scene->areaLightList.size() * randomLight->material->diffuse * solidAngle * BRDF * dot(N, L);*/
-
-			float solidAngle = (dot(lightNormal, -L) * randomLight->calculateArea()) / dist2;
-			if (solidAngle != 0)
-			{
-				float lightPDF = 1 / solidAngle;
-				Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * BRDF * (dot(N, L) / lightPDF);
-			}
+			float lightPDF = 1 / solidAngle;
+			Ld = (float)scene->areaLightList.size() * randomLight->material->diffuse * mfBRDF * (dot(N, L) / lightPDF);
 		}
 	}
-#pragma endregion
-
-
-
-	//float ior = 1.5f;
-	//float roughness = 0.5f;
-	//// Calculate colour at normal incidence
-	//vec3 F0 = vec3(abs((1.0f - ior) / (1.0f + ior)));
-	//F0 = F0 * F0;
-	//F0 = mix(F0, ray->hit->material->diffuse, vec3(1.0f));
-	//vec3 reflectionVector = reflect(ray->dir, N);
-	//vec3 radiance = BLACK;
-	//float NoV = clamp(dot(N, ray->dir), 0.0f, 1.0f);
-	//// Generate a sample vector in some local space
-	//vec3 sampleVector = CosineWeightedDiffuseReflection(N);
-	//// Convert the vector in world space
-	//sampleVector = reflectionVector;
-	//// Calculate the half vector
-	//vec3 halfVector = normalize(sampleVector + ray->dir);
-	//float cosT = clamp(dot(sampleVector, N), 0.0f, 1.0f);
-	//float sinT = sqrt(1 - cosT * cosT);
-	//// Calculate fresnel
-	//vec3 fresnel = Fresnel_Schlick(clamp(dot(halfVector, ray->dir), 0.0f, 0.1f), F0);
-	//// Geometry term
-	//float geometry = GGX_PartialGeometryTerm(ray->dir, N, halfVector, roughness) * GGX_PartialGeometryTerm(sampleVector, N, halfVector, roughness);
-	//// Calculate the Cook-Torrance denominator
-	//float denominator = clamp(4 * (NoV * clamp(dot(halfVector, N), 0.0f, 1.0f) + 0.05f), 0.0f, 1.0f);
-	//vec3 kS = fresnel;
-	//// Accumulate the radiance
-	//radiance = geometry * fresnel * sinT / denominator;
 
 	// continue random walk
 	vec3 R = CosineWeightedDiffuseReflection(N);
