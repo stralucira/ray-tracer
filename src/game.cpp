@@ -4,7 +4,7 @@
 
 float ROTATEMODIFIER = 0.05f;
 int FRAMEMODIFIER = 0;
-POINT p;
+int px, py;
 
 Scene* scene;
 RayTracer* rayTracer;
@@ -49,11 +49,22 @@ void Game::HandleInput( float dt ) { }
 
 void Game::MouseDown(int _Button)
 {
-	if (p.x > 0 || p.y > 0)
+
+	if (px > 0 || py > 0)
 	{
 		frameCount = FRAMEMODIFIER;
-		rayTracer->Focus(p.x, p.y);
+		rayTracer->Focus((float) px, (float) py);
 	}
+
+	switch(_Button) {
+    case SDL_BUTTON_RIGHT:
+        	
+        break;
+
+    case SDL_BUTTON_LEFT:
+        //do smth
+        break;
+}
 };
 
 void Game::KeyUp(int a_Key) { keyState[a_Key] = false; }
@@ -247,8 +258,12 @@ void Game::KeyDown(int a_Key)
 // -----------------------------------------------------------
 void Game::Tick(float dt)
 {
-	GetCursorPos(&p);
-	ScreenToClient(FindWindow(NULL, "ReyTracer"), &p);
+	//GetCursorPos(&p);
+	//ScreenToClient(NSWindow(NULL, "ReyTracer"), &p);
+
+	if (SDL_GetMouseState(&px, &py) && SDL_BUTTON(SDL_BUTTON_LEFT)) {
+    	printf("Mouse Button 1 (left) is pressed at x = %d and y = %d.\n", px , py );
+	}
 
 	// Translation:
 	if (keyState[SDL_SCANCODE_W]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Surge(scene->MOVEMODIFIER); }
@@ -325,6 +340,6 @@ void Game::Tick(float dt)
 	sprintf(buffer, "Pixel summed: %i.", pixelCount);
 	screen->Print(buffer, 2, 62, 0xffffff);
 
-	sprintf(buffer, "Click to focus. X: %i Y: %i", p.x, p.y);
+	sprintf(buffer, "Click to focus. X: %i Y: %i", px, py);
 	screen->Print(buffer, 2, 72, 0xffffff);
 }

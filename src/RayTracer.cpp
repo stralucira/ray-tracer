@@ -674,7 +674,7 @@ vec3 RayTracer::SampleMIS(Ray* ray)
 		// continue random walk
 		vec3 R = CosineWeightedDiffuseReflection(N);
 		float hemiPDF = 1 / (PI * 2.0f);
-		ray = &Ray(I, R);
+		//ray = &Ray(I, R);
 		T *= (dot(N, R) / hemiPDF) * BRDF;
 	}
 	return E;
@@ -964,7 +964,7 @@ float RayTracer::Fresnel(vec3 dir, vec3 normal, float index)
 
 vec3 RayTracer::Fresnel_Schlick(float cosT, vec3 F0)
 {
-	return F0 + (1.0f - F0) * pow(1 - cosT, 5);
+	return F0 + (1.0f - F0) * pow(1.0f - cosT, 5.0f);
 }
 
 vec3 RayTracer::GetColor(Ray* ray)
