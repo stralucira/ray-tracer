@@ -19,6 +19,97 @@ Scene::Scene(int scene_id)
 
 	switch (scene_id)
 	{
+	case 0: //
+		pos = vec3(0.53f, 0.72f, -2.59f);
+		lookAt = pos + vec3(-0.34f, 0.00f, 0.94f);
+		focalLength = 2.24968f;
+		apertureSize = 0.05052f;
+		camera = new Camera(pos, lookAt, focalLength, apertureSize);
+
+		MOVEMODIFIER = 0.10f;
+
+		skydome = new HDRBitmap("equi.hdr");
+
+		lightList.push_back(new Light(vec3(0.0f, 4.7f, 7.45f), vec3(50.0f, 50.0f, 50.0f)));
+
+		/// light source
+		primList.push_back(new Triangle(vec3(-5, 4.9, 5), vec3(-5, 4.9, 9.9), vec3(0, 4.9, 5), 1, true));
+		primList.back()->material = new Material(vec3(5.0f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
+		primList.push_back(new Triangle(vec3(-5, 4.9, 9.9), vec3(0, 4.9, 9.9), vec3(0, 4.9, 5), 1, true));
+		primList.back()->material = new Material(vec3(5.0f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
+
+		/// sphere light
+		primList.push_back(new Sphere(vec3(-5.0f, 5.0f, 2.0f), 0.2f, true));
+		primList.back()->material = new Material(vec3(10.f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
+		primList.push_back(new Sphere(vec3(0.0f, 5.0f, 2.0f), 0.2f, true));
+		primList.back()->material = new Material(vec3(10.f), Material::Shader::DIFFUSE);
+		areaLightList.push_back(primList.back());
+
+		/// red glass ball
+		primList.push_back(new Sphere(vec3(-3.0f, 0.5f, 2.0f), 1.0f));
+		primList.back()->material = new Material(vec3(0.9f, 0.6f, 0.6f), Material::Shader::GLASS);
+		primList.back()->material->ior = 1.52f;
+
+		/// not so shiny blue ball 
+		primList.push_back(new Sphere(vec3(-2.0f, 0.5f, 6.0f), 1.0f));
+		primList.back()->material = new Material(vec3(0.1f, 0.3f, 0.9f), Material::Shader::MIRROR);
+		primList.back()->material->shininess = 750.f;
+
+		/// green diffuse ball
+		primList.push_back(new Sphere(vec3(0.5f, 0.5f, 4.0f), 1.0f));
+		primList.back()->material = new Material(vec3(0.3f, 0.9f, 0.3f), Material::Shader::DIFFUSE);
+
+		/// right mirror
+		primList.push_back(new Triangle(vec3(-3, 3, 7), vec3(-6, 3, 3), vec3(-6, -0.5, 3), 1));
+		primList.back()->material = new Material(vec3(0.9), Material::Shader::MIRROR);
+		primList.back()->material->shininess = 1000.f;
+		primList.push_back(new Triangle(vec3(-3, 3, 7), vec3(-6, -0.5, 3), vec3(-3, -0.5, 7), 1));
+		primList.back()->material = new Material(vec3(0.9), Material::Shader::MIRROR);
+		primList.back()->material->shininess = 1000.f;
+
+		primList.push_back(new Cylinder(vec3(-3, 3, 7), vec3(0.0f, -1.0f, 0.0f), 0.1f, 3.5f));
+		primList.back()->material = new Material(vec3(1.0f), Material::Shader::DIFFUSE);
+
+		primList.push_back(new Cylinder(vec3(-6, -0.5, 3), vec3(0.0f, 1.0f, 0.0f), 0.1f, 3.5f));
+		primList.back()->material = new Material(vec3(1.0f), Material::Shader::DIFFUSE);
+
+		/// top plane
+		primList.push_back(new Triangle(vec3(-8, 5, -5), vec3(-8, 5, 10), vec3(3, 5, -5), 1));
+		primList.back()->material = new Material(vec3(0.2), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(3, 5, -5), vec3(-8, 5, 10), vec3(3, 5, 10), 1));
+		primList.back()->material = new Material(vec3(0.2), Material::Shader::DIFFUSE);
+
+		/// right plane
+		primList.push_back(new Triangle(vec3(-8, 5, 10), vec3(-8, 5, -5), vec3(-8, -0.5, -5), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(-8, 5, 10), vec3(-8, -0.5, -5), vec3(-8, -0.5, 10), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+
+		/// left plane
+		primList.push_back(new Triangle(vec3(3, 5, -5), vec3(3, 5, 10), vec3(3, -0.5, -5), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(3, -0.5, -5), vec3(3, 5, 10), vec3(3, -0.5, 10), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+
+		/// bottom plane
+		primList.push_back(new Triangle(vec3(-8, -0.5, 10), vec3(-8, -0.5, -5), vec3(3, -0.5, -5), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(3, -0.5, 10), vec3(-8, -0.5, 10), vec3(3, -0.5, -5), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+
+		/// back plane
+		primList.push_back(new Triangle(vec3(-8, 5, 10), vec3(-8, -0.5, 10), vec3(3, -0.5, 10), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+		primList.push_back(new Triangle(vec3(3, 5, 10), vec3(-8, 5, 10), vec3(3, -0.5, 10), 1));
+		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
+
+		this->LoadObject("cube.obj", true);
+		this->LoadObject("teapot.obj", true);
+
+		break;
 	case 1: // orignal scene
 		pos = vec3(0.f, 0.f, -4.f);
 		lookAt = pos + vec3(0.0f, 0.0f, 1.0f);
@@ -151,100 +242,6 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(1411.23f, 134.46f, -1694.33f), vec3(1000.0f, 1000.0f, 1000.0f)));
 
 		this->LoadObject("x-wing.obj");
-
-		break;
-	case 4: // tie fighter scene
-		pos = vec3(88.94f, 47.57f, -175.54f);
-		lookAt = pos + vec3(0.55f, -0.38f, -0.74f);
-		camera = new Camera(pos, lookAt);
-
-		MOVEMODIFIER = 10.00f;
-
-		skydome = new HDRBitmap("space.hdr");
-
-		lightList.push_back(new Light(vec3(143.12f, 11.31f, -271.44f), vec3(200.0f, 200.0f, 200.0f)));
-		lightList.push_back(new Light(vec3(149.62f, -12.83f, -274.64f), vec3(0.0f, 200.0f, 0.0f)));
-		lightList.push_back(new Light(vec3(132.69f, 0.15f, -313.19f), vec3(100.0f, 0.0f, 0.0f)));
-		lightList.push_back(new Light(vec3(157.25f, -0.39f, -312.82f), vec3(100.0f, 0.0f, 0.0f)));
-
-		this->LoadObject("TIE-fighter.obj");
-
-		break;
-	case 5: // millennium falcon scene
-		pos = vec3(0, 1600, -6000);
-		lookAt = pos + vec3(0.0f, -0.48f, 0.88f);
-		camera = new Camera(pos, lookAt);
-
-		MOVEMODIFIER = 10.00f;
-
-		skydome = new HDRBitmap("space.hdr");
-
-		lightList.push_back(new Light(vec3(180.0f, 0.0f, -2850.0f), vec3(200.0f, 200.0f, 200.0f)));
-
-		this->LoadObject("millenium-falcon.obj");
-
-		break;
-	case 0:
-		pos = vec3(0.0f, 2.0f, -1.0f);
-		lookAt = pos + vec3(0.0f, 0.0f, 1.0f);
-		focalLength = 7.43219f;
-		apertureSize = 0.53288f;
-		camera = new Camera(pos, lookAt, focalLength, apertureSize);
-
-		MOVEMODIFIER = 0.10f;
-
-		skydome = new HDRBitmap("equi.hdr");
-
-		lightList.push_back(new Light(vec3(0.0f, 4.7f, 7.45f), vec3(50.0f, 50.0f, 50.0f)));
-
-		primList.push_back(new Triangle(vec3(-1.5, 4.9, 5), vec3(-1.5, 4.9, 9.9), vec3(1.5, 4.9, 5), 1, true));
-		primList.back()->material = new Material(vec3(10.0f), Material::Shader::DIFFUSE);
-		areaLightList.push_back(primList.back());
-		primList.push_back(new Triangle(vec3(-1.5, 4.9, 9.9), vec3(1.5, 4.9, 9.9), vec3(1.5, 4.9, 5), 1, true));
-		primList.back()->material = new Material(vec3(10.0f), Material::Shader::DIFFUSE);
-		areaLightList.push_back(primList.back());
-
-		/// red glass ball
-		primList.push_back(new Sphere(vec3(-2.0f, 2.0f, 7.0f), 1.0f));
-		primList.back()->material = new Material(vec3(0.9f, 0.6f, 0.6f), Material::Shader::GLASS);
-		primList.back()->material->ior = 1.52f;
-
-		/// not so shiny blue ball 
-		primList.push_back(new Sphere(vec3(-2.0f, 0.0f, 4.0f), 1.0f));
-		primList.back()->material = new Material(vec3(0.1f, 0.3f, 0.9f), Material::Shader::MIRROR);
-		primList.back()->material->shininess = 750.f;
-
-		/// green diffuse ball
-		primList.push_back(new Sphere(vec3(0.5f, 0.0f, 9.0f), 1.0f));
-		primList.back()->material = new Material(vec3(0.3f, 0.9f, 0.3f), Material::Shader::DIFFUSE);
-
-		primList.push_back(new Triangle(vec3(-3, 5, -5), vec3(-3, 5, 10), vec3(3, 5, -5), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);		
-		primList.push_back(new Triangle(vec3(3, 5, -5), vec3(-3, 5, 10), vec3(3, 5, 10), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-
-		primList.push_back(new Triangle(vec3(-3, 5, 10), vec3(-3, 5, -5), vec3(-3, -3, -5), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-		primList.push_back(new Triangle(vec3(-3, 5, 10), vec3(-3, -3, -5), vec3(-3, -3, 10), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-
-		primList.push_back(new Triangle(vec3(3, 5, -5), vec3(3, 5, 10), vec3(3, -3, -5), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-		primList.push_back(new Triangle(vec3(3, -3, -5), vec3(3, 5, 10), vec3(3, -3, 10), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-
-		primList.push_back(new Triangle(vec3(-3, -3, 10), vec3(-3, -3, -5), vec3(3, -3, -5), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-		primList.push_back(new Triangle(vec3(3, -3, 10), vec3(-3, -3, 10), vec3(3, -3, -5), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-
-		primList.push_back(new Triangle(vec3(-3, 5, 10), vec3(-3, -3, 10), vec3(3, -3, 10), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-		primList.push_back(new Triangle(vec3(3, 5, 10), vec3(-3, 5, 10), vec3(3, -3, 10), 1));
-		primList.back()->material = new Material(vec3(0.7), Material::Shader::DIFFUSE);
-
-		this->LoadObject("cube.obj", true);
-		this->LoadObject("teapot.obj");
 
 		break;
 	case 9:

@@ -18,7 +18,6 @@ public:
 	bool intersect(Ray* ray);
 	vec2 getTexCoord(Ray * ray);
 	bool getIsLight();
-	bool getIsTriangle() { return false; }
 	vec3 getNormal(vec3 point);
 
 	AABB* calculateAABB();

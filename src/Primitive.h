@@ -17,7 +17,6 @@ public:
 
 	virtual bool intersect(Ray* ray) = 0;
 	virtual bool getIsLight() = 0;
-	virtual bool getIsTriangle() = 0;
 	virtual vec3 getNormal(vec3 point) = 0;
 	virtual vec2 getTexCoord(Ray* ray) = 0;
 	

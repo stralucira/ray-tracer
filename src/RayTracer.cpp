@@ -60,11 +60,11 @@ int RayTracer::Render(int samples)
 
 				/*if (x < halfWidth)
 				{
-					color = Sample(&ray, 0, true);
+					color = SampleSimple(&ray, 0);
 				}
 				else
 				{
-					color = SampleSimple(&ray, 0);
+					color = Sample(&ray, 0, true);
 				}*/
 			}
 
@@ -83,10 +83,10 @@ int RayTracer::Render(int samples)
 			int b = glm::min((int)accumulator[y][x].b, 255);
 
 			// Gamma correction
-			/*float gamma = 2.2f;
+			float gamma = 1.0f;
 			r = (int)(pow((float)r / 255, 1 / gamma) * 255);
 			g = (int)(pow((float)g / 255, 1 / gamma) * 255);
-			b = (int)(pow((float)b / 255, 1 / gamma) * 255);*/
+			b = (int)(pow((float)b / 255, 1 / gamma) * 255);
 
 			pixelCount += r + g + b;
 
@@ -404,11 +404,7 @@ vec3 RayTracer::SampleSimple(Ray* ray, int depth)
 	// terminate if we hit a light source
 	if (ray->hit->getIsLight())
 	{
-		if (ray->hit->getIsTriangle())
-		{
-			/// only one side of the triangle should emmit light
-			return 0.5f * ray->hit->material->diffuse;
-		}
+		if (dot(ray->hit->getNormal(I), ray->dir) > 0.0f) return BLACK;
 		return ray->hit->material->diffuse;
 	}
 	/// Emission Le(x, ωo) (outgoing radiance), direct illumination
@@ -916,7 +912,7 @@ vec3 RayTracer::CosineWeightedDiffuseReflection(vec3 normal)
 	float r0 = RandomFloat(&seed1), r1 = RandomFloat(&seed2);
 	float r = sqrt(r0);
 	float theta = 2.0f * PI * r1;
-	float x = r * cosf(theta); //sine(theta + 2.0f * PI);
+	float x = r * cosf(theta); //sine(theta + 0.5f * PI);
 	float y = r * sinf(theta); //sine(theta);
 
 	vec3 randomDir = normalize(vec3(RandomFloat(&seed0), RandomFloat(&seed1), RandomFloat(&seed2)));
