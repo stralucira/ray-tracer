@@ -62,6 +62,12 @@ Scene::Scene(int scene_id)
 		primList.push_back(new Sphere(vec3(0.5f, 0.5f, 4.0f), 1.0f));
 		primList.back()->material = new Material(vec3(0.3f, 0.9f, 0.3f), Material::Shader::DIFFUSE);
 
+		primList.push_back(new Sphere(vec3(0.5f, 0.5f, 8.9f), 1.0f));
+		primList.back()->material = new Material(vec3(0.1, 0.1, 0.1), Material::Shader::MIRROR);
+		primList.back()->material->shininess = 50.f;
+		primList.back()->material->roughness = 0.2f;
+		primList.back()->material->specular = vec3(1.00, 0.71, 0.29);
+
 		/// right mirror
 		primList.push_back(new Triangle(vec3(-3, 3, 7), vec3(-6, 3, 3), vec3(-6, -0.5, 3), 1));
 		primList.back()->material = new Material(vec3(0.9), Material::Shader::MIRROR);

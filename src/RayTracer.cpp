@@ -60,11 +60,11 @@ int RayTracer::Render(int samples)
 
 				/*if (x < halfWidth)
 				{
-					color = SampleSimple(&ray, 0);
+					color = Sample(&ray, 0, true);
 				}
 				else
 				{
-					color = Sample(&ray, 0, true);
+					color = SampleEX(&ray, 0, true);
 				}*/
 			}
 
@@ -364,17 +364,15 @@ vec3 RayTracer::Trace(Ray* ray, bool isShadowRay)
 	{
 		float tToLight = ray->t;
 		ray->t = INFINITY;
-		this->scene->bvh->Traverse(ray, this->scene->bvh->root, true);
+		this->scene->bvh->Traverse(ray, this->scene->bvh->root);
 
 		if (ray->t < tToLight)
 		{
 			return BLACK; // false
 		}
-		else
-		{
-			return WHITE; // true
-		}
+		return WHITE;
 	}
+	
 
 	if (nearest == INFINITY)
 	{
