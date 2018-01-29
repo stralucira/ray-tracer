@@ -2,7 +2,7 @@
 #include "RayTracer.h"
 #include "Sphere.h"
 
-#define RR 1
+#define RR 0
 
 int iCPU2 = omp_get_num_procs();
 glm::uint seed0 = 2283 * 88231;

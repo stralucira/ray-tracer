@@ -21,7 +21,7 @@ void Game::Init()
 // 0 Cornell Box
 // 1 The original scene
 // 2 LEGO Han Solo, 8k triangles
-// 3 X-wing, 34k triangles
+// 3 Bespin scene
 // -----------------------------------------------------------
 // Fear is the path to the dark side
 // -----------------------------------------------------------

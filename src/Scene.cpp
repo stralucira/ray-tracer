@@ -19,7 +19,7 @@ Scene::Scene(int scene_id)
 
 	switch (scene_id)
 	{
-	case 0: //
+	case 0: // cornell box
 		pos = vec3(0.53f, 0.72f, -2.59f);
 		lookAt = pos + vec3(-0.34f, 0.00f, 0.94f);
 		focalLength = 2.24968f;
@@ -123,7 +123,7 @@ Scene::Scene(int scene_id)
 
 		MOVEMODIFIER = 0.50f;
 
-		skydome = new HDRBitmap("space.hdr");
+		skydome = new HDRBitmap("equi.hdr");
 
 		primList.push_back(new Sphere(vec3(0.f, 0.f, -10.f), .1f, true));
 		primList.back()->material = new Material(vec3(20.f, 0.f, 0.f), Material::Shader::DIFFUSE);
@@ -223,7 +223,7 @@ Scene::Scene(int scene_id)
 
 		MOVEMODIFIER = 1.00f;
 
-		skydome = new HDRBitmap("space.hdr");
+		skydome = new HDRBitmap("equi.hdr");
 
 		lightList.push_back(new Light(vec3(0.50f, 16.77f, 10.85f), vec3(200.0f, 200.0f, 200.0f)));
 		lightList.push_back(new Light(vec3(12.37f, 19.72f, 11.91f), vec3(200.0f, 200.0f, 200.0f)));
@@ -231,10 +231,12 @@ Scene::Scene(int scene_id)
 		this->LoadObject("han.obj");
 
 		break;
-	case 3: // x-wing scene
-		pos = vec3(1697.0f, 231.0f, -967.0f);
-		lookAt = pos + vec3(-0.41f, -0.24f, -0.88f);
-		camera = new Camera(pos, lookAt);
+	case 3: // bespin scene
+		pos = vec3(1284.36f, 215.31f, -1246.97f);
+		lookAt = pos + vec3(0.31f, -0.23f, -0.92f);
+		focalLength = 421.80096f;
+		apertureSize = 4.06909f;
+		camera = new Camera(pos, lookAt, focalLength, apertureSize);
 
 		MOVEMODIFIER = 10.00f;
 
@@ -247,7 +249,7 @@ Scene::Scene(int scene_id)
 		lightList.push_back(new Light(vec3(1351.50f, 112.44f, -1888.60f), vec3(1000.0f, 100.0f, 100.0f)));
 		lightList.push_back(new Light(vec3(1411.23f, 134.46f, -1694.33f), vec3(1000.0f, 1000.0f, 1000.0f)));
 
-		this->LoadObject("x-wing.obj");
+		this->LoadObject("bespin.obj");
 
 		break;
 	case 9:
