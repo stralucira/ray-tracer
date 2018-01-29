@@ -238,7 +238,7 @@ Scene::Scene(int scene_id)
 
 		MOVEMODIFIER = 10.00f;
 
-		skydome = new HDRBitmap("equi.hdr");
+		skydome = new HDRBitmap("t_sky_clouds_dawn_04_02_c.hdr");
 
 		lightList.push_back(new Light(vec3(1409.98f, 107.04f, -1637.97f), vec3(200.0f, 200.0f, 200.0f)));
 		lightList.push_back(new Light(vec3(1467.80f, 111.66f, -1881.94f), vec3(1000.0f, 100.0f, 100.0f)));
