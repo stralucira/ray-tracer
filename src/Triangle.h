@@ -60,6 +60,7 @@ public:
 	bool intersect(Ray* ray);
 	vec2 getTexCoord(Ray * ray);
 	bool getIsLight();
+	bool getIsTriangle() { return true; }
 	vec3 getNormal(vec3 point);
 
 	vec3 calculateCentroid();

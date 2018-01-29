@@ -3,7 +3,7 @@
 
 newmtl Default
 	Ns 50.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -15,7 +15,7 @@ newmtl Default
 
 newmtl GREY_ALUMINUM
 	Ns 72.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -28,7 +28,7 @@ newmtl GREY_ALUMINUM
 
 newmtl A_SHIP_WHITE
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -40,7 +40,7 @@ newmtl A_SHIP_WHITE
 
 newmtl WHITE_GENERAL
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -52,7 +52,7 @@ newmtl WHITE_GENERAL
 
 newmtl BLACK_LENS
 	Ns 16.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -64,7 +64,7 @@ newmtl BLACK_LENS
 
 newmtl BLUE_R2_D2
 	Ns 83.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -77,7 +77,7 @@ newmtl BLUE_R2_D2
 
 newmtl BLACK_THRONE
 	Ns 51.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -89,7 +89,7 @@ newmtl BLACK_THRONE
 
 newmtl BLACK_TUBE
 	Ns 16.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -101,7 +101,7 @@ newmtl BLACK_TUBE
 
 newmtl ENGINE_2
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -115,7 +115,7 @@ newmtl ENGINE_2
 
 newmtl WING_FRONT
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -129,7 +129,7 @@ newmtl WING_FRONT
 
 newmtl WING_BACK
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -143,7 +143,7 @@ newmtl WING_BACK
 
 newmtl WING_BOTT
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -157,7 +157,7 @@ newmtl WING_BOTT
 
 newmtl WING_TOP
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -171,7 +171,7 @@ newmtl WING_TOP
 
 newmtl LASER
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -185,7 +185,7 @@ newmtl LASER
 
 newmtl RED_PLSTC
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -197,7 +197,7 @@ newmtl RED_PLSTC
 
 newmtl BLUE_PLASTIC
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -209,7 +209,7 @@ newmtl BLUE_PLASTIC
 
 newmtl ENGINE
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -223,7 +223,7 @@ newmtl ENGINE
 
 newmtl INT_ENG
 	Ns 7.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -235,7 +235,7 @@ newmtl INT_ENG
 
 newmtl ORANGE_XWING
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -247,7 +247,7 @@ newmtl ORANGE_XWING
 
 newmtl XW_SIDE
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -261,7 +261,7 @@ newmtl XW_SIDE
 
 newmtl METAL_REFLEX
 	Ns 72.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -274,7 +274,7 @@ newmtl METAL_REFLEX
 
 newmtl XW_BACK
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -288,7 +288,7 @@ newmtl XW_BACK
 
 newmtl XW_TOP
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -302,7 +302,7 @@ newmtl XW_TOP
 
 newmtl XW_DOWN
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -316,7 +316,7 @@ newmtl XW_DOWN
 
 newmtl PHOTON
 	Ns 36.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -328,7 +328,7 @@ newmtl PHOTON
 
 newmtl R2_EYE
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -340,7 +340,7 @@ newmtl R2_EYE
 
 newmtl CANOPY
 	Ns 16.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -354,7 +354,7 @@ newmtl CANOPY
 
 newmtl BLUE_GLASS
 	Ns 29.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 0.2500
 	Tr 0.7500
 	Tf 0.2500 0.2500 0.2500 
@@ -366,7 +366,7 @@ newmtl BLUE_GLASS
 
 newmtl ORANGE
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -378,7 +378,7 @@ newmtl ORANGE
 
 newmtl CHROME
 	Ns 67.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -391,7 +391,7 @@ newmtl CHROME
 
 newmtl SKIN
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -403,7 +403,7 @@ newmtl SKIN
 
 newmtl GREY_MATTE
 	Ns 5.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -415,7 +415,7 @@ newmtl GREY_MATTE
 
 newmtl WHITE_SURFACE
 	Ns 5.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -427,7 +427,7 @@ newmtl WHITE_SURFACE
 
 newmtl PILOTBLACK_MATTE
 	Ns 21.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -439,7 +439,7 @@ newmtl PILOTBLACK_MATTE
 
 newmtl LT_BLUE_PLSTC
 	Ns 53.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -451,7 +451,7 @@ newmtl LT_BLUE_PLSTC
 
 newmtl BIB_BUMP_MAP
 	Ns 5.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -465,7 +465,7 @@ newmtl BIB_BUMP_MAP
 
 newmtl VISOR
 	Ns 53.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 0.5700
 	Tr 0.4300
 	Tf 0.5700 0.5700 0.5700 
@@ -477,7 +477,7 @@ newmtl VISOR
 
 newmtl REBEL_HELMET_GRY
 	Ns 0.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -491,7 +491,7 @@ newmtl REBEL_HELMET_GRY
 
 newmtl RED_DECOR
 	Ns 30.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -503,7 +503,7 @@ newmtl RED_DECOR
 
 newmtl EYE
 	Ns 50.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -515,7 +515,7 @@ newmtl EYE
 
 newmtl IRIS
 	Ns 50.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 
@@ -527,7 +527,7 @@ newmtl IRIS
 
 newmtl PUPIL
 	Ns 50.0000
-	Ni 1.5000
+	Ni 1.0000
 	d 1.0000
 	Tr 0.0000
 	Tf 1.0000 1.0000 1.0000 

@@ -431,4 +431,19 @@ inline double sine(double x)
 	return x;
 }
 
+inline glm::uint RandomInt(glm::uint* seed)
+{
+	// Marsaglia Xor32; see http://excamera.com/sphinx/article-xorshift.html
+	// also see https://github.com/WebDrake/xorshift/blob/master/xorshift.c for higher quality variants
+	*seed ^= *seed << 13;
+	*seed ^= *seed >> 17;
+	*seed ^= *seed << 5;
+	return *seed;
+}
+
+inline float RandomFloat(glm::uint* seed)
+{
+	return RandomInt(seed) * 2.3283064365387e-10f;
+}
+
 }; // namespace Tmpl8

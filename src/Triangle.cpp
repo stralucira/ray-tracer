@@ -2,6 +2,8 @@
 #include "Triangle.h"
 
 #define MOLLER_TRUMBORE
+glm::uint seed5 = 8342 * 19325;
+glm::uint seed6 = 9194 * 14384;
 
 // from https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 bool Triangle::intersect(Ray* ray)
@@ -66,8 +68,8 @@ AABB* Triangle::calculateAABB()
 vec3 Triangle::randomPointOnPrimitive(vec3 point)
 {
 	
-	float x = (float)rand() / (RAND_MAX);
-	float y = (float)rand() / (RAND_MAX);
+	float x = RandomFloat(&seed5);
+	float y = RandomFloat(&seed6);
 	if (x + y > 1)
 	{
 		x = 1 - x;
@@ -85,10 +87,4 @@ float Triangle::calculateArea()
 	float s = (ab + bc + ca) / 2;
 
 	return sqrt(s * (s - ab) * (s - bc) * (s - ca));
-
-	/*vec3 ab = normalize(b-a);
-	vec3 ac = normalize(c-a);
-	float theta = acos(dot(ab,ac));
-
-	return glm::length(distance(b,a)) * glm::length(distance(c,a)) * sin(theta) * 0.5f;*/
 }

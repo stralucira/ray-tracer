@@ -28,7 +28,7 @@ void Game::Init()
 // Fear is the path to the dark side
 // -----------------------------------------------------------
 	
-	LoadScene(9); // <-- Change scene here
+	LoadScene(0); // <-- Change scene here
 	srand((glm::uint)time(NULL));
 }
 
@@ -49,22 +49,14 @@ void Game::HandleInput( float dt ) { }
 
 void Game::MouseDown(int _Button)
 {
-
-	if (px > 0 || py > 0)
+	switch(_Button)
 	{
-		frameCount = FRAMEMODIFIER;
-		rayTracer->Focus((float) px, (float) py);
-	}
-
-	switch(_Button) {
-    case SDL_BUTTON_RIGHT:
-        	
-        break;
-
     case SDL_BUTTON_LEFT:
-        //do smth
+		frameCount = FRAMEMODIFIER;
+		rayTracer->Focus(px, py);
+		printf("Focusing on coordinate (%d, %d)\n", px, py);
         break;
-}
+	}
 };
 
 void Game::KeyUp(int a_Key) { keyState[a_Key] = false; }
@@ -134,136 +126,12 @@ void Game::KeyDown(int a_Key)
 	}
 }
 
-//	frameCount = 0;
-//	switch (a_Key)
-//	{
-//		// Scene loader, needs destructor
-//	//case SDL_SCANCODE_1:
-//	//	LoadScene(1);
-//	//	break;
-//	//case SDL_SCANCODE_2:
-//	//	LoadScene(2);
-//	//	break;
-//	//case SDL_SCANCODE_3:
-//	//	LoadScene(3);
-//	//	break;
-//
-//		// Translation:
-//	case SDL_SCANCODE_W:
-//		rayTracer->scene->camera->Surge(scene->MOVEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_A:
-//		rayTracer->scene->camera->Sway(-scene->MOVEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_S:
-//		rayTracer->scene->camera->Surge(-scene->MOVEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_D:
-//		rayTracer->scene->camera->Sway(scene->MOVEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_Q:
-//		rayTracer->scene->camera->Heave(-scene->MOVEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_E:
-//		rayTracer->scene->camera->Heave(scene->MOVEMODIFIER);
-//		break;
-//
-//		// Rotation:
-//	case SDL_SCANCODE_UP:
-//		rayTracer->scene->camera->Pitch(-ROTATEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_DOWN:
-//		rayTracer->scene->camera->Pitch(ROTATEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_LEFT:
-//		rayTracer->scene->camera->Yaw(ROTATEMODIFIER);
-//		break;
-//	case SDL_SCANCODE_RIGHT:
-//		rayTracer->scene->camera->Yaw(-ROTATEMODIFIER);
-//		break;
-//	//case SDL_SCANCODE_Z:
-//	//	rayTracer->scene->camera->Roll(-ROTATEMODIFIER);
-//	//	break;
-//	//case SDL_SCANCODE_X:
-//	//	rayTracer->scene->camera->Roll(ROTATEMODIFIER);
-//	//	break;
-//
-//		// Zooming:
-//	case SDL_SCANCODE_EQUALS:
-//		rayTracer->scene->camera->Zoom(ZOOMMODIFIER);
-//		break;
-//	case SDL_SCANCODE_MINUS:
-//		rayTracer->scene->camera->Zoom(-ZOOMMODIFIER);
-//		break;
-//
-//		// Print Camera Position:
-//	case SDL_SCANCODE_P:
-//		rayTracer->scene->camera->PrintPosition();
-//		break;
-//
-//		// Move light to current camera position
-//	case SDL_SCANCODE_L:
-//		rayTracer->scene->lightList.back()->pos = rayTracer->scene->camera->pos;
-//		break;
-//
-//		// BVH Depth rendering
-//	case SDL_SCANCODE_B:
-//		rayTracer->depthRendering = !rayTracer->depthRendering;
-//		break;
-//
-//		// Toggle Shadow
-//	case SDL_SCANCODE_V:
-//		rayTracer->renderShadow = !rayTracer->renderShadow;
-//		break;
-//
-//		// Toggle Traversal Mode
-//	case SDL_SCANCODE_T:
-//#if ENABLETOPBVH
-//		if (rayTracer->scene->bvhTop->traversalMode != 2)
-//			rayTracer->scene->bvhTop->traversalMode++;
-//		else
-//			rayTracer->scene->bvhTop->traversalMode = 0;
-//#else
-//		if (rayTracer->scene->bvh->traversalMode != 2)
-//			rayTracer->scene->bvh->traversalMode++;
-//		else
-//			rayTracer->scene->bvh->traversalMode = 0;
-//#endif
-//		break;
-//
-//		// Reset Camera Position:
-//	case SDL_SCANCODE_R:
-//		rayTracer->scene->camera->Init(rayTracer->scene->pos, rayTracer->scene->lookAt);
-//		break;
-//
-//	case SDL_SCANCODE_1:
-//		LoadScene(1);
-//		break;
-//	case SDL_SCANCODE_2:
-//		LoadScene(2);
-//		break;
-//	case SDL_SCANCODE_3:
-//		LoadScene(3);
-//		break;
-//	case SDL_SCANCODE_4:
-//		LoadScene(4);
-//		break;
-//	case SDL_SCANCODE_5:
-//		LoadScene(5);
-//		break;
-//
-
 // -----------------------------------------------------------
 // Main game tick function
 // -----------------------------------------------------------
 void Game::Tick(float dt)
 {
-	//GetCursorPos(&p);
-	//ScreenToClient(NSWindow(NULL, "ReyTracer"), &p);
-
-	if (SDL_GetMouseState(&px, &py) && SDL_BUTTON(SDL_BUTTON_LEFT)) {
-    	printf("Mouse Button 1 (left) is pressed at x = %d and y = %d.\n", px , py );
-	}
+	SDL_GetMouseState(&px, &py);
 
 	// Translation:
 	if (keyState[SDL_SCANCODE_W]) { frameCount = FRAMEMODIFIER; rayTracer->scene->camera->Surge(scene->MOVEMODIFIER); }

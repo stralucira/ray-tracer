@@ -37,9 +37,6 @@ public:
 	float focalLength;
 	float apertureSize;
 
-	glm::uint RandomInt(glm::uint* seed);
-	float RandomFloat(glm::uint* seed);
-
 	// Camera matrix
 	void SetPosition(vec3& pos)
 	{

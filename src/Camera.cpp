@@ -135,14 +135,14 @@ void Camera::GenerateRay(Ray* ray, int x, int y)
 void Camera::GenerateRayDOF(Ray* ray, int x, int y)
 {
 	/// fast rectangular plane depth of field
-	//vec3 DoF = transform * vec4(RandomFloat(&seed3) * apertureSize - apertureSize * 0.05f, RandomFloat(&seed4) * apertureSize - apertureSize * 0.05f, 0.0f, 0.f);
+	vec3 DoF = transform * vec4(RandomFloat(&seed3) * apertureSize - apertureSize * 0.05f, RandomFloat(&seed4) * apertureSize - apertureSize * 0.05f, 0.0f, 0.f);
 
 	/// fast circular plane depth of field
 	float dir = RandomFloat(&seed3) * PI * 2.f;
 	float len = RandomFloat(&seed4) * apertureSize;
 	float dof_x = len * (float)sine(double(dir + PI * 0.5f));
 	float dof_y = len * (float)sine(double(dir));
-	vec3 DoF = transform * vec4(dof_x, dof_y, 0.f, 0.f);
+	//vec3 DoF = transform * vec4(dof_x, dof_y, 0.f, 0.f);
 
 	ray->t = INFINITY;
 	ray->u = INFINITY;
@@ -151,19 +151,4 @@ void Camera::GenerateRayDOF(Ray* ray, int x, int y)
 	ray->orig = this->pos + DoF;
 	ray->dir = normalize((this->p0 + ((float)x / SCRWIDTH) * (this->p1 - this->p0) + ((float)y / SCRHEIGHT) * (this->p2 - this->p0)) - ray->orig);
 	ray->invDir = 1.0f / ray->dir;
-}
-
-glm::uint Camera::RandomInt(glm::uint* seed)
-{
-	// Marsaglia Xor32; see http://excamera.com/sphinx/article-xorshift.html
-	// also see https://github.com/WebDrake/xorshift/blob/master/xorshift.c for higher quality variants
-	*seed ^= *seed << 13;
-	*seed ^= *seed >> 17;
-	*seed ^= *seed << 5;
-	return *seed;
-}
-
-float Camera::RandomFloat(glm::uint* seed)
-{
-	return RandomInt(seed) * 2.3283064365387e-10f;
 }

@@ -4,15 +4,6 @@
 class Sphere : public Primitive
 {
 public:
-	/*Sphere(vec3 position, float radius) : Primitive(position)
-	{
-		this->radius = radius;
-		this->radius2 = radius * radius;
-		
-		this->centroid = position;
-		this->bounds = calculateAABB();
-	}*/
-
 	Sphere(vec3 position, float radius, bool isLight = false) : Primitive(position)
 	{
 		this->radius = radius;
@@ -23,12 +14,12 @@ public:
 
 		this->isLight = isLight;
 	}
-
 	~Sphere();
 
 	bool intersect(Ray* ray);
 	vec2 getTexCoord(Ray * ray);
 	bool getIsLight();
+	bool getIsTriangle() { return false; }
 	vec3 getNormal(vec3 point);
 
 	AABB* calculateAABB();

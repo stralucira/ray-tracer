@@ -32,9 +32,6 @@ public:
 	vec3 SampleEX(Ray* ray, int depth, bool secondaryRay);
 	vec3 CosineWeightedDiffuseReflection(vec3 normal);
 
-	glm::uint RandomInt(glm::uint* seed);
-	float RandomFloat(glm::uint* seed);
-
 	// Global stuff
 	vec3 Reflect(vec3 dir, vec3 normal);
 	vec3 Refract(vec3 dir, vec3 normal, float ior);
@@ -47,10 +44,9 @@ public:
 
 	void Focus(int x, int y);
 
+	// microfacet BRDF stuff
 	float chiGGX(float v);
-
 	float GGX_Distribution(vec3 n, vec3 h, float alpha);
-
 	float GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha);
 	
 	bool depthRendering = false;
